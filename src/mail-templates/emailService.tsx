@@ -1,21 +1,30 @@
 // src/EmailService.tsx
+import { render } from '@react-email/render';
 import nodemailer from 'nodemailer';
-import WelcomeEmail from './WelcomeMessage';
-import VerificationEmail from './VerificationEmail';
+
 import ForgotPasswordEmail from './ForgotPasswordEmail';
-import ReactDOMServer from 'react-dom/server';
+import VerificationEmail from './VerificationEmail';
+import WelcomeEmail from './WelcomeMessage';
 
 const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_SERVER_HOST,
   port: Number(process.env.EMAIL_SERVER_PORT),
-  secure: process.env.EMAIL_SERVER_PORT === '587',
+  secure: false, // true for 465, false for other ports
   auth: {
     user: process.env.EMAIL_SERVER_USER,
     pass: process.env.EMAIL_SERVER_PASSWORD,
   },
+  tls: {
+    rejectUnauthorized: false,
+  },
 });
+
 const sendEmail = async (to: string, subject: string, htmlContent: string) => {
   try {
+    // Verify transporter configuration
+    await transporter.verify();
+    console.log('SMTP server is ready to take our messages');
+
     const info = await transporter.sendMail({
       from: process.env.EMAIL_FROM,
       to,
@@ -23,10 +32,16 @@ const sendEmail = async (to: string, subject: string, htmlContent: string) => {
       html: htmlContent,
     });
 
-    console.log('Email sent: %s', info.messageId);
+    console.log('Email sent successfully: %s', info.messageId);
     return info;
   } catch (error) {
     console.error('Error sending email:', error);
+    console.error('SMTP Config:', {
+      host: process.env.EMAIL_SERVER_HOST,
+      port: process.env.EMAIL_SERVER_PORT,
+      user: process.env.EMAIL_SERVER_USER,
+      from: process.env.EMAIL_FROM,
+    });
     throw error;
   }
 };
@@ -34,9 +49,7 @@ const sendEmail = async (to: string, subject: string, htmlContent: string) => {
 // Function to send a Welcome email
 export const sendWelcomeEmail = async (to: string, firstName: string) => {
   const subject = 'Welcome to Our Service!';
-  const htmlContent = ReactDOMServer.renderToStaticMarkup(
-    <WelcomeEmail firstName={firstName} />
-  );
+  const htmlContent = await render(<WelcomeEmail firstName={firstName} />);
   return sendEmail(to, subject, htmlContent);
 };
 
@@ -47,7 +60,7 @@ export const sendForgotPasswordEmail = async (
   resetToken: string
 ) => {
   const subject = 'Reset Your Password';
-  const htmlContent = ReactDOMServer.renderToStaticMarkup(
+  const htmlContent = await render(
     <ForgotPasswordEmail firstName={firstName} resetToken={resetToken} />
   );
   return sendEmail(to, subject, htmlContent);
@@ -60,7 +73,7 @@ export const sendVerificationEmail = async (
   verificationToken: string
 ) => {
   const subject = 'Email Verification';
-  const htmlContent = ReactDOMServer.renderToStaticMarkup(
+  const htmlContent = await render(
     <VerificationEmail
       firstName={firstName}
       verificationToken={verificationToken}
