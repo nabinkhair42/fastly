@@ -1,10 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
-import dbConnect from '@/lib/dbConnect';
-import { createAccountSchema } from '@/zod/authValidation';
-import { sendVerificationEmail } from '@/mail-templates/emailService';
 import { generateOtp } from '@/helpers/generateOtp';
 import { hashPassword } from '@/helpers/hashPassword';
+import dbConnect from '@/lib/dbConnect';
+import { sendResponse } from '@/lib/sendResponse';
+import { sendVerificationEmail } from '@/mail-templates/emailService';
 import { UserAuthModel } from '@/models/users';
+import { createAccountSchema } from '@/zod/authValidation';
+import { NextRequest } from 'next/server';
 
 export async function POST(request: NextRequest) {
   await dbConnect();
@@ -20,7 +21,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (error) {
-      return NextResponse.json({ message: error.message }, { status: 400 });
+      return sendResponse(error.message, 400);
     }
 
     // check if user already exists
@@ -30,20 +31,15 @@ export async function POST(request: NextRequest) {
         (existingUser?.authMethod).charAt(0).toUpperCase() +
         (existingUser?.authMethod).slice(1);
 
-      return NextResponse.json(
-        {
-          message: `User already exists with ${existingUserAuthMethod} method`,
-        },
-        { status: 400 }
+      return sendResponse(
+        `User already exists with ${existingUserAuthMethod} method`,
+        400
       );
     }
 
     // check if password and confirm password match
     if (password !== confirmPassword) {
-      return NextResponse.json(
-        { message: 'Password and confirm password do not match' },
-        { status: 400 }
-      );
+      return sendResponse('Password and confirm password do not match', 400);
     }
 
     // hash password
@@ -55,26 +51,37 @@ export async function POST(request: NextRequest) {
     // generate verification code expires at
     const verificationCodeExpiresAt = new Date(Date.now() + 1000 * 60 * 5);
 
-    // create user auth
+    // Additional validation to ensure required fields are present
+    if (!firstName?.trim() || !lastName?.trim()) {
+      return sendResponse('First name and last name are required', 400);
+    }
+
+    // create user auth with temporary user details
     await UserAuthModel.create({
       email,
       password: hashedPassword,
       verificationCode,
       verificationCodeExpiresAt,
-      firstName,
+      firstName: firstName.trim(),
+      lastName: lastName.trim(),
     });
 
     // send verification email
     await sendVerificationEmail(email, firstName, verificationCode);
 
-    return NextResponse.json(
-      { message: 'User Almost Created Please Verify' },
-      { status: 201 }
+    return sendResponse(
+      'Account created successfully. Please check your email for verification code.',
+      201
     );
-  } catch {
-    return NextResponse.json(
-      { message: 'Internal Server Error' },
-      { status: 500 }
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return sendResponse('Internal Server Error', 500, null, error.message);
+    }
+    return sendResponse(
+      'Internal Server Error',
+      500,
+      null,
+      'Unknown error occurred'
     );
   }
 }

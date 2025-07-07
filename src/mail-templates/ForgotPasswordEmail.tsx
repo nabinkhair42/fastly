@@ -32,7 +32,7 @@ const ForgotPasswordEmail = ({
         >
           <Section style={{ textAlign: 'center', marginBottom: '20px' }}>
             <Img
-              src="https://yourcompany.com/logo.png"
+              src="https://www.algodocs.dev/icon.svg"
               alt="Company Logo"
               width="150"
               height="50"
@@ -63,7 +63,7 @@ const ForgotPasswordEmail = ({
             <Row style={{ marginTop: '20px', justifyContent: 'center' }}>
               <Column style={{ textAlign: 'center' }}>
                 <Link
-                  href={`https://yourcompany.com/reset-password/${resetToken}`}
+                  href={`${process.env.NEXT_PUBLIC_APP_URL}/reset-password/?token=${resetToken}`}
                   style={{
                     padding: '12px 20px',
                     backgroundColor: '#4CAF50',
@@ -87,7 +87,7 @@ const ForgotPasswordEmail = ({
             <Text
               style={{ fontSize: '12px', color: '#777', marginTop: '10px' }}
             >
-              [Company Name] | [Company Address]
+              AlgoDocs | Nepal
             </Text>
           </Section>
         </Container>

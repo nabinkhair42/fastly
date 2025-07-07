@@ -1,5 +1,5 @@
+import { User, UserAuth } from '@/types/user';
 import mongoose from 'mongoose';
-import { UserAuth, User } from '@/types/user';
 
 const authUserSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
@@ -10,14 +10,16 @@ const authUserSchema = new mongoose.Schema({
   verificationCodeExpiresAt: { type: Date, default: null },
   resetPasswordToken: { type: String, default: null },
   resetPasswordTokenExpiresAt: { type: Date, default: null },
+  // Temporary fields for account creation (moved to User model during verification)
+  firstName: { type: String, default: null },
+  lastName: { type: String, default: null },
   createdAt: { type: Date, default: Date.now, immutable: true },
   updatedAt: { type: Date, default: Date.now },
 });
 
-export const UserAuthModel = mongoose.model<UserAuth>(
-  'UserAuth',
-  authUserSchema
-);
+export const UserAuthModel =
+  mongoose.models.UserAuth ||
+  mongoose.model<UserAuth>('UserAuth', authUserSchema);
 
 const userSchema = new mongoose.Schema({
   authUser: {
@@ -37,4 +39,5 @@ const userSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now },
 });
 
-export const UserModel = mongoose.model<User>('User', userSchema);
+export const UserModel =
+  mongoose.models.User || mongoose.model<User>('User', userSchema);

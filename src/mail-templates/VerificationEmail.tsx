@@ -5,7 +5,6 @@ import {
   Head,
   Html,
   Img,
-  Link,
   Row,
   Section,
   Text,
@@ -32,7 +31,7 @@ const VerificationEmail = ({
         >
           <Section style={{ textAlign: 'center', marginBottom: '20px' }}>
             <Img
-              src="https://yourcompany.com/logo.png"
+              src="https://www.algodocs.dev/icon.svg"
               alt="Company Logo"
               width="150"
               height="50"
@@ -61,18 +60,10 @@ const VerificationEmail = ({
 
             <Row style={{ marginTop: '20px', justifyContent: 'center' }}>
               <Column style={{ textAlign: 'center' }}>
-                <Link
-                  href={`https://yourcompany.com/verify-email/${verificationToken}`}
-                  style={{
-                    padding: '12px 20px',
-                    backgroundColor: '#4CAF50',
-                    color: '#fff',
-                    textDecoration: 'none',
-                    borderRadius: '4px',
-                  }}
-                >
-                  Verify Email Address
-                </Link>
+                {/* SHOW THE OTP HERE */}
+                <Text style={{ fontSize: '16px', lineHeight: '1.5' }}>
+                  {verificationToken}
+                </Text>
               </Column>
             </Row>
 
@@ -85,7 +76,7 @@ const VerificationEmail = ({
             <Text
               style={{ fontSize: '12px', color: '#777', marginTop: '10px' }}
             >
-              [Company Name] | [Company Address]
+              AlgoDocs | Nepal
             </Text>
           </Section>
         </Container>

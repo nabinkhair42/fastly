@@ -58,6 +58,11 @@ export const verifyEmailSchema = z.object({
   verificationCode: z
     .string()
     .min(6, { message: 'Verification code must be 6 characters long' }),
+  email: z.string().email({ message: 'Invalid email address' }),
+});
+
+export const resendVerificationEmailSchema = z.object({
+  email: z.string().email({ message: 'Invalid email address' }),
 });
 
 export const forgotPasswordSchema = z.object({

@@ -1,14 +1,14 @@
 import {
-  Html,
-  Head,
   Body,
-  Container,
-  Text,
-  Img,
-  Section,
-  Row,
   Column,
+  Container,
+  Head,
+  Html,
+  Img,
   Link,
+  Row,
+  Section,
+  Text,
 } from '@react-email/components';
 
 const WelcomeEmail = ({ firstName }: { firstName: string }) => {
@@ -26,7 +26,7 @@ const WelcomeEmail = ({ firstName }: { firstName: string }) => {
         >
           <Section style={{ textAlign: 'center', marginBottom: '20px' }}>
             <Img
-              src="https://yourcompany.com/logo.png"
+              src="https://www.algodocs.dev/icon.svg"
               alt="Company Logo"
               width="150"
               height="50"
@@ -81,7 +81,7 @@ const WelcomeEmail = ({ firstName }: { firstName: string }) => {
             <Text
               style={{ fontSize: '12px', color: '#777', marginTop: '10px' }}
             >
-              [Company Name] | [Company Address]
+              AlgoDocs | Nepal
             </Text>
           </Section>
         </Container>

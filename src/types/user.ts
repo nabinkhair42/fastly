@@ -31,6 +31,7 @@ export interface UserAuth {
   id: string;
   email: string;
   firstName: string;
+  lastName: string;
   password: string;
   isVerified: boolean;
   authMethod: AuthMethod;

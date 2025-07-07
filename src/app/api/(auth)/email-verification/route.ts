@@ -1,27 +1,28 @@
-import { NextRequest, NextResponse } from 'next/server';
-import dbConnect from '@/lib/dbConnect';
-import { verifyEmailSchema } from '@/zod/authValidation';
 import { generateJwtToken } from '@/helpers/jwtToken';
+import dbConnect from '@/lib/dbConnect';
+import { sendResponse } from '@/lib/sendResponse';
 import { sendWelcomeEmail } from '@/mail-templates/emailService';
-import { UserModel, UserAuthModel } from '@/models/users';
+import { UserAuthModel, UserModel } from '@/models/users';
+import { verifyEmailSchema } from '@/zod/authValidation';
+import { NextRequest } from 'next/server';
 
 export async function POST(request: NextRequest) {
   await dbConnect();
   try {
-    const { verificationCode } = await request.json();
-    const { error } = verifyEmailSchema.safeParse({ verificationCode });
+    const { verificationCode, email } = await request.json();
+    const { error } = verifyEmailSchema.safeParse({ verificationCode, email });
 
     if (error) {
-      return NextResponse.json({ message: error.message }, { status: 400 });
+      return sendResponse(error.message, 400);
     }
 
-    // check if verification code is valid
-    const userAuth = await UserAuthModel.findOne({ verificationCode });
+    // ✅ SECURE - Check both email AND verification code
+    const userAuth = await UserAuthModel.findOne({
+      email,
+      verificationCode,
+    });
     if (!userAuth) {
-      return NextResponse.json(
-        { message: 'Invalid verification code' },
-        { status: 400 }
-      );
+      return sendResponse('Invalid verification code or email', 400);
     }
 
     // check if verification code has expired
@@ -29,41 +30,51 @@ export async function POST(request: NextRequest) {
       userAuth.verificationCodeExpiresAt &&
       userAuth.verificationCodeExpiresAt < new Date()
     ) {
-      return NextResponse.json(
-        { message: 'Verification code has expired' },
-        { status: 400 }
-      );
+      return sendResponse('Verification code has expired', 400);
     }
 
     // check if user is already verified
     if (userAuth.isVerified) {
-      return NextResponse.json(
-        { message: 'User already verified' },
-        { status: 400 }
+      return sendResponse('User already verified', 400);
+    }
+
+    // Validate that required user data exists
+    if (!userAuth.firstName || !userAuth.lastName) {
+      return sendResponse(
+        'Account creation failed: Missing required user information. Please create account again.',
+        400
       );
     }
 
-    // verify user
+    // create user with data from userAuth
+    await UserModel.create({
+      authUser: userAuth._id,
+      firstName: userAuth.firstName,
+      lastName: userAuth.lastName,
+      email: userAuth.email,
+      username: `${userAuth.firstName.toLowerCase()}_${Date.now()}`, // Generate temporary username
+    });
+
+    // verify user and clear verification data
     userAuth.isVerified = true;
+    userAuth.verificationCode = null;
+    userAuth.verificationCodeExpiresAt = null;
+    // Clear temporary fields after moving to User model
+    userAuth.firstName = null;
+    userAuth.lastName = null;
     await userAuth.save();
 
-    // create user
-    await UserModel.create({ authUser: userAuth._id });
-
     // generate jwt token
+    // TODO: Consider using httpOnly cookies for better security
     const jwtToken = generateJwtToken({ userId: userAuth._id });
 
     // send welcome email
     await sendWelcomeEmail(userAuth.email, jwtToken);
 
-    return NextResponse.json(
-      { message: 'User verified successfully', jwtToken },
-      { status: 200 }
-    );
-  } catch {
-    return NextResponse.json(
-      { message: 'Internal Server Error' },
-      { status: 500 }
-    );
+    return sendResponse('Email verified successfully', 200, { jwtToken });
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error occurred';
+    return sendResponse('Internal Server Error', 500, null, errorMessage);
   }
 }

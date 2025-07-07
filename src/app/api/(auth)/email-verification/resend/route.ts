@@ -1,32 +1,30 @@
-import { NextRequest, NextResponse } from 'next/server';
-import dbConnect from '@/lib/dbConnect';
-import { verifyEmailSchema } from '@/zod/authValidation';
 import { generateOtp } from '@/helpers/generateOtp';
-import { UserAuthModel } from '@/models/users';
+import dbConnect from '@/lib/dbConnect';
+import { sendResponse } from '@/lib/sendResponse';
 import { sendVerificationEmail } from '@/mail-templates/emailService';
+import { UserAuthModel } from '@/models/users';
+import { resendVerificationEmailSchema } from '@/zod/authValidation';
+import { NextRequest } from 'next/server';
 
 export async function POST(req: NextRequest) {
   await dbConnect();
   try {
     const { email } = await req.json();
-    const { error } = verifyEmailSchema.safeParse({ email });
+    const { error } = resendVerificationEmailSchema.safeParse({ email });
 
     if (error) {
-      return NextResponse.json({ message: error.message }, { status: 400 });
+      return sendResponse(error.message, 400);
     }
 
     // check if user exists
     const userAuth = await UserAuthModel.findOne({ email });
     if (!userAuth) {
-      return NextResponse.json({ message: 'User not found' }, { status: 404 });
+      return sendResponse('User not found', 404);
     }
 
     // check if user is already verified
     if (userAuth.isVerified) {
-      return NextResponse.json(
-        { message: 'User already verified' },
-        { status: 400 }
-      );
+      return sendResponse('User already verified', 400);
     }
 
     // generate verification code
@@ -47,14 +45,10 @@ export async function POST(req: NextRequest) {
       verificationCode
     );
 
-    return NextResponse.json(
-      { message: 'Verification code sent to email' },
-      { status: 200 }
-    );
-  } catch {
-    return NextResponse.json(
-      { message: 'Internal Server Error' },
-      { status: 500 }
-    );
+    return sendResponse('Verification code sent to email', 200);
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error occurred';
+    return sendResponse('Internal Server Error', 500, null, errorMessage);
   }
 }
