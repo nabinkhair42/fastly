@@ -1,16 +1,15 @@
-// src/emails/ForgotPasswordEmail.tsx
 import {
-  Html,
-  Head,
   Body,
-  Container,
-  Text,
-  Image,
-  Section,
-  Row,
   Column,
+  Container,
+  Head,
+  Html,
+  Img,
   Link,
-} from '@react-email/react';
+  Row,
+  Section,
+  Text,
+} from '@react-email/components';
 
 const ForgotPasswordEmail = ({
   firstName,
@@ -32,7 +31,7 @@ const ForgotPasswordEmail = ({
           }}
         >
           <Section style={{ textAlign: 'center', marginBottom: '20px' }}>
-            <Image
+            <Img
               src="https://yourcompany.com/logo.png"
               alt="Company Logo"
               width="150"

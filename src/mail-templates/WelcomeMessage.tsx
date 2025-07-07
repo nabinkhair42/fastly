@@ -1,16 +1,15 @@
-// src/emails/WelcomeEmail.tsx
 import {
   Html,
   Head,
   Body,
   Container,
   Text,
-  Image,
+  Img,
   Section,
   Row,
   Column,
   Link,
-} from '@react-email/react';
+} from '@react-email/components';
 
 const WelcomeEmail = ({ firstName }: { firstName: string }) => {
   return (
@@ -26,7 +25,7 @@ const WelcomeEmail = ({ firstName }: { firstName: string }) => {
           }}
         >
           <Section style={{ textAlign: 'center', marginBottom: '20px' }}>
-            <Image
+            <Img
               src="https://yourcompany.com/logo.png"
               alt="Company Logo"
               width="150"
