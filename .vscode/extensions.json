@@ -6,6 +6,8 @@
     "ms-vscode.vscode-typescript-next",
     "formulahendry.auto-rename-tag",
     "christian-kohler.path-intellisense",
-    "ms-vscode.vscode-json"
+    "ms-vscode.vscode-json",
+    "nabinkhair.vtheme"
+
   ]
 } 

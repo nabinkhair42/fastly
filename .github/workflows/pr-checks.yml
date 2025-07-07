@@ -1,0 +1,108 @@
+name: Pull Request Checks
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+jobs:
+  pr-validation:
+    name: PR Validation
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.x
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check for changes in specific directories
+        id: changes
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            api:
+              - 'src/app/api/**'
+            components:
+              - 'src/components/**'
+            models:
+              - 'src/models/**'
+            auth:
+              - 'src/app/api/(auth)/**'
+            email:
+              - 'src/mail-templates/**'
+
+      - name: Lint changed files
+        run: pnpm lint
+
+      - name: Check formatting
+        run: pnpm format:check
+
+      - name: Type check
+        run: pnpm exec tsc --noEmit
+
+      - name: Build check
+        run: pnpm build
+
+      - name: Check PR size
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: files } = await github.rest.pulls.listFiles({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+            });
+
+            const additions = files.reduce((sum, file) => sum + file.additions, 0);
+            const deletions = files.reduce((sum, file) => sum + file.deletions, 0);
+            const changes = additions + deletions;
+
+            let sizeLabel = '';
+            if (changes < 100) sizeLabel = 'size/small';
+            else if (changes < 500) sizeLabel = 'size/medium';
+            else if (changes < 1000) sizeLabel = 'size/large';
+            else sizeLabel = 'size/xl';
+
+            // Add size label
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              labels: [sizeLabel]
+            });
+
+      - name: Auto-assign labels based on changes
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const labels = [];
+
+            if ('${{ steps.changes.outputs.api }}' === 'true') labels.push('api');
+            if ('${{ steps.changes.outputs.components }}' === 'true') labels.push('frontend');
+            if ('${{ steps.changes.outputs.models }}' === 'true') labels.push('database');
+            if ('${{ steps.changes.outputs.auth }}' === 'true') labels.push('authentication');
+            if ('${{ steps.changes.outputs.email }}' === 'true') labels.push('email');
+
+            if (labels.length > 0) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                labels: labels
+              });
+            }

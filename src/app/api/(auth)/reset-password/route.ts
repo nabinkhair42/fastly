@@ -8,7 +8,7 @@ import { NextRequest } from 'next/server';
 export async function POST(request: NextRequest) {
   await dbConnect();
   try {
-    const { password, confirmPassword } = await request.json();
+    const { email, password, confirmPassword } = await request.json();
     const resetPasswordToken = request.headers.get('Authorization');
 
     if (!resetPasswordToken) {
@@ -24,9 +24,13 @@ export async function POST(request: NextRequest) {
       return sendResponse(error.message, 400);
     }
 
-    // check if reset password token is valid
-    const userAuth = await UserAuthModel.findOne({ resetPasswordToken });
+    // check if user exists
+    const userAuth = await UserAuthModel.findOne({ email });
     if (!userAuth) {
+      return sendResponse('User not found. Please sign up first.', 404);
+    }
+    // check if reset password token is valid
+    if (userAuth.resetPasswordToken !== resetPasswordToken) {
       return sendResponse('Invalid or expired reset password token', 400);
     }
 

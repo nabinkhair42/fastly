@@ -1,0 +1,20 @@
+{
+  "framework": "nextjs",
+  "buildCommand": "pnpm build",
+  "devCommand": "pnpm dev",
+  "installCommand": "pnpm install --frozen-lockfile",
+  "regions": ["iad1"],
+  "functions": {
+    "src/app/api/**": {
+      "maxDuration": 30
+    }
+  },
+  "env": {
+    "PNPM_VERSION": "10.x"
+  },
+  "build": {
+    "env": {
+      "NODE_ENV": "production"
+    }
+  }
+}
