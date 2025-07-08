@@ -1,5 +1,5 @@
 import { verifyPassword } from '@/helpers/hashPassword';
-import { generateJwtToken } from '@/helpers/jwtToken';
+import { generateTokenPair } from '@/helpers/jwtToken';
 import dbConnect from '@/lib/dbConnect';
 import { sendResponse } from '@/lib/sendResponse';
 import { UserAuthModel } from '@/models/users';
@@ -36,12 +36,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // generate jwt token
-    // TODO: Consider using httpOnly cookies for better security
-    const jwtToken = generateJwtToken({ userId: userAuth._id });
+    // generate secure token pair
+    const tokens = generateTokenPair(userAuth._id.toString(), userAuth.email);
 
     return sendResponse('Login successful', 200, {
-      jwtToken,
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
       user: {
         id: userAuth._id,
         email: userAuth.email,

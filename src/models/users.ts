@@ -35,6 +35,7 @@ const userSchema = new mongoose.Schema({
   location: { type: Object, default: null },
   socialAccounts: { type: Array, default: [] },
   bio: { type: String, default: null },
+  hasChangedUsername: { type: Boolean, default: false }, // Track if username has been changed
   createdAt: { type: Date, default: Date.now, immutable: true },
   updatedAt: { type: Date, default: Date.now },
 });

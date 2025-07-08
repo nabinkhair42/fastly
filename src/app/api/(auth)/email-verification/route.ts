@@ -1,4 +1,4 @@
-import { generateJwtToken } from '@/helpers/jwtToken';
+import { generateTokenPair } from '@/helpers/jwtToken';
 import dbConnect from '@/lib/dbConnect';
 import { sendResponse } from '@/lib/sendResponse';
 import { sendWelcomeEmail } from '@/mail-templates/emailService';
@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
       return sendResponse(error.message, 400);
     }
 
-    // ✅ SECURE - Check both email AND verification code
+    // Check both email AND verification code
     const userAuth = await UserAuthModel.findOne({
       email,
       verificationCode,
@@ -64,14 +64,21 @@ export async function POST(request: NextRequest) {
     userAuth.lastName = null;
     await userAuth.save();
 
-    // generate jwt token
-    // TODO: Consider using httpOnly cookies for better security
-    const jwtToken = generateJwtToken({ userId: userAuth._id });
+    // generate secure token pair
+    const tokens = generateTokenPair(userAuth._id.toString(), userAuth.email);
 
     // send welcome email
-    await sendWelcomeEmail(userAuth.email, jwtToken);
+    await sendWelcomeEmail(userAuth.email, tokens.accessToken);
 
-    return sendResponse('Email verified successfully', 200, { jwtToken });
+    return sendResponse('Email verified successfully', 200, {
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
+      user: {
+        id: userAuth._id,
+        email: userAuth.email,
+        isVerified: userAuth.isVerified,
+      },
+    });
   } catch (error: unknown) {
     const errorMessage =
       error instanceof Error ? error.message : 'Unknown error occurred';

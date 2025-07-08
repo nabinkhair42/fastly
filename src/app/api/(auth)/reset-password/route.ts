@@ -2,20 +2,19 @@ import { hashPassword } from '@/helpers/hashPassword';
 import dbConnect from '@/lib/dbConnect';
 import { sendResponse } from '@/lib/sendResponse';
 import { UserAuthModel } from '@/models/users';
-import { resetPasswordSchema } from '@/zod/authValidation';
+import { resetPasswordRequestSchema } from '@/zod/authValidation';
 import { NextRequest } from 'next/server';
 
 export async function POST(request: NextRequest) {
   await dbConnect();
   try {
-    const { email, password, confirmPassword } = await request.json();
-    const resetPasswordToken = request.headers.get('Authorization');
+    const { email, resetToken, password, confirmPassword } =
+      await request.json();
 
-    if (!resetPasswordToken) {
-      return sendResponse('Reset password token is required', 400);
-    }
-
-    const { error } = resetPasswordSchema.safeParse({
+    // Validate request body
+    const { error } = resetPasswordRequestSchema.safeParse({
+      email,
+      resetToken,
       password,
       confirmPassword,
     });
@@ -29,8 +28,9 @@ export async function POST(request: NextRequest) {
     if (!userAuth) {
       return sendResponse('User not found. Please sign up first.', 404);
     }
+
     // check if reset password token is valid
-    if (userAuth.resetPasswordToken !== resetPasswordToken) {
+    if (userAuth.resetPasswordToken !== resetToken) {
       return sendResponse('Invalid or expired reset password token', 400);
     }
 
@@ -54,6 +54,7 @@ export async function POST(request: NextRequest) {
     userAuth.password = hashedPassword;
     userAuth.resetPasswordToken = null;
     userAuth.resetPasswordTokenExpiresAt = null;
+    userAuth.updatedAt = new Date();
     await userAuth.save();
 
     return sendResponse('Password reset successfully', 200);
