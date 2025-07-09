@@ -8,7 +8,7 @@ export default function AuthLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { shouldShow, isLoading } = useRedirectIfAuthenticated('/users');
+  const { shouldShow, isLoading } = useRedirectIfAuthenticated('/dashboard');
 
   if (isLoading) {
     return <ScreenLoader />;

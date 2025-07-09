@@ -64,7 +64,7 @@ export const useAuthRedirect = (userDetails: unknown) => {
   useEffect(() => {
     if (!isLoading && isAuthenticated && userDetails) {
       // Always redirect to dashboard
-      router.push('/users');
+      router.push('/dashboard');
     }
   }, [isAuthenticated, isLoading, userDetails, router]);
 

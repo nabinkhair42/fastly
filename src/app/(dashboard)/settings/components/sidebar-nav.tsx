@@ -10,6 +10,7 @@ interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {
   items: {
     href: string;
     title: string;
+    icon: React.ReactNode;
   }[];
 }
 
@@ -35,6 +36,7 @@ export function SidebarNav({ className, items, ...props }: SidebarNavProps) {
           )}
         >
           <Link key={item.href} href={item.href}>
+            <div className="flex items-center gap-2">{item.icon}</div>
             {item.title}
           </Link>
         </Button>

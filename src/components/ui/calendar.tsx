@@ -1,21 +1,21 @@
 'use client';
 
-import * as React from 'react';
 import {
   ChevronDownIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
 } from 'lucide-react';
+import * as React from 'react';
 import { DayButton, DayPicker, getDefaultClassNames } from 'react-day-picker';
 
-import { cn } from '@/lib/utils';
 import { Button, buttonVariants } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 function Calendar({
   className,
   classNames,
   showOutsideDays = true,
-  captionLayout = 'label',
+  captionLayout = 'dropdown',
   buttonVariant = 'ghost',
   formatters,
   components,
@@ -66,16 +66,16 @@ function Calendar({
           defaultClassNames.month_caption
         ),
         dropdowns: cn(
-          'w-full flex items-center text-sm font-medium justify-center h-(--cell-size) gap-1.5',
+          'w-full flex items-center text-sm font-medium justify-center h-(--cell-size) gap-2',
           defaultClassNames.dropdowns
         ),
-        dropdown_root: cn(
-          'relative has-focus:border-ring border border-input shadow-xs has-focus:ring-ring/50 has-focus:ring-[3px] rounded-md',
-          defaultClassNames.dropdown_root
-        ),
         dropdown: cn(
-          'absolute bg-popover inset-0 opacity-0',
+          'absolute bg-popover inset-0 opacity-0 border border-input rounded-md shadow-md text-sm',
           defaultClassNames.dropdown
+        ),
+        dropdown_root: cn(
+          'relative has-focus:border-ring border border-input shadow-md has-focus:ring-ring/50 has-focus:ring-[3px] rounded-md bg-background hover:bg-accent transition-colors',
+          defaultClassNames.dropdown_root
         ),
         caption_label: cn(
           'select-none font-medium',
@@ -165,6 +165,7 @@ function Calendar({
             </td>
           );
         },
+
         ...components,
       }}
       {...props}

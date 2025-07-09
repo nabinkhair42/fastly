@@ -84,7 +84,7 @@ export const updateUserDetailsSchema = z.object({
   dob: z.date().optional(),
 });
 
-// Schema for profile form with URLs
+// Schema for profile form with social accounts
 export const profileFormSchema = z.object({
   firstName: z
     .string()
@@ -111,13 +111,15 @@ export const profileFormSchema = z.object({
     .string()
     .max(200, { message: 'Bio must be less than 200 characters' })
     .optional(),
-  urls: z
+  socialAccounts: z
     .array(
       z.object({
-        value: z.string().url({ message: 'Please enter a valid URL' }),
+        provider: z.string().min(1, { message: 'Provider is required' }),
+        url: z.string().url({ message: 'Please enter a valid URL' }),
       })
     )
     .optional(),
+  dob: z.date().optional(),
 });
 
 // Schema for user account deletion

@@ -46,7 +46,7 @@ export default function LoginPage() {
     try {
       await loginMutation.mutateAsync(data);
       // Redirect to users page after successful login
-      router.push('/users');
+      router.push('/dashboard');
     } catch (error) {
       console.error(error);
     }

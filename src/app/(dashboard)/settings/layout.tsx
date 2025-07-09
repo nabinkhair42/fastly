@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 
+import { Fingerprint, Settings, UserCheck2Icon, UserPen } from 'lucide-react';
 import { SidebarNav } from './components/sidebar-nav';
 
 export const metadata: Metadata = {
@@ -9,14 +10,22 @@ export const metadata: Metadata = {
 
 const sidebarNavItems = [
   {
+    icon: <Settings className="h-4 w-4" />,
     title: 'Profile',
     href: '/settings',
   },
   {
+    icon: <UserPen className="h-4 w-4" />,
+    title: 'Edit Profile',
+    href: '/settings/edit-profile',
+  },
+  {
+    icon: <UserCheck2Icon className="h-4 w-4" />,
     title: 'Account',
     href: '/settings/account',
   },
   {
+    icon: <Fingerprint className="h-4 w-4" />,
     title: 'Change Password',
     href: '/settings/change-password',
   },

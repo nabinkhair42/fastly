@@ -38,31 +38,29 @@ export default function UsersPage() {
               ) : (
                 <div className="space-y-4">
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Name</p>
-                    <p className="text-sm text-gray-900">
+                    <p className="text-sm font-medium ">Name</p>
+                    <p className="text-sm text-muted-foreground">
                       {userDetails?.data.user.firstName}{' '}
                       {userDetails?.data.user.lastName}
                     </p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-500">
-                      Username
-                    </p>
-                    <p className="text-sm text-gray-900">
+                    <p className="text-sm font-medium ">Username</p>
+                    <p className="text-sm text-muted-foreground">
                       @{userDetails?.data.user.username}
                     </p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Email</p>
-                    <p className="text-sm text-gray-900 flex items-center">
+                    <p className="text-sm font-medium ">Email</p>
+                    <p className="text-sm text-muted-foreground flex items-center">
                       <Mail className="h-4 w-4 mr-1" />
                       {userDetails?.data.user.email}
                     </p>
                   </div>
                   {userDetails?.data.user.bio && (
                     <div>
-                      <p className="text-sm font-medium text-gray-500">Bio</p>
-                      <p className="text-sm text-gray-900">
+                      <p className="text-sm font-medium ">Bio</p>
+                      <p className="text-sm text-muted-foreground">
                         {userDetails.data.user.bio}
                       </p>
                     </div>
@@ -84,22 +82,20 @@ export default function UsersPage() {
             <CardContent>
               <div className="space-y-4">
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-500">Status</span>
+                  <span className="text-sm ">Status</span>
                   <span className="text-sm font-medium text-green-600">
                     Active
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-500">Email Verified</span>
+                  <span className="text-sm ">Email Verified</span>
                   <span className="text-sm font-medium text-green-600">
                     ✓ Yes
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-500">
-                    Username Changes
-                  </span>
-                  <span className="text-sm font-medium text-gray-900">
+                  <span className="text-sm ">Username Changes</span>
+                  <span className="text-sm font-medium text-muted-foreground">
                     {userDetails?.data.user.username ? '1/1' : '0/1'}
                   </span>
                 </div>
@@ -139,7 +135,7 @@ export default function UsersPage() {
         <Card className="mt-8">
           <CardContent className="pt-6">
             <div className="text-center py-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">
+              <h2 className="text-2xl font-bold text-muted-foreground mb-2">
                 Welcome to Your Dashboard!
               </h2>
               <p className="text-gray-600 mb-4">

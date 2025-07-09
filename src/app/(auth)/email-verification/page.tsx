@@ -46,7 +46,7 @@ export default function EmailVerificationPage() {
   const verifyEmailMutation = useVerifyEmail(() => {
     // This callback runs after auth state is updated
     // Redirect to dashboard after successful verification
-    router.push('/users');
+    router.push('/dashboard');
   });
   const resendVerificationMutation = useResendVerification();
 
