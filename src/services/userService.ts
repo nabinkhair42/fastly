@@ -5,7 +5,7 @@ import {
   DeleteUserRequest,
   UpdateUserDetailsRequest,
   UserDetailsResponse,
-} from '@/types/user';
+} from '@/types/api';
 
 // User Service Functions
 export const userService = {

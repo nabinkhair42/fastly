@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-import { buttonVariants } from '@/components/ui/button';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {
@@ -19,25 +19,25 @@ export function SidebarNav({ className, items, ...props }: SidebarNavProps) {
   return (
     <nav
       className={cn(
-        'flex space-x-2 lg:flex-col lg:space-x-0 lg:space-y-1',
+        'flex flex-row space-x-2 lg:flex-col lg:space-x-0 lg:space-y-1 p-2',
         className
       )}
       {...props}
     >
       {items.map(item => (
-        <Link
+        <Button
+          asChild
           key={item.href}
-          href={item.href}
+          variant={'ghost'}
           className={cn(
-            buttonVariants({ variant: 'ghost' }),
-            pathname === item.href
-              ? 'bg-muted hover:bg-muted'
-              : 'hover:bg-transparent hover:underline',
-            'justify-start'
+            'text-left justify-start text-sm',
+            pathname === item.href && 'bg-primary/10 hover:bg-primary/15'
           )}
         >
-          {item.title}
-        </Link>
+          <Link key={item.href} href={item.href}>
+            {item.title}
+          </Link>
+        </Button>
       ))}
     </nav>
   );

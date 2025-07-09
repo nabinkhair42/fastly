@@ -67,6 +67,14 @@ export const updateUserDetailsSchema = z.object({
     .string()
     .max(200, { message: 'Bio must be less than 200 characters' })
     .optional(),
+  socialAccounts: z
+    .array(
+      z.object({
+        url: z.string().url({ message: 'Please enter a valid URL' }),
+        provider: z.string().optional(),
+      })
+    )
+    .optional(),
   preferences: z
     .object({
       theme: z.string().optional(),
@@ -74,6 +82,42 @@ export const updateUserDetailsSchema = z.object({
     })
     .optional(),
   dob: z.date().optional(),
+});
+
+// Schema for profile form with URLs
+export const profileFormSchema = z.object({
+  firstName: z
+    .string()
+    .min(1, { message: 'First name is required' })
+    .max(20, { message: 'First name must be less than 20 characters' }),
+  lastName: z
+    .string()
+    .min(1, { message: 'Last name is required' })
+    .max(20, { message: 'Last name must be less than 20 characters' }),
+  username: z
+    .string()
+    .min(1, { message: 'Username is required' })
+    .max(20, { message: 'Username must be less than 20 characters' })
+    .refine(
+      username => {
+        const usernameRegex = /^[a-zA-Z0-9_]+$/;
+        return usernameRegex.test(username);
+      },
+      {
+        message: 'Username must contain only letters, numbers, and underscores',
+      }
+    ),
+  bio: z
+    .string()
+    .max(200, { message: 'Bio must be less than 200 characters' })
+    .optional(),
+  urls: z
+    .array(
+      z.object({
+        value: z.string().url({ message: 'Please enter a valid URL' }),
+      })
+    )
+    .optional(),
 });
 
 // Schema for user account deletion
@@ -109,4 +153,10 @@ export const changePasswordSchema = z.object({
     .string()
     .min(8, { message: 'Confirm password must be at least 8 characters long' })
     .max(255, { message: 'Confirm password must be less than 255 characters' }),
+});
+
+// Schema for account preferences
+export const accountPreferencesSchema = z.object({
+  theme: z.enum(['light', 'dark']),
+  font: z.enum(['sans', 'serif', 'mono']),
 });

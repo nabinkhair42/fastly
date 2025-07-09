@@ -2,7 +2,7 @@ import { requireAuth } from '@/lib/authMiddleware';
 import dbConnect from '@/lib/dbConnect';
 import { sendResponse } from '@/lib/sendResponse';
 import { UserModel } from '@/models/users';
-import { UpdateUserDetailsRequest } from '@/types/user';
+import { UpdateUserDetailsRequest } from '@/types/api';
 import { updateUserDetailsSchema } from '@/zod/usersUpdate';
 import { NextRequest } from 'next/server';
 
@@ -31,6 +31,7 @@ export async function GET(request: NextRequest) {
         bio: user.bio,
         preferences: user.preferences,
         dob: user.dob,
+        hasChangedUsername: user.hasChangedUsername,
       },
     });
   } catch (error: unknown) {
@@ -48,7 +49,8 @@ export async function POST(request: NextRequest) {
       return authResult.response;
     }
 
-    const { firstName, lastName, bio, preferences, dob } = await request.json();
+    const { firstName, lastName, bio, socialAccounts, preferences, dob } =
+      await request.json();
 
     // Validate request body
     const { error } = updateUserDetailsSchema.safeParse({
@@ -79,6 +81,9 @@ export async function POST(request: NextRequest) {
     if (bio !== undefined) {
       const trimmedBio = bio.trim();
       updateFields.bio = trimmedBio || null;
+    }
+    if (socialAccounts !== undefined) {
+      updateFields.socialAccounts = socialAccounts;
     }
     if (preferences !== undefined) {
       updateFields.preferences = preferences;

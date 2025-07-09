@@ -10,19 +10,26 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useLogout } from '@/hooks/useAuthMutations';
 import { useUserDetails } from '@/hooks/useUserMutations';
-import { LogOut, User } from 'lucide-react';
+import { LogOut, Moon, Sun, User } from 'lucide-react';
+import { useTheme } from 'next-themes';
+import { useRouter } from 'next/navigation';
 
 const UserDropdown = () => {
   const { data: userDetails } = useUserDetails();
   const logoutMutation = useLogout();
+  const router = useRouter();
+  const { setTheme, theme } = useTheme();
 
-  console.log(userDetails);
   const avatarFallback =
-    userDetails?.data?.user?.firstName?.charAt(0) ||
-    '' + userDetails?.data?.user?.lastName?.charAt(0);
+    (userDetails?.data?.user?.firstName?.charAt(0) || '') +
+    (userDetails?.data?.user?.lastName?.charAt(0) || '');
 
   const handleLogout = () => {
     logoutMutation.mutate();
+  };
+
+  const toggleTheme = () => {
+    setTheme(theme === 'light' ? 'dark' : 'light');
   };
 
   return (
@@ -52,9 +59,22 @@ const UserDropdown = () => {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={() => router.push('/settings/account')}>
           <User className="mr-2 h-4 w-4" />
           <span>Profile</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={toggleTheme}>
+          {theme === 'light' ? (
+            <>
+              <Moon className="mr-2 h-4 w-4" />
+              <span>Dark Mode</span>
+            </>
+          ) : (
+            <>
+              <Sun className="mr-2 h-4 w-4" />
+              <span>Light Mode</span>
+            </>
+          )}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={handleLogout}>
           <LogOut className="mr-2 h-4 w-4" />

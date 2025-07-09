@@ -8,7 +8,7 @@ import {
   ForgotPasswordRequest,
   LoginRequest,
   ResetPasswordRequest,
-} from '@/types/user';
+} from '@/types/api';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 

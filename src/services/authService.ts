@@ -7,7 +7,7 @@ import {
   LoginResponse,
   RefreshTokenRequest,
   ResetPasswordRequest,
-} from '@/types/user';
+} from '@/types/api';
 
 // Auth Service Functions
 export const authService = {

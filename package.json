@@ -5,9 +5,7 @@
   "packageManager": "yarn@1.22.22",
   "engines": {
     "node": ">=18.0.0",
-    "yarn": ">=1.22.0",
-    "npm": "please-use-yarn",
-    "pnpm": "please-use-yarn"
+    "yarn": ">=1.22.0"
   },
   "scripts": {
     "preinstall": "node -e \"if(process.env.npm_execpath.indexOf('yarn') === -1) throw new Error('Please use Yarn instead of NPM or PNPM to install dependencies. See: https://yarnpkg.com/lang/en/docs/install/')\"",
@@ -46,7 +44,7 @@
     "@tanstack/react-query": "^5.81.5",
     "@types/bcrypt": "^5.0.2",
     "@types/jsonwebtoken": "^9.0.10",
-    "axios": "^1.10.0",
+    "axios": "1.10.0",
     "bcrypt": "^6.0.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -62,7 +60,7 @@
     "react": "^19.0.0",
     "react-day-picker": "^9.8.0",
     "react-dom": "^19.0.0",
-    "react-hook-form": "^7.60.0",
+    "react-hook-form": "7.60.0",
     "sonner": "^2.0.6",
     "tailwind-merge": "^3.3.1",
     "zod": "^3.25.75"

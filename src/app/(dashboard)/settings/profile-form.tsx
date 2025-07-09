@@ -1,7 +1,6 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import Link from 'next/link';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -16,89 +15,166 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
-import { toast } from 'sonner';
+import { CheckCircle, Loader2, Trash2, XCircle } from 'lucide-react';
 
-const profileFormSchema = z.object({
-  username: z
-    .string()
-    .min(2, {
-      message: 'Username must be at least 2 characters.',
-    })
-    .max(30, {
-      message: 'Username must not be longer than 30 characters.',
-    }),
-  email: z
-    .string({
-      required_error: 'Please select an email to display.',
-    })
-    .email(),
-  bio: z.string().max(160).min(4),
-  urls: z
-    .array(
-      z.object({
-        value: z.string().url({ message: 'Please enter a valid URL.' }),
-      })
-    )
-    .optional(),
-});
+import { useDebounce } from '@/hooks/useDebounce';
+import {
+  useChangeUsername,
+  useUpdateUserDetails,
+  useUserDetails,
+} from '@/hooks/useUserMutations';
+import { userService } from '@/services/userService';
+import { profileFormSchema } from '@/zod/usersUpdate';
+import { useEffect, useState } from 'react';
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
-// This can come from your database or API.
-const defaultValues: Partial<ProfileFormValues> = {
-  bio: 'I own a computer.',
-  urls: [
-    { value: 'https://shadcn.com' },
-    { value: 'http://twitter.com/shadcn' },
-  ],
-};
-
 export function ProfileForm() {
+  const { data: userDetails, isLoading } = useUserDetails();
+  const updateUserDetails = useUpdateUserDetails();
+  const changeUsername = useChangeUsername();
+
+  const [usernameValue, setUsernameValue] = useState('');
+  const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(
+    null
+  );
+  const [checkingUsername, setCheckingUsername] = useState(false);
+  const debouncedUsername = useDebounce(usernameValue, 500);
+
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
-    defaultValues,
+    defaultValues: {
+      firstName: '',
+      lastName: '',
+      username: '',
+      bio: '',
+      urls: [],
+    },
     mode: 'onChange',
   });
 
-  const { fields, append } = useFieldArray({
+  const { fields, append, remove } = useFieldArray({
     name: 'urls',
     control: form.control,
   });
 
+  // Update form when user details are loaded
+  useEffect(() => {
+    if (userDetails?.data?.user) {
+      const user = userDetails.data.user;
+      const initialUsername = user.username || '';
+      form.reset({
+        firstName: user.firstName || '',
+        lastName: user.lastName || '',
+        username: initialUsername,
+        bio: user.bio || '',
+        urls:
+          user.socialAccounts?.map(account => ({ value: account.url })) || [],
+      });
+      setUsernameValue(initialUsername);
+    }
+  }, [userDetails, form]);
+
+  // Check username availability when debounced value changes
+  useEffect(() => {
+    if (debouncedUsername && userDetails?.data?.user) {
+      const currentUsername = userDetails.data.user.username;
+      const hasChangedUsername = userDetails.data.user.hasChangedUsername;
+
+      // Don't check if username hasn't changed or if user has already changed username
+      if (debouncedUsername === currentUsername || hasChangedUsername) {
+        setUsernameAvailable(null);
+        return;
+      }
+
+      // Don't check if username is empty or too short
+      if (debouncedUsername.length < 3) {
+        setUsernameAvailable(null);
+        return;
+      }
+
+      // Reset states before checking
+      setCheckingUsername(true);
+      setUsernameAvailable(null);
+
+      // Use the service directly instead of the mutation hook
+      userService
+        .checkUsernameAvailability(debouncedUsername)
+        .then(() => {
+          setUsernameAvailable(true);
+          setCheckingUsername(false);
+        })
+        .catch(() => {
+          setUsernameAvailable(false);
+          setCheckingUsername(false);
+        });
+    }
+  }, [debouncedUsername, userDetails]);
+
   function onSubmit(data: ProfileFormValues) {
-    toast.success('You submitted the following values:', {
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
+    const user = userDetails?.data?.user;
+    if (!user) return;
+
+    // Check if username has changed and user hasn't already changed it
+    const usernameChanged = data.username !== user.username;
+    const canChangeUsername = !user.hasChangedUsername;
+
+    if (usernameChanged && canChangeUsername) {
+      // Change username first, then update other details
+      changeUsername.mutate(
+        { username: data.username },
+        {
+          onSuccess: () => {
+            // After username change, update other details
+            updateOtherDetails(data);
+          },
+        }
+      );
+    } else {
+      // Just update other details
+      updateOtherDetails(data);
+    }
+  }
+
+  function updateOtherDetails(data: ProfileFormValues) {
+    // Transform URLs to social accounts format
+    const socialAccounts =
+      data.urls?.map(url => ({
+        url: url.value,
+        provider: 'website', // Default provider
+      })) || [];
+
+    updateUserDetails.mutate({
+      firstName: data.firstName,
+      lastName: data.lastName,
+      bio: data.bio,
+      socialAccounts,
     });
   }
 
+  if (isLoading) {
+    return <div className="px-6">Loading...</div>;
+  }
+
+  const user = userDetails?.data?.user;
+  const hasChangedUsername = user?.hasChangedUsername || false;
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 px-6">
         <FormField
           control={form.control}
-          name="username"
+          name="firstName"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Username</FormLabel>
+              <FormLabel>First Name</FormLabel>
               <FormControl>
-                <Input placeholder="shadcn" {...field} />
+                <Input placeholder="John" {...field} />
               </FormControl>
               <FormDescription>
-                This is your public display name. It can be your real name or a
-                pseudonym. You can only change this once every 30 days.
+                This is your first name. It will be displayed on your profile.
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -106,26 +182,84 @@ export function ProfileForm() {
         />
         <FormField
           control={form.control}
-          name="email"
+          name="lastName"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a verified email to display" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="m@example.com">m@example.com</SelectItem>
-                  <SelectItem value="m@google.com">m@google.com</SelectItem>
-                  <SelectItem value="m@support.com">m@support.com</SelectItem>
-                </SelectContent>
-              </Select>
+              <FormLabel>Last Name</FormLabel>
+              <FormControl>
+                <Input placeholder="Doe" {...field} />
+              </FormControl>
               <FormDescription>
-                You can manage verified email addresses in your{' '}
-                <Link href="/examples/forms">email settings</Link>.
+                This is your last name. It will be displayed on your profile.
               </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="username"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Username</FormLabel>
+              <FormControl>
+                <div className="relative">
+                  <Input
+                    placeholder="shadcn"
+                    {...field}
+                    disabled={hasChangedUsername}
+                    onChange={e => {
+                      field.onChange(e);
+                      setUsernameValue(e.target.value);
+                    }}
+                  />
+                  {!hasChangedUsername &&
+                    usernameValue &&
+                    usernameValue !== user?.username && (
+                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                        {checkingUsername ? (
+                          <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                        ) : usernameAvailable === true ? (
+                          <CheckCircle className="h-4 w-4 text-green-500" />
+                        ) : usernameAvailable === false ? (
+                          <XCircle className="h-4 w-4 text-red-500" />
+                        ) : null}
+                      </div>
+                    )}
+                </div>
+              </FormControl>
+              <FormDescription>
+                {hasChangedUsername ? (
+                  <span className="text-muted-foreground">
+                    Username can only be changed once. You have already updated
+                    your username.
+                  </span>
+                ) : (
+                  <span className="text-muted-foreground">
+                    You can change your username only once. Choose carefully.
+                  </span>
+                )}
+              </FormDescription>
+              {!hasChangedUsername &&
+                usernameValue &&
+                usernameValue !== user?.username && (
+                  <div className="text-sm">
+                    {checkingUsername ? (
+                      <span className="text-muted-foreground">
+                        Checking availability...
+                      </span>
+                    ) : usernameAvailable === true ? (
+                      <span className="text-green-600">
+                        ✓ Username is available
+                      </span>
+                    ) : usernameAvailable === false ? (
+                      <span className="text-red-600">
+                        ✗ Username is already taken
+                      </span>
+                    ) : null}
+                  </div>
+                )}
               <FormMessage />
             </FormItem>
           )}
@@ -144,8 +278,7 @@ export function ProfileForm() {
                 />
               </FormControl>
               <FormDescription>
-                You can <span>@mention</span> other users and organizations to
-                link to them.
+                This is your bio. It will be displayed on your profile.
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -166,7 +299,22 @@ export function ProfileForm() {
                     Add links to your website, blog, or social media profiles.
                   </FormDescription>
                   <FormControl>
-                    <Input {...field} />
+                    <div className="flex flex-row gap-2">
+                      <Input
+                        {...field}
+                        className="flex-1 mt-2"
+                        placeholder="https://example.com"
+                      />
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        className="mt-2"
+                        size="sm"
+                        onClick={() => remove(index)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -183,7 +331,20 @@ export function ProfileForm() {
             Add URL
           </Button>
         </div>
-        <Button type="submit">Update profile</Button>
+        <Button
+          type="submit"
+          disabled={
+            updateUserDetails.isPending ||
+            changeUsername.isPending ||
+            (!hasChangedUsername &&
+              usernameValue !== user?.username &&
+              usernameAvailable === false)
+          }
+        >
+          {updateUserDetails.isPending || changeUsername.isPending
+            ? 'Updating...'
+            : 'Update profile'}
+        </Button>
       </form>
     </Form>
   );

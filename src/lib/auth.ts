@@ -43,23 +43,21 @@ export { userService } from '@/services/userService';
 
 // Types
 export type {
+  ChangePasswordRequest,
+  ChangeUsernameRequest,
   CreateAccountRequest,
+  DeleteUserRequest,
   EmailVerificationRequest,
   ForgotPasswordRequest,
   LoginRequest,
   LoginResponse,
   RefreshTokenRequest,
   ResetPasswordRequest,
-} from '@/types/user';
-
-export type {
-  ChangePasswordRequest,
-  ChangeUsernameRequest,
-  DeleteUserRequest,
   UpdateUserDetailsRequest,
   UserDetailsResponse,
-  UserProfile,
-} from '@/types/user';
+} from '@/types/api';
+
+export type { UserProfile } from '@/types/user';
 
 // Utilities
 export { default as api, tokenManager } from '@/lib/axios';

@@ -8,7 +8,7 @@ import {
   DeleteUserRequest,
   UpdateUserDetailsRequest,
   UserDetailsResponse,
-} from '@/types/user';
+} from '@/types/api';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
@@ -85,7 +85,7 @@ export const useChangeUsername = (onSuccessCallback?: () => void) => {
         queryKey: userQueryKeys.userDetails,
       });
 
-      // Update auth context with new username
+      // Update auth context with new username and hasChangedUsername flag
       const cachedUserDetails = queryClient.getQueryData(
         userQueryKeys.userDetails
       ) as UserDetailsResponse;
@@ -96,6 +96,8 @@ export const useChangeUsername = (onSuccessCallback?: () => void) => {
           lastName: cachedUserDetails.data.user.lastName,
           email: cachedUserDetails.data.user.email,
           username: variables.username, // Use the new username
+          preferences: cachedUserDetails.data.user.preferences,
+          dob: cachedUserDetails.data.user.dob,
         });
       }
 
@@ -122,17 +124,6 @@ export const useCheckUsernameAvailability = () => {
   return useMutation({
     mutationFn: (username: string) =>
       userService.checkUsernameAvailability(username),
-    onSuccess: response => {
-      toast.success(response.message || 'Username is available!');
-    },
-    onError: (
-      error: Error & { response?: { data?: { message?: string } } }
-    ) => {
-      const message =
-        error.response?.data?.message ||
-        'Failed to check username availability. Please try again.';
-      toast.error(message);
-    },
   });
 };
 
