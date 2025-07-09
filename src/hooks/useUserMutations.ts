@@ -1,14 +1,14 @@
 'use client';
 
 import { useAuth } from '@/providers/AuthProvider';
+import { userService } from '@/services/userService';
 import {
   ChangePasswordRequest,
   ChangeUsernameRequest,
   DeleteUserRequest,
   UpdateUserDetailsRequest,
   UserDetailsResponse,
-  userService,
-} from '@/services/userService';
+} from '@/types/user';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
@@ -53,6 +53,8 @@ export const useUpdateUserDetails = () => {
           lastName: cachedUserDetails.data.user.lastName,
           email: cachedUserDetails.data.user.email,
           username: cachedUserDetails.data.user.username,
+          preferences: cachedUserDetails.data.user.preferences,
+          dob: cachedUserDetails.data.user.dob,
         });
       }
 
@@ -70,16 +72,18 @@ export const useUpdateUserDetails = () => {
 };
 
 // Change username mutation
-export const useChangeUsername = () => {
+export const useChangeUsername = (onSuccessCallback?: () => void) => {
   const queryClient = useQueryClient();
   const { updateUser } = useAuth();
 
   return useMutation({
     mutationFn: (data: ChangeUsernameRequest) =>
       userService.changeUsername(data),
-    onSuccess: (response, variables) => {
+    onSuccess: async (response, variables) => {
       // Invalidate and refetch user details
-      queryClient.invalidateQueries({ queryKey: userQueryKeys.userDetails });
+      await queryClient.invalidateQueries({
+        queryKey: userQueryKeys.userDetails,
+      });
 
       // Update auth context with new username
       const cachedUserDetails = queryClient.getQueryData(
@@ -96,6 +100,11 @@ export const useChangeUsername = () => {
       }
 
       toast.success(response.message || 'Username updated successfully!');
+
+      // Call the success callback after everything is updated
+      if (onSuccessCallback) {
+        onSuccessCallback();
+      }
     },
     onError: (
       error: Error & { response?: { data?: { message?: string } } }
@@ -103,6 +112,25 @@ export const useChangeUsername = () => {
       const message =
         error.response?.data?.message ||
         'Failed to update username. Please try again.';
+      toast.error(message);
+    },
+  });
+};
+
+// Check if username is available
+export const useCheckUsernameAvailability = () => {
+  return useMutation({
+    mutationFn: (username: string) =>
+      userService.checkUsernameAvailability(username),
+    onSuccess: response => {
+      toast.success(response.message || 'Username is available!');
+    },
+    onError: (
+      error: Error & { response?: { data?: { message?: string } } }
+    ) => {
+      const message =
+        error.response?.data?.message ||
+        'Failed to check username availability. Please try again.';
       toast.error(message);
     },
   });

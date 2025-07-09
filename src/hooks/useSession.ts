@@ -1,6 +1,19 @@
 'use client';
 
 import { useAuth } from '@/providers/AuthProvider';
+import { AuthenticatedUser } from '@/types/user';
+
+/**
+ * Type definitions for session data
+ */
+export interface SessionData {
+  user: AuthenticatedUser | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  isLoggedIn: boolean;
+  isGuest: boolean;
+  status: 'loading' | 'authenticated' | 'unauthenticated';
+}
 
 /**
  * Hook to access session information
@@ -23,21 +36,3 @@ export const useSession = (): SessionData => {
         : 'unauthenticated',
   };
 };
-
-/**
- * Type definitions for session data
- */
-export interface SessionData {
-  user: {
-    userId: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    username: string;
-  } | null;
-  isAuthenticated: boolean;
-  isLoading: boolean;
-  isLoggedIn: boolean;
-  isGuest: boolean;
-  status: 'loading' | 'authenticated' | 'unauthenticated';
-}

@@ -46,6 +46,9 @@ export const authenticate = async (
       user: {
         userId: decoded.userId,
         email: decoded.email,
+        firstName: userAuth.firstName || '',
+        lastName: userAuth.lastName || '',
+        username: userAuth.username || '',
       },
     };
   } catch (error) {

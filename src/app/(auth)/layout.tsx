@@ -1,7 +1,7 @@
 'use client';
 
+import ScreenLoader from '@/components/screen-loader';
 import { useRedirectIfAuthenticated } from '@/hooks/useRequireAuth';
-import { Loader } from 'lucide-react';
 
 export default function AuthLayout({
   children,
@@ -11,15 +11,11 @@ export default function AuthLayout({
   const { shouldShow, isLoading } = useRedirectIfAuthenticated('/users');
 
   if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <Loader className="animate-spin" size={24} />
-      </div>
-    );
+    return <ScreenLoader />;
   }
 
   if (!shouldShow) {
-    return null; // Will redirect to /users
+    return null;
   }
 
   return (

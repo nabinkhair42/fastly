@@ -1,14 +1,14 @@
 'use client';
 
 import { useAuth } from '@/providers/AuthProvider';
+import { authService } from '@/services/authService';
 import {
-  authService,
   CreateAccountRequest,
   EmailVerificationRequest,
   ForgotPasswordRequest,
   LoginRequest,
   ResetPasswordRequest,
-} from '@/services/authService';
+} from '@/types/user';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
@@ -55,7 +55,7 @@ export const useCreateAccount = () => {
 };
 
 // Email verification mutation
-export const useVerifyEmail = () => {
+export const useVerifyEmail = (onSuccessCallback?: () => void) => {
   const { login } = useAuth();
 
   return useMutation({
@@ -65,6 +65,10 @@ export const useVerifyEmail = () => {
       const { accessToken, refreshToken, user } = response.data;
       login(accessToken, refreshToken, user);
       toast.success('Email verified successfully! Welcome aboard!');
+      // Call the callback after auth state is updated
+      if (onSuccessCallback) {
+        onSuccessCallback();
+      }
     },
     onError: (
       error: Error & { response?: { data?: { message?: string } } }

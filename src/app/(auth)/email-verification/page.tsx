@@ -15,7 +15,6 @@ import {
   FormDescription,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from '@/components/ui/form';
 import {
@@ -30,12 +29,12 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import { REGEXP_ONLY_DIGITS_AND_CHARS } from 'input-otp';
 import {
   InputOTP,
   InputOTPGroup,
   InputOTPSlot,
 } from '@/components/ui/input-otp';
+import { REGEXP_ONLY_DIGITS_AND_CHARS } from 'input-otp';
 
 type EmailVerificationFormData = z.infer<typeof verifyEmailSchema>;
 
@@ -43,7 +42,12 @@ export default function EmailVerificationPage() {
   const [email, setEmail] = useState('');
   const [countdown, setCountdown] = useState(0);
   const router = useRouter();
-  const verifyEmailMutation = useVerifyEmail();
+
+  const verifyEmailMutation = useVerifyEmail(() => {
+    // This callback runs after auth state is updated
+    // Redirect to dashboard after successful verification
+    router.push('/users');
+  });
   const resendVerificationMutation = useResendVerification();
 
   const form = useForm<EmailVerificationFormData>({
@@ -79,8 +83,7 @@ export default function EmailVerificationPage() {
       await verifyEmailMutation.mutateAsync(data);
       // Clear stored email
       localStorage.removeItem('verificationEmail');
-      // Redirect to about-you page
-      router.push('/about-you');
+      // Redirect will be handled in the mutation's onSuccess callback
     } catch (error) {
       console.error(error);
     }
@@ -119,9 +122,8 @@ export default function EmailVerificationPage() {
                 control={form.control}
                 name="verificationCode"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Verification Code</FormLabel>
-                    <FormControl>
+                  <FormItem className="flex flex-col items-center justify-center">
+                    <FormControl className="flex flex-col justify-center">
                       <InputOTP
                         placeholder="Enter 6-digit code"
                         className="text-center text-lg"

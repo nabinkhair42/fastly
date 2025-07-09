@@ -54,6 +54,28 @@ export const useRedirectIfAuthenticated = (redirectTo: string = '/') => {
 };
 
 /**
+ * Hook for redirect to dashboard once authenticated
+ * Redirects authenticated users to the dashboard
+ */
+export const useAuthRedirect = (userDetails: unknown) => {
+  const { isAuthenticated, isLoading } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isLoading && isAuthenticated && userDetails) {
+      // Always redirect to dashboard
+      router.push('/users');
+    }
+  }, [isAuthenticated, isLoading, userDetails, router]);
+
+  return {
+    isAuthenticated,
+    isLoading,
+    shouldRedirect: !isLoading && isAuthenticated && userDetails,
+  };
+};
+
+/**
  * Hook for conditional authentication checks
  * More flexible than useRequireAuth for custom logic
  */

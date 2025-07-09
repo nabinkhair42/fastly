@@ -1,6 +1,7 @@
 'use client';
 
 import { tokenManager } from '@/lib/axios';
+import { AuthenticatedUser } from '@/types/user';
 import {
   createContext,
   ReactNode,
@@ -9,21 +10,17 @@ import {
   useState,
 } from 'react';
 
-interface User {
-  userId: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  username: string;
-}
-
 interface AuthContextType {
-  user: User | null;
+  user: AuthenticatedUser | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (accessToken: string, refreshToken: string, user: User) => void;
+  login: (
+    accessToken: string,
+    refreshToken: string,
+    user: AuthenticatedUser
+  ) => void;
   logout: () => void;
-  updateUser: (user: User) => void;
+  updateUser: (user: AuthenticatedUser) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -41,7 +38,7 @@ interface AuthProviderProps {
 }
 
 export default function AuthProvider({ children }: AuthProviderProps) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<AuthenticatedUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   // Initialize auth state from localStorage
@@ -67,7 +64,11 @@ export default function AuthProvider({ children }: AuthProviderProps) {
     initializeAuth();
   }, []);
 
-  const login = (accessToken: string, refreshToken: string, userData: User) => {
+  const login = (
+    accessToken: string,
+    refreshToken: string,
+    userData: AuthenticatedUser
+  ) => {
     tokenManager.setTokens(accessToken, refreshToken);
     localStorage.setItem('user', JSON.stringify(userData));
     setUser(userData);
@@ -95,7 +96,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
     }
   };
 
-  const updateUser = (updatedUser: User) => {
+  const updateUser = (updatedUser: AuthenticatedUser) => {
     setUser(updatedUser);
     localStorage.setItem('user', JSON.stringify(updatedUser));
   };

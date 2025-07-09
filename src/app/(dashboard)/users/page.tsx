@@ -8,62 +8,16 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { useLogout } from '@/hooks/useAuthMutations';
-import { useRequireAuth } from '@/hooks/useRequireAuth';
-import { useSession } from '@/hooks/useSession';
 import { useUserDetails } from '@/hooks/useUserMutations';
-import { Calendar, LogOut, Mail, Settings, User } from 'lucide-react';
+import { Calendar, Mail, Settings, User } from 'lucide-react';
 
 export default function UsersPage() {
-  const { isReady } = useRequireAuth();
-  const { user } = useSession();
   const { data: userDetails, isLoading } = useUserDetails();
-  const logoutMutation = useLogout();
-
-  if (!isReady) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
-      </div>
-    );
-  }
-
-  const handleLogout = () => {
-    logoutMutation.mutate();
-  };
-  console.log(user);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <h1 className="text-xl font-semibold text-gray-900">Dashboard</h1>
-            </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-700">
-                Welcome, {user?.firstName} {user?.lastName}!
-              </span>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleLogout}
-                disabled={logoutMutation.isPending}
-                loading={logoutMutation.isPending}
-                loadingText="Signing Out"
-              >
-                <LogOut className="h-4 w-4" />
-                Sign Out
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
-
+    <div className="min-h-screen bg-background">
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* User Profile Card */}
           <Card className="col-span-1 md:col-span-2 lg:col-span-1">

@@ -1,55 +1,13 @@
 import api from '@/lib/axios';
-
-// Types
-export interface LoginRequest {
-  email: string;
-  password: string;
-}
-
-export interface LoginResponse {
-  success: boolean;
-  message: string;
-  statusCode: number;
-  data: {
-    accessToken: string;
-    refreshToken: string;
-    user: {
-      userId: string;
-      firstName: string;
-      lastName: string;
-      email: string;
-      username: string;
-    };
-  };
-}
-
-export interface CreateAccountRequest {
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-}
-
-export interface EmailVerificationRequest {
-  email: string;
-  verificationCode: string;
-}
-
-export interface ForgotPasswordRequest {
-  email: string;
-}
-
-export interface ResetPasswordRequest {
-  email: string;
-  resetToken: string;
-  password: string;
-  confirmPassword: string;
-}
-
-export interface RefreshTokenRequest {
-  refreshToken: string;
-}
+import {
+  CreateAccountRequest,
+  EmailVerificationRequest,
+  ForgotPasswordRequest,
+  LoginRequest,
+  LoginResponse,
+  RefreshTokenRequest,
+  ResetPasswordRequest,
+} from '@/types/user';
 
 // Auth Service Functions
 export const authService = {

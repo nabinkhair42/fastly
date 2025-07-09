@@ -50,7 +50,7 @@ export type {
   LoginResponse,
   RefreshTokenRequest,
   ResetPasswordRequest,
-} from '@/services/authService';
+} from '@/types/user';
 
 export type {
   ChangePasswordRequest,
@@ -59,7 +59,7 @@ export type {
   UpdateUserDetailsRequest,
   UserDetailsResponse,
   UserProfile,
-} from '@/services/userService';
+} from '@/types/user';
 
 // Utilities
 export { default as api, tokenManager } from '@/lib/axios';

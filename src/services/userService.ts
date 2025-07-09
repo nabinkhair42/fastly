@@ -1,47 +1,11 @@
 import api from '@/lib/axios';
-import { SocialAccountUrl } from '@/types/user';
-
-// Types
-export interface UserProfile {
-  _id: string;
-  firstName: string;
-  lastName: string;
-  username: string;
-  email: string;
-  avatar: string | null;
-  location: string | null;
-  socialAccounts: SocialAccountUrl | null;
-  bio: string | null;
-}
-
-export interface UpdateUserDetailsRequest {
-  firstName?: string;
-  lastName?: string;
-  bio?: string;
-}
-
-export interface ChangeUsernameRequest {
-  username: string;
-}
-
-export interface ChangePasswordRequest {
-  currentPassword: string;
-  newPassword: string;
-  confirmPassword: string;
-}
-
-export interface DeleteUserRequest {
-  password: string;
-}
-
-export interface UserDetailsResponse {
-  success: boolean;
-  message: string;
-  statusCode: number;
-  data: {
-    user: UserProfile;
-  };
-}
+import {
+  ChangePasswordRequest,
+  ChangeUsernameRequest,
+  DeleteUserRequest,
+  UpdateUserDetailsRequest,
+  UserDetailsResponse,
+} from '@/types/user';
 
 // User Service Functions
 export const userService = {
@@ -60,6 +24,12 @@ export const userService = {
   // Change username (one-time only)
   changeUsername: async (data: ChangeUsernameRequest) => {
     const response = await api.post('/change-username', data);
+    return response.data;
+  },
+
+  // Check if username is available
+  checkUsernameAvailability: async (username: string) => {
+    const response = await api.get(`/change-username?username=${username}`);
     return response.data;
   },
 

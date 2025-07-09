@@ -2,7 +2,7 @@ import { requireAuth } from '@/lib/authMiddleware';
 import dbConnect from '@/lib/dbConnect';
 import { sendResponse } from '@/lib/sendResponse';
 import { UserModel } from '@/models/users';
-import { UpdateUserDetailsRequest } from '@/services/userService';
+import { UpdateUserDetailsRequest } from '@/types/user';
 import { updateUserDetailsSchema } from '@/zod/usersUpdate';
 import { NextRequest } from 'next/server';
 
@@ -29,6 +29,8 @@ export async function GET(request: NextRequest) {
         location: user.location,
         socialAccounts: user.socialAccounts,
         bio: user.bio,
+        preferences: user.preferences,
+        dob: user.dob,
       },
     });
   } catch (error: unknown) {
@@ -46,13 +48,15 @@ export async function POST(request: NextRequest) {
       return authResult.response;
     }
 
-    const { firstName, lastName, bio } = await request.json();
+    const { firstName, lastName, bio, preferences, dob } = await request.json();
 
     // Validate request body
     const { error } = updateUserDetailsSchema.safeParse({
       firstName,
       lastName,
       bio,
+      preferences,
+      dob,
     });
     if (error) {
       return sendResponse(error.message, 400);
@@ -76,7 +80,12 @@ export async function POST(request: NextRequest) {
       const trimmedBio = bio.trim();
       updateFields.bio = trimmedBio || null;
     }
-
+    if (preferences !== undefined) {
+      updateFields.preferences = preferences;
+    }
+    if (dob !== undefined) {
+      updateFields.dob = dob;
+    }
     // Only update if there are actual changes
     if (Object.keys(updateFields).length === 1) {
       // Only updatedAt, no real changes

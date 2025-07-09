@@ -1,5 +1,39 @@
 import { z } from 'zod';
 
+// Schema for checking username availability
+export const checkUsernameSchema = z.object({
+  username: z
+    .string()
+    .min(1, { message: 'Username is required' })
+    .max(20, { message: 'Username must be less than 20 characters' })
+    .refine(
+      username => {
+        const usernameRegex = /^[a-zA-Z0-9_]+$/;
+        return usernameRegex.test(username);
+      },
+      {
+        message: 'Username must contain only letters, numbers, and underscores',
+      }
+    ),
+});
+
+// Schema for checking username availability
+export const checkUsernameAvailabilitySchema = z.object({
+  username: z
+    .string()
+    .min(1, { message: 'Username is required' })
+    .max(20, { message: 'Username must be less than 20 characters' })
+    .refine(
+      username => {
+        const usernameRegex = /^[a-zA-Z0-9_]+$/;
+        return usernameRegex.test(username);
+      },
+      {
+        message: 'Username must contain only letters, numbers, and underscores',
+      }
+    ),
+});
+
 // Schema for changing username (separate endpoint)
 export const changeUsernameSchema = z.object({
   username: z
@@ -33,6 +67,13 @@ export const updateUserDetailsSchema = z.object({
     .string()
     .max(200, { message: 'Bio must be less than 200 characters' })
     .optional(),
+  preferences: z
+    .object({
+      theme: z.string().optional(),
+      font: z.string().optional(),
+    })
+    .optional(),
+  dob: z.date().optional(),
 });
 
 // Schema for user account deletion

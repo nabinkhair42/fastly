@@ -52,16 +52,13 @@ export async function POST(request: NextRequest) {
       firstName: userAuth.firstName,
       lastName: userAuth.lastName,
       email: userAuth.email,
-      username: `${userAuth.firstName.toLowerCase()}_${Date.now()}`, // Generate temporary username
+      username: `${userAuth.firstName.toLowerCase()}_${Date.now()}`,
     });
 
     // verify user and clear verification data
     userAuth.isVerified = true;
     userAuth.verificationCode = null;
     userAuth.verificationCodeExpiresAt = null;
-    // Clear temporary fields after moving to User model
-    userAuth.firstName = null;
-    userAuth.lastName = null;
     await userAuth.save();
 
     // generate secure token pair
@@ -77,6 +74,8 @@ export async function POST(request: NextRequest) {
         id: userAuth._id,
         email: userAuth.email,
         isVerified: userAuth.isVerified,
+        firstName: userAuth.firstName,
+        lastName: userAuth.lastName,
       },
     });
   } catch (error: unknown) {
