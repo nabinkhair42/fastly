@@ -54,7 +54,6 @@ export const useUpdateUserDetails = () => {
           email: cachedUserDetails.data.user.email,
           username: cachedUserDetails.data.user.username,
           preferences: cachedUserDetails.data.user.preferences,
-          dob: cachedUserDetails.data.user.dob,
         });
       }
 
@@ -97,7 +96,6 @@ export const useChangeUsername = (onSuccessCallback?: () => void) => {
           email: cachedUserDetails.data.user.email,
           username: variables.username, // Use the new username
           preferences: cachedUserDetails.data.user.preferences,
-          dob: cachedUserDetails.data.user.dob,
         });
       }
 

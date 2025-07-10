@@ -62,7 +62,7 @@ export interface AuthResponse {
 export interface UpdateUserDetailsRequest {
   firstName?: string;
   lastName?: string;
-  bio?: string;
+  bio?: string | null;
   socialAccounts?: SocialAccountUrl[];
   preferences?: {
     theme?: string;
@@ -89,11 +89,5 @@ export interface UserDetailsResponse {
   message: string;
   data: {
     user: UserProfile;
-    preferences: {
-      theme: string;
-      font: string;
-    };
-    dob: Date | null;
-    hasChangedUsername: boolean;
   };
 }

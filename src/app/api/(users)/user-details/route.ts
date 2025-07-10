@@ -21,6 +21,7 @@ export async function GET(request: NextRequest) {
 
     return sendResponse('User details fetched successfully', 200, {
       user: {
+        _id: user._id.toString(),
         firstName: user.firstName,
         lastName: user.lastName,
         username: user.username,
@@ -49,20 +50,16 @@ export async function POST(request: NextRequest) {
       return authResult.response;
     }
 
-    const { firstName, lastName, bio, socialAccounts, preferences, dob } =
-      await request.json();
+    const requestData = await request.json();
 
     // Validate request body
-    const { error } = updateUserDetailsSchema.safeParse({
-      firstName,
-      lastName,
-      bio,
-      preferences,
-      dob,
-    });
-    if (error) {
-      return sendResponse(error.message, 400);
+    const validationResult = updateUserDetailsSchema.safeParse(requestData);
+    if (!validationResult.success) {
+      return sendResponse(validationResult.error.message, 400);
     }
+
+    const { firstName, lastName, bio, socialAccounts, preferences, dob } =
+      validationResult.data;
 
     // Find user by authenticated user ID
     const user = await UserModel.findOne({ authUser: authResult.user!.userId });
@@ -79,11 +76,14 @@ export async function POST(request: NextRequest) {
       updateFields.lastName = lastName.trim();
     }
     if (bio !== undefined) {
-      const trimmedBio = bio.trim();
+      const trimmedBio = bio?.trim();
       updateFields.bio = trimmedBio || null;
     }
     if (socialAccounts !== undefined) {
-      updateFields.socialAccounts = socialAccounts;
+      updateFields.socialAccounts = socialAccounts.map(account => ({
+        url: account.url,
+        provider: account.provider || 'website',
+      }));
     }
     if (preferences !== undefined) {
       updateFields.preferences = preferences;
@@ -92,8 +92,7 @@ export async function POST(request: NextRequest) {
       updateFields.dob = dob;
     }
     // Only update if there are actual changes
-    if (Object.keys(updateFields).length === 1) {
-      // Only updatedAt, no real changes
+    if (Object.keys(updateFields).length === 0) {
       return sendResponse('No changes detected', 200);
     }
 

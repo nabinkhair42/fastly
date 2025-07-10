@@ -66,7 +66,7 @@ const SettingsPage = () => {
           </div>
         </div>
         <Button asChild>
-          <Link href="/settings/profile">
+          <Link href="/settings/edit-profile">
             <Edit className="h-4 w-4 mr-2" />
             Edit Profile
           </Link>

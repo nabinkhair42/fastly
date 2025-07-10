@@ -62,7 +62,6 @@ export interface AuthenticatedUser {
     theme: Theme;
     font: Font;
   };
-  dob?: Date | null;
 }
 
 export interface UserProfile {

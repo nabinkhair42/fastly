@@ -71,7 +71,7 @@ export const updateUserDetailsSchema = z.object({
     .array(
       z.object({
         url: z.string().url({ message: 'Please enter a valid URL' }),
-        provider: z.string().optional(),
+        provider: z.string().optional().default('website'),
       })
     )
     .optional(),
@@ -81,7 +81,15 @@ export const updateUserDetailsSchema = z.object({
       font: z.string().optional(),
     })
     .optional(),
-  dob: z.date().optional(),
+  dob: z
+    .union([z.string(), z.date()])
+    .optional()
+    .transform(val => {
+      if (typeof val === 'string') {
+        return new Date(val);
+      }
+      return val;
+    }),
 });
 
 // Schema for profile form with social accounts
@@ -119,7 +127,15 @@ export const profileFormSchema = z.object({
       })
     )
     .optional(),
-  dob: z.date().optional(),
+  dob: z
+    .union([z.string(), z.date()])
+    .optional()
+    .transform(val => {
+      if (typeof val === 'string') {
+        return new Date(val);
+      }
+      return val;
+    }),
 });
 
 // Schema for user account deletion

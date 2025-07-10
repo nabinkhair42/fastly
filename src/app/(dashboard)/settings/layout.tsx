@@ -40,7 +40,7 @@ export default function SettingsLayout({ children }: SettingsLayoutProps) {
     <div className="space-y-6 p-10 pb-16 max-w-5xl mx-auto">
       <div className="flex flex-col lg:flex-row border rounded-xl overflow-hidden min-h-[500px]">
         {/* Sidebar */}
-        <aside className="w-full lg:w-1/4 bg-sidebar border-none lg:border-r p-4 lg:rounded-l-xl rounded-t-xl lg:rounded-t-none">
+        <aside className="w-full lg:w-1/4 bg-sidebar p-4 lg:rounded-l-xl rounded-t-xl lg:rounded-t-none border-r">
           <SidebarNav items={sidebarNavItems} />
         </aside>
 
