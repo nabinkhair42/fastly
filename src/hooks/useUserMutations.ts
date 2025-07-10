@@ -10,6 +10,7 @@ import {
   UserDetailsResponse,
 } from '@/types/api';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 // Query keys
@@ -148,13 +149,13 @@ export const useChangePassword = () => {
 export const useDeleteUser = () => {
   const { logout } = useAuth();
   const queryClient = useQueryClient();
-
+  const router = useRouter();
   return useMutation({
     mutationFn: (data: DeleteUserRequest) => userService.deleteUser(data),
     onSuccess: response => {
-      // Log out user and clear all cached data
       logout();
-      queryClient.clear();
+      queryClient.invalidateQueries({ queryKey: userQueryKeys.userDetails });
+      router.push('/');
       toast.success(response.message || 'Account deleted successfully!');
     },
     onError: (

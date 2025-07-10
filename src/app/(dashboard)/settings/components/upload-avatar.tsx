@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useAvatarCrop } from '@/hooks/useAvatarCrop';
+import { useAvatarUpload } from '@/hooks/useAvatarUpload';
 import { useUserDetails } from '@/hooks/useUserMutations';
 import { Edit, Trash2, Upload } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
@@ -19,8 +20,8 @@ import 'react-image-crop/dist/ReactCrop.css';
 export function UploadAvatar() {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
   const { data: userDetails } = useUserDetails();
+  const { uploadAvatar, isUploading } = useAvatarUpload();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const defaultAvatar = userDetails?.data?.user?.avatar;
@@ -36,21 +37,18 @@ export function UploadAvatar() {
     }
   };
 
-  const handleUpload = async (croppedImageBlob: string) => {
-    setIsUploading(true);
+  const handleUpload = async (croppedImageBlob: Blob) => {
     try {
-      // TODO: Implement actual upload logic
-      console.log(
-        'Uploading avatar:',
-        croppedImageBlob.substring(0, 50) + '...'
-      );
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Convert blob to file
+      const file = new File([croppedImageBlob], 'avatar.png', {
+        type: 'image/png',
+      });
+
+      await uploadAvatar(file);
       setIsOpen(false);
       setSelectedFile(null);
     } catch (error) {
       console.error('Upload failed:', error);
-    } finally {
-      setIsUploading(false);
     }
   };
 
@@ -77,7 +75,7 @@ export function UploadAvatar() {
                 <Edit className="h-3 w-3" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuContent align="start" className="w-48">
               <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
                 <Upload className="h-4 w-4 mr-2" />
                 Upload a photo...
@@ -125,7 +123,7 @@ function ImageCropper({
   isUploading,
 }: {
   file: File;
-  onCrop: (croppedImage: string) => void;
+  onCrop: (croppedImage: Blob) => void;
   onClose: () => void;
   isUploading: boolean;
 }) {

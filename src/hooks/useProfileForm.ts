@@ -10,9 +10,9 @@ import {
   useUserDetails,
 } from '@/hooks/useUserMutations';
 import { userService } from '@/services/userService';
-import { profileFormSchema } from '@/zod/usersUpdate';
+import { profileFormInputSchema } from '@/zod/usersUpdate';
 
-type ProfileFormValues = z.infer<typeof profileFormSchema>;
+type ProfileFormValues = z.infer<typeof profileFormInputSchema>;
 
 export function useProfileForm() {
   const { data: userDetails, isLoading } = useUserDetails();
@@ -27,7 +27,7 @@ export function useProfileForm() {
   const debouncedUsername = useDebounce(usernameValue, 500);
 
   const form = useForm<ProfileFormValues>({
-    resolver: zodResolver(profileFormSchema),
+    resolver: zodResolver(profileFormInputSchema),
     defaultValues: {
       firstName: '',
       lastName: '',

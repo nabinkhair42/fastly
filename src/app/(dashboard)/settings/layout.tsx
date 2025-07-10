@@ -4,8 +4,8 @@ import { Fingerprint, Settings, UserCheck2Icon, UserPen } from 'lucide-react';
 import { SidebarNav } from './components/sidebar-nav';
 
 export const metadata: Metadata = {
-  title: 'Forms',
-  description: 'Advanced form example using react-hook-form and Zod.',
+  title: 'User Settings',
+  description: 'User settings for the dashboard.',
 };
 
 const sidebarNavItems = [
@@ -37,10 +37,10 @@ interface SettingsLayoutProps {
 
 export default function SettingsLayout({ children }: SettingsLayoutProps) {
   return (
-    <div className="space-y-6 p-10 pb-16 max-w-5xl mx-auto">
+    <div className="space-y-6 p-4 pb-16 max-w-5xl mx-auto">
       <div className="flex flex-col lg:flex-row border rounded-xl overflow-hidden min-h-[500px]">
         {/* Sidebar */}
-        <aside className="w-full lg:w-1/4 bg-sidebar p-4 lg:rounded-l-xl rounded-t-xl lg:rounded-t-none border-r">
+        <aside className="w-full lg:w-1/4 bg-sidebar p-4 lg:rounded-l-xl rounded-t-xl lg:rounded-t-none border-b lg:border-b-0 lg:border-r">
           <SidebarNav items={sidebarNavItems} />
         </aside>
 

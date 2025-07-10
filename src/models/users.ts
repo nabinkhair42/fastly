@@ -1,4 +1,4 @@
-import { User, UserAuth } from '@/types/user';
+import type { User, UserAuth } from '@/types/user';
 import mongoose from 'mongoose';
 
 const authUserSchema = new mongoose.Schema({

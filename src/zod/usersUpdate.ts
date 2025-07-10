@@ -84,7 +84,7 @@ export const updateUserDetailsSchema = z.object({
   dob: z
     .union([z.string(), z.date()])
     .optional()
-    .transform(val => {
+    .transform((val): Date | undefined => {
       if (typeof val === 'string') {
         return new Date(val);
       }
@@ -127,15 +127,45 @@ export const profileFormSchema = z.object({
       })
     )
     .optional(),
-  dob: z
-    .union([z.string(), z.date()])
-    .optional()
-    .transform(val => {
-      if (typeof val === 'string') {
-        return new Date(val);
+  dob: z.date().optional(),
+});
+
+// Input schema for the form (before transformation)
+export const profileFormInputSchema = z.object({
+  firstName: z
+    .string()
+    .min(1, { message: 'First name is required' })
+    .max(20, { message: 'First name must be less than 20 characters' }),
+  lastName: z
+    .string()
+    .min(1, { message: 'Last name is required' })
+    .max(20, { message: 'Last name must be less than 20 characters' }),
+  username: z
+    .string()
+    .min(1, { message: 'Username is required' })
+    .max(20, { message: 'Username must be less than 20 characters' })
+    .refine(
+      username => {
+        const usernameRegex = /^[a-zA-Z0-9_]+$/;
+        return usernameRegex.test(username);
+      },
+      {
+        message: 'Username must contain only letters, numbers, and underscores',
       }
-      return val;
-    }),
+    ),
+  bio: z
+    .string()
+    .max(200, { message: 'Bio must be less than 200 characters' })
+    .optional(),
+  socialAccounts: z
+    .array(
+      z.object({
+        provider: z.string().min(1, { message: 'Provider is required' }),
+        url: z.string().url({ message: 'Please enter a valid URL' }),
+      })
+    )
+    .optional(),
+  dob: z.date().optional(),
 });
 
 // Schema for user account deletion
@@ -175,6 +205,6 @@ export const changePasswordSchema = z.object({
 
 // Schema for account preferences
 export const accountPreferencesSchema = z.object({
-  theme: z.enum(['light', 'dark']),
-  font: z.enum(['sans', 'serif', 'mono']),
+  theme: z.enum(['light', 'dark', 'system']),
+  font: z.enum(['sans', 'serif', 'mono', 'system']),
 });

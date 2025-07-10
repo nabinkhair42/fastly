@@ -1,5 +1,6 @@
 import api from '@/lib/axios';
 import {
+  AvatarUploadResponse,
   ChangePasswordRequest,
   ChangeUsernameRequest,
   DeleteUserRequest,
@@ -42,6 +43,12 @@ export const userService = {
   // Delete user account
   deleteUser: async (data: DeleteUserRequest) => {
     const response = await api.delete('/delete-user', { data });
+    return response.data;
+  },
+
+  // Update user avatar in database
+  updateAvatar: async (avatarUrl: string): Promise<AvatarUploadResponse> => {
+    const response = await api.post('/upload-avatar', { avatar: avatarUrl });
     return response.data;
   },
 };

@@ -91,3 +91,10 @@ export interface UserDetailsResponse {
     user: UserProfile;
   };
 }
+
+export interface AvatarUploadResponse {
+  message: string;
+  data?: {
+    avatar: string;
+  };
+}

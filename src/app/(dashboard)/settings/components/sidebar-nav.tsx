@@ -20,7 +20,7 @@ export function SidebarNav({ className, items, ...props }: SidebarNavProps) {
   return (
     <nav
       className={cn(
-        'flex flex-row space-x-2 lg:flex-col lg:space-x-0 lg:space-y-1 p-2',
+        'grid grid-cols-2 lg:grid-cols-1 space-x-2 lg:space-x-0 lg:space-y-1 p-2',
         className
       )}
       {...props}
@@ -31,7 +31,7 @@ export function SidebarNav({ className, items, ...props }: SidebarNavProps) {
           key={item.href}
           variant={'ghost'}
           className={cn(
-            'text-left justify-start text-sm',
+            'text-left justify-start text-sm col-span-1 w-full',
             pathname === item.href && 'bg-primary/10 hover:bg-primary/15'
           )}
         >

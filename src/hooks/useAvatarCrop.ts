@@ -12,7 +12,7 @@ export function useAvatarCrop() {
   const [completedCrop, setCompletedCrop] = useState<PixelCrop>();
   const imageRef = useRef<HTMLImageElement>(null);
 
-  const getCroppedImageBlob = async (): Promise<string> => {
+  const getCroppedImageBlob = async (): Promise<Blob> => {
     if (!completedCrop || !imageRef.current) {
       throw new Error('Crop not completed or image not loaded');
     }
@@ -60,16 +60,16 @@ export function useAvatarCrop() {
 
     ctx.restore();
 
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
       canvas.toBlob(
         blob => {
           if (!blob) {
-            throw new Error('Failed to create blob');
+            reject(new Error('Failed to create blob'));
+            return;
           }
-          const url = URL.createObjectURL(blob);
-          resolve(url);
+          resolve(blob);
         },
-        'image/jpeg',
+        'image/png',
         0.9
       );
     });
