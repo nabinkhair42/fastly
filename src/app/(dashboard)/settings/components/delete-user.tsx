@@ -57,14 +57,12 @@ export const DeleteUser = () => {
       { password },
       {
         onSuccess: () => {
-          // Reset state after successful deletion
           setConfirmationText('');
           setPassword('');
           setErrors({});
           setIsOpen(false);
         },
         onError: () => {
-          // Clear password on error for security
           setPassword('');
           setErrors({ password: 'Incorrect password' });
         },

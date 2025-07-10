@@ -19,7 +19,10 @@ export async function POST(request: NextRequest) {
     // check if user exists
     const userAuth = await UserAuthModel.findOne({ email });
     if (!userAuth) {
-      return sendResponse('Invalid email or password', 401);
+      return sendResponse(
+        'User not found, Please create an account to continue',
+        401
+      );
     }
 
     // check if password is correct
