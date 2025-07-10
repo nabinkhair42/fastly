@@ -1,56 +1,56 @@
 version: 2
 updates:
   # Enable version updates for pnpm dependencies
-  - package-ecosystem: 'npm' # Dependabot uses "npm" for all Node.js package managers including pnpm
-    directory: '/'
+  - package-ecosystem: "npm" # Dependabot uses "npm" for all Node.js package managers including pnpm
+    directory: "/"
     schedule:
-      interval: 'weekly'
-      day: 'monday'
-      time: '09:00'
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
     open-pull-requests-limit: 10
     reviewers:
-      - 'nabinkhair42'
+      - "nabinkhair42"
     assignees:
-      - 'nabinkhair42'
+      - "nabinkhair42"
     commit-message:
-      prefix: 'chore'
-      include: 'scope'
+      prefix: "chore"
+      include: "scope"
     labels:
-      - 'dependencies'
-      - 'automated'
-      - 'pnpm'
+      - "dependencies"
+      - "automated"
+      - "pnpm"
     groups:
       production-dependencies:
-        dependency-type: 'production'
+        dependency-type: "production"
         patterns:
-          - '*'
+          - "*"
         update-types:
-          - 'minor'
-          - 'patch'
+          - "minor"
+          - "patch"
       development-dependencies:
-        dependency-type: 'development'
+        dependency-type: "development"
         patterns:
-          - '*'
+          - "*"
         update-types:
-          - 'minor'
-          - 'patch'
+          - "minor"
+          - "patch"
       major-updates:
-        dependency-type: 'production'
+        dependency-type: "production"
         patterns:
-          - '*'
+          - "*"
         update-types:
-          - 'major'
+          - "major"
 
   # Enable version updates for GitHub Actions
-  - package-ecosystem: 'github-actions'
-    directory: '/'
+  - package-ecosystem: "github-actions"
+    directory: "/"
     schedule:
-      interval: 'weekly'
-      day: 'monday'
-      time: '09:00'
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
     commit-message:
-      prefix: 'ci'
-      include: 'scope'
+      prefix: "ci"
+      include: "scope"
     labels:
-      - 'github-actions'
-      - 'automated'
+      - "github-actions"
+      - "automated"

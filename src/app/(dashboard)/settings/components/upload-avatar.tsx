@@ -178,6 +178,9 @@ function ImageCropper({
             circularCrop
             className="max-w-full"
           >
+            {/* Using forwardRef with Image requires custom implementation */}
+            {/* We need to keep using img here because ReactCrop expects a standard img element */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               ref={imageRef as React.RefObject<HTMLImageElement>}
               src={imageSrc}
