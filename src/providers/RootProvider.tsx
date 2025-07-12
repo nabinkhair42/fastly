@@ -26,6 +26,7 @@ function FontProvider({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth();
   const { data: userDetails } = useUserDetails();
   const { setTheme } = useTheme();
+
   const [font, setFont] = useState<'sans' | 'serif' | 'mono' | 'system'>(
     'sans'
   );
@@ -67,7 +68,7 @@ export default function RootProvider({
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <FontProvider>
             {children}
-            <Toaster position="bottom-right" richColors />
+            <Toaster position="top-center" richColors />
           </FontProvider>
         </ThemeProvider>
       </AuthProvider>

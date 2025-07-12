@@ -1,6 +1,5 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -9,7 +8,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { useUserDetails } from '@/hooks/useUserMutations';
-import { Calendar, Mail, Settings, User } from 'lucide-react';
+import { Calendar, Mail, User } from 'lucide-react';
 
 export default function UsersPage() {
   const { data: userDetails, isLoading } = useUserDetails();
@@ -102,53 +101,7 @@ export default function UsersPage() {
               </div>
             </CardContent>
           </Card>
-
-          {/* Quick Actions */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Settings className="h-5 w-5 mr-2" />
-                Quick Actions
-              </CardTitle>
-              <CardDescription>Manage your account</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <Button variant="outline" className="w-full justify-start">
-                  <User className="h-4 w-4 mr-2" />
-                  Edit Profile
-                </Button>
-                <Button variant="outline" className="w-full justify-start">
-                  <Settings className="h-4 w-4 mr-2" />
-                  Account Settings
-                </Button>
-                <Button variant="outline" className="w-full justify-start">
-                  <Mail className="h-4 w-4 mr-2" />
-                  Change Email
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
         </div>
-
-        {/* Welcome Message */}
-        <Card className="mt-8">
-          <CardContent className="pt-6">
-            <div className="text-center py-8">
-              <h2 className="text-2xl font-bold text-muted-foreground mb-2">
-                Welcome to Your Dashboard!
-              </h2>
-              <p className="text-muted-foreground mb-4">
-                Your account setup is complete. You can now access all features
-                of the platform.
-              </p>
-              <div className="flex justify-center space-x-4">
-                <Button>Get Started</Button>
-                <Button variant="outline">Learn More</Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       </main>
     </div>
   );
