@@ -56,6 +56,7 @@ export default function EmailVerificationPage() {
       email: '',
       verificationCode: '',
     },
+    mode: 'onChange',
   });
 
   useEffect(() => {

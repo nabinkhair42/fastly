@@ -40,6 +40,7 @@ export default function LoginPage() {
       email: '',
       password: '',
     },
+    mode: 'onChange',
   });
 
   const onSubmit = async (data: LoginFormData) => {

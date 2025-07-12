@@ -37,11 +37,14 @@ export default function ForgotPasswordPage() {
     defaultValues: {
       email: '',
     },
+    mode: 'onChange',
   });
 
   const onSubmit = async (data: ForgotPasswordFormData) => {
     try {
       await forgotPasswordMutation.mutateAsync(data);
+      // Store email in localStorage for reset-password page
+      localStorage.setItem('resetPasswordEmail', data.email);
       // Could redirect to a success page or show success message
     } catch (error) {
       console.error(error);

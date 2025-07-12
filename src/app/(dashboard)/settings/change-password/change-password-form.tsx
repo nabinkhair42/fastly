@@ -28,6 +28,7 @@ export default function ChangePasswordForm() {
       newPassword: '',
       confirmPassword: '',
     },
+    mode: 'onChange',
   });
 
   const onSubmit = (data: ChangePasswordFormData) => {

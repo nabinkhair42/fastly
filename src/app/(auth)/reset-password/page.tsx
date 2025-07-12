@@ -18,100 +18,106 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { useCreateAccount } from '@/hooks/useAuthMutations';
-import { createAccountSchema } from '@/zod/authValidation';
+import { useResetPassword } from '@/hooks/useAuthMutations';
+import { resetPasswordRequestSchema } from '@/zod/authValidation';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Eye, EyeOff, User } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { Eye, EyeOff, Lock } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-type CreateAccountFormData = z.infer<typeof createAccountSchema>;
+type ResetPasswordFormData = z.infer<typeof resetPasswordRequestSchema>;
 
-export default function CreateAccountPage() {
+export default function ResetPasswordPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const resetPasswordMutation = useResetPassword();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const router = useRouter();
-  const createAccountMutation = useCreateAccount();
+  const [token, setToken] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
 
-  const form = useForm<CreateAccountFormData>({
-    resolver: zodResolver(createAccountSchema),
+  const form = useForm<ResetPasswordFormData>({
+    resolver: zodResolver(resetPasswordRequestSchema),
     defaultValues: {
-      firstName: '',
-      lastName: '',
       email: '',
+      resetToken: '',
       password: '',
       confirmPassword: '',
     },
     mode: 'onChange',
   });
 
-  const onSubmit = async (data: CreateAccountFormData) => {
-    if (data.password !== data.confirmPassword) {
-      form.setError('confirmPassword', {
-        message: 'Passwords do not match',
-      });
-      return;
+  useEffect(() => {
+    // Get token from URL query parameter
+    const tokenFromUrl = searchParams.get('token');
+    if (tokenFromUrl) {
+      setToken(tokenFromUrl);
+      form.setValue('resetToken', tokenFromUrl);
+    } else {
+      // If no token, redirect to forgot password
+      router.push('/forgot-password');
     }
 
+    // Get email from localStorage (if available from forgot password page)
+    const storedEmail = localStorage.getItem('resetPasswordEmail');
+    if (storedEmail) {
+      setEmail(storedEmail);
+      form.setValue('email', storedEmail);
+    }
+  }, [searchParams, form, router]);
+
+  const onSubmit = async (data: ResetPasswordFormData) => {
     try {
-      await createAccountMutation.mutateAsync({
-        ...data,
-        confirmPassword: data.confirmPassword || '',
-      });
-      // Store email in localStorage for email verification page
-      localStorage.setItem('verificationEmail', data.email);
-      router.push('/email-verification');
+      await resetPasswordMutation.mutateAsync(data);
+      // Clear stored email
+      localStorage.removeItem('resetPasswordEmail');
+      // Redirect to login page after successful reset
+      router.push('/log-in');
     } catch (error) {
       console.error(error);
     }
   };
+
+  if (!token) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <Card className="w-full max-w-md">
+          <CardContent className="pt-6">
+            <div className="text-center">
+              <p className="text-muted-foreground">
+                Invalid or missing reset token. Please request a new password
+                reset.
+              </p>
+              <Button
+                onClick={() => router.push('/forgot-password')}
+                className="mt-4"
+              >
+                Go to Forgot Password
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center">
       <Card className="w-full max-w-md">
         <CardHeader>
           <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-muted">
-            <User className="h-6 w-6" />
+            <Lock className="h-6 w-6" />
           </div>
-          <CardTitle className="text-2xl font-bold">Create Account</CardTitle>
-          <CardDescription>
-            Enter your information to create a new account
-          </CardDescription>
+          <CardTitle className="text-2xl font-bold">
+            Reset Your Password
+          </CardTitle>
+          <CardDescription>Enter your new password below</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="firstName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>First Name</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter your first name" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="lastName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Last Name</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter your last name" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
               <FormField
                 control={form.control}
                 name="email"
@@ -121,8 +127,13 @@ export default function CreateAccountPage() {
                     <FormControl>
                       <Input
                         type="email"
-                        placeholder="Enter your email"
+                        placeholder="Enter your email address"
                         {...field}
+                        value={email}
+                        onChange={e => {
+                          setEmail(e.target.value);
+                          field.onChange(e);
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -135,12 +146,12 @@ export default function CreateAccountPage() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Password</FormLabel>
+                    <FormLabel>New Password</FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Input
                           type={showPassword ? 'text' : 'password'}
-                          placeholder="Enter your password"
+                          placeholder="Enter your new password"
                           {...field}
                         />
                         <Button
@@ -168,12 +179,12 @@ export default function CreateAccountPage() {
                 name="confirmPassword"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Confirm Password</FormLabel>
+                    <FormLabel>Confirm New Password</FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Input
                           type={showConfirmPassword ? 'text' : 'password'}
-                          placeholder="Confirm your password"
+                          placeholder="Confirm your new password"
                           {...field}
                         />
                         <Button
@@ -201,24 +212,23 @@ export default function CreateAccountPage() {
               <Button
                 type="submit"
                 className="w-full"
-                disabled={createAccountMutation.isPending}
-                loading={createAccountMutation.isPending}
-                loadingText="Creating"
+                disabled={resetPasswordMutation.isPending}
+                loading={resetPasswordMutation.isPending}
+                loadingText="Resetting"
               >
-                Create Account
+                Reset Password
               </Button>
             </form>
           </Form>
         </CardContent>
         <CardFooter className="flex justify-center">
           <div className="text-center text-sm">
-            Already have an account?{' '}
             <Button
               variant="link"
               className="p-0 font-normal"
               onClick={() => router.push('/log-in')}
             >
-              Sign in
+              Back to Sign In
             </Button>
           </div>
         </CardFooter>

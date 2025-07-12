@@ -44,6 +44,7 @@ export function AccountForm() {
       theme: (theme as 'light' | 'dark' | 'system') || 'system',
       font: font || 'sans',
     },
+    mode: 'onChange',
   });
 
   const watchedTheme = form.watch('theme');
