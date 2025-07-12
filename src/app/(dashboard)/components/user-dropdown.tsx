@@ -59,7 +59,7 @@ const UserDropdown = () => {
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => router.push('/settings/account')}>
           <Settings className="mr-2 h-4 w-4" />
-          <span>Settings</span>
+          <span>Account Settings</span>
         </DropdownMenuItem>
         <DropdownMenuItem onClick={handleLogout}>
           <LogOut className="mr-2 h-4 w-4" />
