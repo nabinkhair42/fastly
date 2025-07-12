@@ -61,32 +61,33 @@ export function UploadAvatar() {
     <div className="space-y-4">
       <div className="text-sm font-medium text-foreground">Profile picture</div>
 
-      <div className="relative">
+      <div className="relative w-fit">
         <Avatar className="h-20 w-20">
           <AvatarImage src={defaultAvatar || ''} />
-          <AvatarFallback className="text-lg">{avatarFallback}</AvatarFallback>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="absolute bottom-1 right-1 h-8 w-8"
-              >
-                <Edit className="h-3 w-3" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-48">
-              <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
-                <Upload className="h-4 w-4 mr-2" />
-                Upload a photo...
-              </DropdownMenuItem>
-              <DropdownMenuItem className="text-destructive">
-                <Trash2 className="h-4 w-4 mr-2" />
-                Remove photo
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <AvatarFallback className="text-lg border">
+            {avatarFallback}
+          </AvatarFallback>
         </Avatar>
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            asChild
+            className="absolute rounded-full h-7 w-7 bottom-1 left-15 -translate-x-1/2 z-50"
+          >
+            <Button variant="outline" size="icon">
+              <Edit className="h-3 w-3" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-48">
+            <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
+              <Upload className="h-4 w-4 mr-2" />
+              Upload a photo...
+            </DropdownMenuItem>
+            <DropdownMenuItem className="text-destructive">
+              <Trash2 className="h-4 w-4 mr-2" />
+              Remove photo
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       <input
