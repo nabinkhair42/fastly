@@ -18,6 +18,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { Separator } from '@/components/ui/separator';
 import { useCreateAccount } from '@/hooks/useAuthMutations';
 import { createAccountSchema } from '@/zod/authValidation';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -26,7 +27,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-
+import { OAuthButtons } from '../oauth-buttons';
 type CreateAccountFormData = z.infer<typeof createAccountSchema>;
 
 export default function CreateAccountPage() {
@@ -147,7 +148,7 @@ export default function CreateAccountPage() {
                           type="button"
                           variant="ghost"
                           size="sm"
-                          className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                          className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 p-0 hover:bg-transparent"
                           onClick={() => setShowPassword(!showPassword)}
                         >
                           {showPassword ? (
@@ -180,7 +181,7 @@ export default function CreateAccountPage() {
                           type="button"
                           variant="ghost"
                           size="sm"
-                          className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                          className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 p-0 hover:bg-transparent"
                           onClick={() =>
                             setShowConfirmPassword(!showConfirmPassword)
                           }
@@ -209,6 +210,15 @@ export default function CreateAccountPage() {
               </Button>
             </form>
           </Form>
+          <div className="my-6 flex items-center gap-4">
+            <Separator className="flex-1" />
+            <span className="text-sm text-muted-foreground">
+              Or sign in with
+            </span>
+            <Separator className="flex-1" />
+          </div>
+
+          <OAuthButtons />
         </CardContent>
         <CardFooter className="flex justify-center">
           <div className="text-center text-sm">
