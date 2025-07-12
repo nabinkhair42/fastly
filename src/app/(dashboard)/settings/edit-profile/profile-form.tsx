@@ -136,7 +136,7 @@ export function ProfileForm() {
                       updated your username.
                     </span>
                   ) : (
-                    <span className="text-muted-foreground">
+                    <span className="text-warning">
                       You can change your username only once. Choose carefully.
                     </span>
                   )}

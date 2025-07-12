@@ -119,16 +119,6 @@ export default function LoginPage() {
                 )}
               />
 
-              <div className="flex items-center justify-end">
-                <Button
-                  variant="link"
-                  className="px-0 font-normal"
-                  onClick={() => router.push('/forgot-password')}
-                >
-                  Forgot password?
-                </Button>
-              </div>
-
               <Button
                 type="submit"
                 className="w-full"
@@ -140,6 +130,16 @@ export default function LoginPage() {
               </Button>
             </form>
           </Form>
+
+          <div className="mt-4 flex items-center justify-end">
+            <Button
+              variant="link"
+              className="px-0 font-normal"
+              onClick={() => router.push('/forgot-password')}
+            >
+              Forgot password?
+            </Button>
+          </div>
         </CardContent>
         <CardFooter className="flex justify-center">
           <div className="text-center text-sm">

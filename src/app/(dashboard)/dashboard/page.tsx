@@ -138,7 +138,7 @@ export default function UsersPage() {
               <h2 className="text-2xl font-bold text-muted-foreground mb-2">
                 Welcome to Your Dashboard!
               </h2>
-              <p className="text-gray-600 mb-4">
+              <p className="text-muted-foreground mb-4">
                 Your account setup is complete. You can now access all features
                 of the platform.
               </p>
