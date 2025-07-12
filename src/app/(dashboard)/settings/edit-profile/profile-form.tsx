@@ -18,13 +18,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useProfileForm } from '@/hooks/useProfileForm';
 import { cn } from '@/lib/utils';
@@ -32,10 +25,158 @@ import { format } from 'date-fns';
 import {
   CalendarIcon,
   CheckCircle,
+  ChevronDown,
   Loader2,
   Trash2,
   XCircle,
 } from 'lucide-react';
+import { useState } from 'react';
+import {
+  FaDiscord,
+  FaFacebook,
+  FaGithub,
+  FaGlobe,
+  FaInstagram,
+  FaLinkedin,
+  FaTiktok,
+  FaXTwitter,
+  FaYoutube,
+} from 'react-icons/fa6';
+
+// Social platform constants
+const SOCIAL_PLATFORMS = {
+  website: {
+    label: 'Website',
+    icon: FaGlobe,
+    placeholder: 'https://yourwebsite.com',
+  },
+  github: {
+    label: 'GitHub',
+    icon: FaGithub,
+    placeholder: 'https://github.com/username',
+  },
+  twitter: {
+    label: 'Twitter',
+    icon: FaXTwitter,
+    placeholder: 'https://twitter.com/username',
+  },
+  linkedin: {
+    label: 'LinkedIn',
+    icon: FaLinkedin,
+    placeholder: 'https://linkedin.com/in/username',
+  },
+  instagram: {
+    label: 'Instagram',
+    icon: FaInstagram,
+    placeholder: 'https://instagram.com/username',
+  },
+  facebook: {
+    label: 'Facebook',
+    icon: FaFacebook,
+    placeholder: 'https://facebook.com/username',
+  },
+  youtube: {
+    label: 'YouTube',
+    icon: FaYoutube,
+    placeholder: 'https://youtube.com/@username',
+  },
+  tiktok: {
+    label: 'TikTok',
+    icon: FaTiktok,
+    placeholder: 'https://tiktok.com/@username',
+  },
+  discord: {
+    label: 'Discord',
+    icon: FaDiscord,
+    placeholder: 'https://discord.gg/server',
+  },
+  other: { label: 'Other', icon: FaGlobe, placeholder: 'https://example.com' },
+} as const;
+
+// Integrated Social Input Component
+function SocialInput({
+  provider,
+  url,
+  onProviderChange,
+  onUrlChange,
+  placeholder = 'https://example.com',
+}: {
+  provider: string;
+  url: string;
+  onProviderChange: (provider: string) => void;
+  onUrlChange: (url: string) => void;
+  placeholder?: string;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const selectedPlatform =
+    SOCIAL_PLATFORMS[provider as keyof typeof SOCIAL_PLATFORMS];
+  const Icon = selectedPlatform?.icon || FaGlobe;
+  const dynamicPlaceholder = selectedPlatform?.placeholder || placeholder;
+
+  return (
+    <div className="relative">
+      <div className="relative">
+        <Input
+          value={url}
+          onChange={e => onUrlChange(e.target.value)}
+          placeholder={dynamicPlaceholder}
+          className="pl-12 pr-10"
+        />
+
+        {/* Platform Icon */}
+        <div className="absolute left-3 top-1/2 transform -translate-y-1/2 flex items-center justify-center">
+          <Icon className="h-4 w-4 text-muted-foreground" />
+        </div>
+
+        {/* Dropdown Trigger */}
+        <button
+          type="button"
+          onClick={() => setIsOpen(!isOpen)}
+          className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center justify-center hover:bg-muted rounded-sm p-1 transition-colors"
+        >
+          <ChevronDown
+            className={cn(
+              'h-3 w-3 text-muted-foreground transition-transform',
+              isOpen && 'rotate-180'
+            )}
+          />
+        </button>
+      </div>
+
+      {/* Dropdown Content */}
+      {isOpen && (
+        <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-popover border rounded-md shadow-md">
+          <div className="grid grid-cols-5 gap-1 p-2">
+            {Object.entries(SOCIAL_PLATFORMS).map(
+              ([key, { icon: PlatformIcon, label }]) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => {
+                    onProviderChange(key);
+                    setIsOpen(false);
+                  }}
+                  className={cn(
+                    'flex items-center justify-center p-2 rounded-sm hover:bg-accent transition-colors',
+                    provider === key && 'bg-accent'
+                  )}
+                  title={label}
+                >
+                  <PlatformIcon className="h-4 w-4" />
+                </button>
+              )
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Backdrop to close dropdown */}
+      {isOpen && (
+        <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
+      )}
+    </div>
+  );
+}
 
 export function ProfileForm() {
   const {
@@ -80,6 +221,7 @@ export function ProfileForm() {
               </FormItem>
             )}
           />
+
           <FormField
             control={form.control}
             name="lastName"
@@ -246,52 +388,26 @@ export function ProfileForm() {
                 Add links to your website, blog, or social media profiles.
               </FormDescription>
             </div>
-
             {fields.map((field, index) => (
               <div key={field.id} className="flex gap-2">
-                <FormField
-                  control={form.control}
-                  name={`socialAccounts.${index}.provider`}
-                  render={({ field }) => (
-                    <FormItem className="flex-1">
-                      <FormControl>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select platform" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="website">Website</SelectItem>
-                            <SelectItem value="github">GitHub</SelectItem>
-                            <SelectItem value="twitter">Twitter</SelectItem>
-                            <SelectItem value="linkedin">LinkedIn</SelectItem>
-                            <SelectItem value="instagram">Instagram</SelectItem>
-                            <SelectItem value="facebook">Facebook</SelectItem>
-                            <SelectItem value="youtube">YouTube</SelectItem>
-                            <SelectItem value="tiktok">TikTok</SelectItem>
-                            <SelectItem value="discord">Discord</SelectItem>
-                            <SelectItem value="other">Other</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name={`socialAccounts.${index}.url`}
-                  render={({ field }) => (
-                    <FormItem className="flex-[2]">
-                      <FormControl>
-                        <Input {...field} placeholder="https://example.com" />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-
+                <div className="flex-1">
+                  <SocialInput
+                    provider={
+                      form.watch(`socialAccounts.${index}.provider`) ||
+                      'website'
+                    }
+                    url={form.watch(`socialAccounts.${index}.url`) || ''}
+                    onProviderChange={provider => {
+                      form.setValue(
+                        `socialAccounts.${index}.provider`,
+                        provider
+                      );
+                    }}
+                    onUrlChange={url => {
+                      form.setValue(`socialAccounts.${index}.url`, url);
+                    }}
+                  />
+                </div>
                 <Button
                   type="button"
                   variant="destructive"
@@ -303,12 +419,10 @@ export function ProfileForm() {
                 </Button>
               </div>
             ))}
-
             <Button
               type="button"
               variant="outline"
-              size="sm"
-              onClick={() => append({ provider: '', url: '' })}
+              onClick={() => append({ provider: 'website', url: '' })}
             >
               Add Social Account
             </Button>

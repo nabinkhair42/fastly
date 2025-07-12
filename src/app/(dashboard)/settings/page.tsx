@@ -21,6 +21,17 @@ import {
   User,
 } from 'lucide-react';
 import Link from 'next/link';
+import {
+  FaDiscord,
+  FaFacebook,
+  FaGithub,
+  FaGlobe,
+  FaInstagram,
+  FaLinkedin,
+  FaTiktok,
+  FaXTwitter,
+  FaYoutube,
+} from 'react-icons/fa6';
 
 const SettingsPage = () => {
   const { data: userDetails, isLoading } = useUserDetails();
@@ -210,10 +221,39 @@ const SettingsPage = () => {
                     key={index}
                     className="flex items-center gap-3 p-3 border rounded-lg"
                   >
-                    <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                    {account.provider === 'website' && (
+                      <FaGlobe className="h-4 w-4 text-muted-foreground" />
+                    )}
+                    {account.provider === 'twitter' && (
+                      <FaXTwitter className="h-4 w-4 text-muted-foreground" />
+                    )}
+                    {account.provider === 'github' && (
+                      <FaGithub className="h-4 w-4 text-muted-foreground" />
+                    )}
+                    {account.provider === 'linkedin' && (
+                      <FaLinkedin className="h-4 w-4 text-muted-foreground" />
+                    )}
+                    {account.provider === 'instagram' && (
+                      <FaInstagram className="h-4 w-4 text-muted-foreground" />
+                    )}
+                    {account.provider === 'facebook' && (
+                      <FaFacebook className="h-4 w-4 text-muted-foreground" />
+                    )}
+                    {account.provider === 'youtube' && (
+                      <FaYoutube className="h-4 w-4 text-muted-foreground" />
+                    )}
+                    {account.provider === 'tiktok' && (
+                      <FaTiktok className="h-4 w-4 text-muted-foreground" />
+                    )}
+                    {account.provider === 'discord' && (
+                      <FaDiscord className="h-4 w-4 text-muted-foreground" />
+                    )}
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium truncate">
-                        {account.provider || 'Website'}
+                        {account.provider
+                          ? account.provider.charAt(0).toUpperCase() +
+                            account.provider.slice(1)
+                          : 'Website'}
                       </p>
                       <a
                         href={account.url}
