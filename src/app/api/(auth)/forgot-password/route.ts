@@ -3,6 +3,10 @@ import dbConnect from '@/lib/dbConnect';
 import { sendResponse } from '@/lib/sendResponse';
 import { sendForgotPasswordEmail } from '@/mail-templates/emailService';
 import { UserAuthModel } from '@/models/users';
+import {
+  canLoginWithEmail,
+  getUserLoginMethods,
+} from '@/services/accountLinkingService';
 import { forgotPasswordSchema } from '@/zod/authValidation';
 import { NextRequest } from 'next/server';
 
@@ -20,6 +24,31 @@ export async function POST(request: NextRequest) {
     const userAuth = await UserAuthModel.findOne({ email });
     if (!userAuth) {
       return sendResponse('User not found. Please sign up first.', 404);
+    }
+
+    // Check if user can login with email/password
+    if (!canLoginWithEmail(userAuth)) {
+      const availableMethods = getUserLoginMethods(userAuth);
+      const oauthMethods = availableMethods.filter(
+        method => method !== 'email'
+      );
+
+      if (oauthMethods.length > 0) {
+        return sendResponse(
+          `This account was created using ${oauthMethods.join(' or ')}. Please sign in using that method, then set up a password in your account settings.`,
+          400,
+          {
+            availableLoginMethods: availableMethods,
+            hasPassword: userAuth.hasPassword,
+            canSetPassword: !userAuth.hasPassword,
+          }
+        );
+      } else {
+        return sendResponse(
+          'This account does not have password login enabled. Please contact support.',
+          400
+        );
+      }
     }
 
     // generate reset password token

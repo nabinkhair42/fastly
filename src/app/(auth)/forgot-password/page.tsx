@@ -21,9 +21,11 @@ import { Input } from '@/components/ui/input';
 import { useForgotPassword } from '@/hooks/useAuthMutations';
 import { forgotPasswordSchema } from '@/zod/authValidation';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Lock } from 'lucide-react';
+import { AlertCircle, Lock, Mail } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { FaGithub, FaGoogle } from 'react-icons/fa6';
 import { z } from 'zod';
 
 type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
@@ -31,6 +33,11 @@ type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
 export default function ForgotPasswordPage() {
   const router = useRouter();
   const forgotPasswordMutation = useForgotPassword();
+  const [oauthError, setOauthError] = useState<{
+    message: string;
+    availableLoginMethods?: string[];
+    canSetPassword?: boolean;
+  } | null>(null);
 
   const form = useForm<ForgotPasswordFormData>({
     resolver: zodResolver(forgotPasswordSchema),
@@ -42,12 +49,35 @@ export default function ForgotPasswordPage() {
 
   const onSubmit = async (data: ForgotPasswordFormData) => {
     try {
+      setOauthError(null);
       await forgotPasswordMutation.mutateAsync(data);
       // Store email in localStorage for reset-password page
       localStorage.setItem('resetPasswordEmail', data.email);
       // Could redirect to a success page or show success message
-    } catch (error) {
+    } catch (error: unknown) {
       console.error(error);
+      // Check if this is an OAuth-related error
+      if (error && typeof error === 'object' && 'response' in error) {
+        const axiosError = error as {
+          response?: {
+            data?: {
+              message?: string;
+              data?: {
+                availableLoginMethods?: string[];
+                canSetPassword?: boolean;
+              };
+            };
+          };
+        };
+        if (axiosError.response?.data?.data?.availableLoginMethods) {
+          setOauthError({
+            message: axiosError.response.data.message || 'Authentication error',
+            availableLoginMethods:
+              axiosError.response.data.data.availableLoginMethods,
+            canSetPassword: axiosError.response.data.data.canSetPassword,
+          });
+        }
+      }
     }
   };
 
@@ -64,6 +94,49 @@ export default function ForgotPasswordPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {oauthError && (
+            <div className="mb-4 p-4 border border-orange-200 bg-orange-50 rounded-lg">
+              <div className="flex items-start gap-3">
+                <AlertCircle className="h-5 w-5 text-orange-600 mt-0.5 flex-shrink-0" />
+                <div className="space-y-3 flex-1">
+                  <p className="text-orange-800">{oauthError.message}</p>
+                  {oauthError.availableLoginMethods &&
+                    oauthError.availableLoginMethods.length > 0 && (
+                      <div>
+                        <p className="font-medium mb-2 text-orange-800">
+                          Available sign-in methods:
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {oauthError.availableLoginMethods.map(method => (
+                            <div
+                              key={method}
+                              className="flex items-center gap-1 text-sm bg-orange-100 text-orange-800 px-2 py-1 rounded"
+                            >
+                              {method === 'github' && (
+                                <FaGithub className="h-3 w-3" />
+                              )}
+                              {method === 'google' && (
+                                <FaGoogle className="h-3 w-3" />
+                              )}
+                              {method === 'email' && (
+                                <Mail className="h-3 w-3" />
+                              )}
+                              <span className="capitalize">{method}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  {oauthError.canSetPassword && (
+                    <p className="text-sm text-orange-700">
+                      Tip: Sign in with your OAuth provider, then set up a
+                      password in your account settings.
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField

@@ -5,13 +5,29 @@ const authUserSchema = new mongoose.Schema({
   firstName: { type: String, default: null },
   lastName: { type: String, default: null },
   email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
+  password: { type: String, default: null }, // Made optional for OAuth users
+  hasPassword: { type: Boolean, default: false }, // Track if user has password
   isVerified: { type: Boolean, default: false },
-  authMethod: { type: String, default: 'email' },
+  authMethod: { type: String, default: 'email' }, // Keep for backward compatibility
+
+  // Auth0 standard: Multiple identity providers per user
+  identities: [
+    {
+      provider: { type: String, required: true }, // 'email', 'github', 'google'
+      providerId: { type: String, required: true }, // OAuth ID or email for email provider
+      providerEmail: { type: String, required: true },
+      isVerified: { type: Boolean, default: false },
+      isPrimary: { type: Boolean, default: false }, // First identity is primary
+      linkedAt: { type: Date, default: Date.now },
+    },
+  ],
+
   verificationCode: { type: String, default: null },
   verificationCodeExpiresAt: { type: Date, default: null },
   resetPasswordToken: { type: String, default: null },
   resetPasswordTokenExpiresAt: { type: Date, default: null },
+  lastLoginAt: { type: Date, default: null },
+  lastLoginProvider: { type: String, default: null }, // Track last used provider
   createdAt: { type: Date, default: Date.now, immutable: true },
   updatedAt: { type: Date, default: Date.now },
 });

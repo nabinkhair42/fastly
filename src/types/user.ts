@@ -1,6 +1,16 @@
 export type AuthMethod = 'email' | 'google' | 'facebook' | 'github';
+export type AuthProvider = 'email' | 'google' | 'github';
 export type Theme = 'light' | 'dark' | 'system';
 export type Font = 'sans' | 'serif' | 'mono' | 'system';
+
+export interface AuthIdentity {
+  provider: AuthProvider;
+  providerId: string;
+  providerEmail: string;
+  isVerified: boolean;
+  isPrimary: boolean;
+  linkedAt: Date;
+}
 
 export interface SocialAccountUrl {
   url: string;
@@ -39,15 +49,19 @@ export interface User {
 export interface UserAuth {
   _id: string;
   email: string;
-  password: string;
+  password: string | null;
+  hasPassword: boolean;
   isVerified: boolean;
-  authMethod: AuthMethod;
+  authMethod: AuthMethod; // Keep for backward compatibility
+  identities: AuthIdentity[];
   verificationCode: string | null;
   verificationCodeExpiresAt: Date | null;
   resetPasswordToken: string | null;
   resetPasswordTokenExpiresAt: Date | null;
   firstName: string | null;
   lastName: string | null;
+  lastLoginAt: Date | null;
+  lastLoginProvider: AuthProvider | null;
   createdAt: Date;
   updatedAt: Date;
 }

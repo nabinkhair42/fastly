@@ -51,4 +51,10 @@ export const userService = {
     const response = await api.post('/upload-avatar', { avatar: avatarUrl });
     return response.data;
   },
+
+  // Get user authentication status
+  getUserAuthStatus: async () => {
+    const response = await api.get('/auth-status');
+    return response.data;
+  },
 };

@@ -2,6 +2,7 @@ import { hashPassword } from '@/helpers/hashPassword';
 import dbConnect from '@/lib/dbConnect';
 import { sendResponse } from '@/lib/sendResponse';
 import { UserAuthModel } from '@/models/users';
+import { AuthIdentity } from '@/types/user';
 import { resetPasswordRequestSchema } from '@/zod/authValidation';
 import { NextRequest } from 'next/server';
 
@@ -52,12 +53,34 @@ export async function POST(request: NextRequest) {
 
     // update user auth and clear reset token
     userAuth.password = hashedPassword;
+    userAuth.hasPassword = true; // Ensure hasPassword is set to true
     userAuth.resetPasswordToken = null;
     userAuth.resetPasswordTokenExpiresAt = null;
     userAuth.updatedAt = new Date();
+
+    // Add email identity if user doesn't have one (OAuth users setting password for first time)
+    const hasEmailIdentity = userAuth.identities.some(
+      (identity: AuthIdentity) => identity.provider === 'email'
+    );
+
+    if (!hasEmailIdentity) {
+      userAuth.identities.push({
+        provider: 'email',
+        providerId: email,
+        providerEmail: email,
+        isVerified: userAuth.isVerified, // Use existing verification status
+        isPrimary: userAuth.identities.length === 0, // First identity is primary
+        linkedAt: new Date(),
+      });
+    }
+
     await userAuth.save();
 
-    return sendResponse('Password reset successfully', 200);
+    return sendResponse('Password reset successfully', 200, {
+      message:
+        'Your password has been reset successfully. You can now sign in with your email and password.',
+      canLoginWithEmail: true,
+    });
   } catch (error: unknown) {
     const errorMessage =
       error instanceof Error ? error.message : 'Unknown error occurred';

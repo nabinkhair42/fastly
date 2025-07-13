@@ -70,11 +70,18 @@ export default function ResetPasswordPage() {
 
   const onSubmit = async (data: ResetPasswordFormData) => {
     try {
-      await resetPasswordMutation.mutateAsync(data);
+      const response = await resetPasswordMutation.mutateAsync(data);
       // Clear stored email
       localStorage.removeItem('resetPasswordEmail');
+
+      // Show success message if available
+      if (response?.data?.message) {
+        // You could show a toast notification here
+        console.log('Success:', response.data.message);
+      }
+
       // Redirect to login page after successful reset
-      router.push('/log-in');
+      router.push('/log-in?message=password-reset-success');
     } catch (error) {
       console.error(error);
     }
@@ -113,7 +120,10 @@ export default function ResetPasswordPage() {
           <CardTitle className="text-2xl font-bold">
             Reset Your Password
           </CardTitle>
-          <CardDescription>Enter your new password below</CardDescription>
+          <CardDescription>
+            Enter your new password below. After resetting, you will be able to
+            sign in with your email and password.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>

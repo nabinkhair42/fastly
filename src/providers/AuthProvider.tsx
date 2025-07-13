@@ -5,6 +5,7 @@ import { AuthenticatedUser } from '@/types/user';
 import {
   createContext,
   ReactNode,
+  useCallback,
   useContext,
   useEffect,
   useState,
@@ -64,17 +65,20 @@ export default function AuthProvider({ children }: AuthProviderProps) {
     initializeAuth();
   }, []);
 
-  const login = (
-    accessToken: string,
-    refreshToken: string,
-    userData: AuthenticatedUser
-  ) => {
-    tokenManager.setTokens(accessToken, refreshToken);
-    localStorage.setItem('user', JSON.stringify(userData));
-    setUser(userData);
-  };
+  const login = useCallback(
+    (
+      accessToken: string,
+      refreshToken: string,
+      userData: AuthenticatedUser
+    ) => {
+      tokenManager.setTokens(accessToken, refreshToken);
+      localStorage.setItem('user', JSON.stringify(userData));
+      setUser(userData);
+    },
+    []
+  );
 
-  const logout = () => {
+  const logout = useCallback(() => {
     // Get token before clearing it
     const accessToken = tokenManager.getAccessToken();
 
@@ -94,12 +98,12 @@ export default function AuthProvider({ children }: AuthProviderProps) {
         // Ignore errors, user is logging out anyway
       });
     }
-  };
+  }, []);
 
-  const updateUser = (updatedUser: AuthenticatedUser) => {
+  const updateUser = useCallback((updatedUser: AuthenticatedUser) => {
     setUser(updatedUser);
     localStorage.setItem('user', JSON.stringify(updatedUser));
-  };
+  }, []);
 
   const isAuthenticated = !!user && !!tokenManager.getAccessToken();
 

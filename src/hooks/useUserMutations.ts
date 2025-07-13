@@ -16,6 +16,7 @@ import { toast } from 'sonner';
 // Query keys
 export const userQueryKeys = {
   userDetails: ['user', 'details'] as const,
+  authStatus: ['user', 'auth-status'] as const,
 };
 
 // Get user details query
@@ -27,6 +28,19 @@ export const useUserDetails = () => {
     queryFn: () => userService.getUserDetails(),
     enabled: isAuthenticated, // Only run when authenticated
     staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
+    refetchOnWindowFocus: false,
+  });
+};
+
+// Get user auth status query
+export const useUserAuthStatus = () => {
+  const { isAuthenticated } = useAuth();
+
+  return useQuery({
+    queryKey: userQueryKeys.authStatus,
+    queryFn: () => userService.getUserAuthStatus(),
+    enabled: isAuthenticated, // Only run when authenticated
+    staleTime: 2 * 60 * 1000, // Consider data fresh for 2 minutes
     refetchOnWindowFocus: false,
   });
 };
