@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
       return sendResponse('Incorrect password, please try again', 401);
     }
 
-    // check if password is correct
+    // verify password
     const isPasswordCorrect = await verifyPassword(password, userAuth.password);
     if (!isPasswordCorrect) {
       return sendResponse('Incorrect password, please try again', 401);
