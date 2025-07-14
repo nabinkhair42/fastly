@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
   } catch (error: unknown) {
     const errorMessage =
       error instanceof Error ? error.message : 'Unknown error occurred';
-    return sendResponse('Internal Server Error', 500, null, errorMessage);
+    return sendResponse(errorMessage, 500, null, error);
   }
 }
 
@@ -107,6 +107,6 @@ export async function POST(request: NextRequest) {
   } catch (error: unknown) {
     const errorMessage =
       error instanceof Error ? error.message : 'Unknown error occurred';
-    return sendResponse('Internal Server Error', 500, null, errorMessage);
+    return sendResponse(errorMessage, 500, null, error);
   }
 }

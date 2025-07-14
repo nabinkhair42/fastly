@@ -26,9 +26,14 @@ export async function POST(request: NextRequest) {
     }
 
     // check if password is correct
+    if (!password || !userAuth.password) {
+      return sendResponse('Incorrect password, please try again', 401);
+    }
+
+    // check if password is correct
     const isPasswordCorrect = await verifyPassword(password, userAuth.password);
     if (!isPasswordCorrect) {
-      return sendResponse('Invalid email or password', 401);
+      return sendResponse('Incorrect password, please try again', 401);
     }
 
     // check if user is verified
@@ -52,8 +57,9 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error: unknown) {
+    console.log(error);
     const errorMessage =
       error instanceof Error ? error.message : 'Unknown error occurred';
-    return sendResponse('Internal Server Error', 500, null, errorMessage);
+    return sendResponse(errorMessage, 500, null, error);
   }
 }
