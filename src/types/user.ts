@@ -1,4 +1,4 @@
-export type AuthMethod = 'email' | 'google' | 'facebook' | 'apple';
+export type AuthMethod = 'email' | 'google' | 'facebook' | 'github';
 export type Theme = 'light' | 'dark' | 'system';
 export type Font = 'sans' | 'serif' | 'mono' | 'system';
 

@@ -18,6 +18,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { Separator } from '@/components/ui/separator';
 import { useLogin } from '@/hooks/useAuthMutations';
 import { loginSchema } from '@/zod/authValidation';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -26,6 +27,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+import { OAuthButtons } from '../oauth-buttons';
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
@@ -102,8 +104,8 @@ export default function LoginPage() {
                         <Button
                           type="button"
                           variant="ghost"
-                          size="sm"
-                          className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                          size="icon"
+                          className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 p-0 hover:bg-transparent"
                           onClick={() => setShowPassword(!showPassword)}
                         >
                           {showPassword ? (
@@ -124,9 +126,9 @@ export default function LoginPage() {
                 className="w-full"
                 disabled={loginMutation.isPending}
                 loading={loginMutation.isPending}
-                loadingText="Signing In"
+                loadingText="Logging In"
               >
-                Sign In
+                Log In
               </Button>
             </form>
           </Form>
@@ -140,6 +142,16 @@ export default function LoginPage() {
               Forgot password?
             </Button>
           </div>
+
+          <div className="my-4 flex items-center gap-4">
+            <Separator className="flex-1" />
+            <span className="text-sm text-muted-foreground">
+              Or sign in with
+            </span>
+            <Separator className="flex-1" />
+          </div>
+
+          <OAuthButtons />
         </CardContent>
         <CardFooter className="flex justify-center">
           <div className="text-center text-sm">
