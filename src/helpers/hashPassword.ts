@@ -9,5 +9,8 @@ export const verifyPassword = async (
   password: string,
   hashedPassword: string
 ) => {
+  if (!password || !hashedPassword) {
+    throw new Error('Password and hashed password are required');
+  }
   return await bcrypt.compare(password, hashedPassword);
 };

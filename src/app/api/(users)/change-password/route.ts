@@ -44,6 +44,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify current password
+    if (!currentPassword || !userAuth.password) {
+      return sendResponse('Current password is required', 400);
+    }
+
     const isCurrentPasswordValid = await verifyPassword(
       currentPassword,
       userAuth.password
@@ -53,6 +57,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if new password is different from current password
+    if (!newPassword) {
+      return sendResponse('New password is required', 400);
+    }
+
     const isSamePassword = await verifyPassword(newPassword, userAuth.password);
     if (isSamePassword) {
       return sendResponse(
@@ -74,13 +82,8 @@ export async function POST(request: NextRequest) {
     });
   } catch (error: unknown) {
     if (error instanceof Error) {
-      return sendResponse('Internal Server Error', 500, null, error.message);
+      return sendResponse(error.message, 500, null, error);
     }
-    return sendResponse(
-      'Internal Server Error',
-      500,
-      null,
-      'Unknown error occurred'
-    );
+    return sendResponse('Unknown error occurred', 500, null, error);
   }
 }

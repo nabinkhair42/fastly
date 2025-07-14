@@ -28,6 +28,10 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Verify password
+    if (!password || !userAuth.password) {
+      return sendResponse('Password is required', 400);
+    }
+
     const isPasswordValid = await verifyPassword(password, userAuth.password);
     if (!isPasswordValid) {
       return sendResponse('Incorrect password', 400);
@@ -42,13 +46,8 @@ export async function DELETE(request: NextRequest) {
     return sendResponse('User account deleted successfully', 200);
   } catch (error: unknown) {
     if (error instanceof Error) {
-      return sendResponse('Internal Server Error', 500, null, error.message);
+      return sendResponse(error.message, 500, null, error);
     }
-    return sendResponse(
-      'Internal Server Error',
-      500,
-      null,
-      'Unknown error occurred'
-    );
+    return sendResponse('Unknown error occurred', 500, null, error);
   }
 }
