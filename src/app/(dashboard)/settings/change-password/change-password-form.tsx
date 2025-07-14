@@ -14,6 +14,8 @@ import { Input } from '@/components/ui/input';
 import { useChangePassword } from '@/hooks/useUserMutations';
 import { changePasswordSchema } from '@/zod/usersUpdate';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Eye, EyeOff } from 'lucide-react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -34,6 +36,7 @@ export default function ChangePasswordForm() {
   const onSubmit = (data: ChangePasswordFormData) => {
     changePassword(data);
   };
+  const [showPassword, setShowPassword] = useState(false);
 
   return (
     <Form {...form}>
@@ -45,7 +48,22 @@ export default function ChangePasswordForm() {
             <FormItem>
               <FormLabel>Current Password</FormLabel>
               <FormControl>
-                <Input {...field} />
+                <div className="relative">
+                  <Input {...field} />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 p-0 hover:bg-transparent"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
               </FormControl>
               <FormDescription>
                 Enter your current password to change it.
@@ -61,7 +79,22 @@ export default function ChangePasswordForm() {
             <FormItem>
               <FormLabel>New Password</FormLabel>
               <FormControl>
-                <Input {...field} />
+                <div className="relative">
+                  <Input {...field} />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 p-0 hover:bg-transparent"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
               </FormControl>
               <FormDescription>
                 Enter your new password to change it.
