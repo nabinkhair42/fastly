@@ -1,6 +1,6 @@
 import { hashPassword } from '@/helpers/hashPassword';
 import { generateTokenPair } from '@/helpers/jwtToken';
-import { UserAuthModel } from '@/models/users';
+import { UserAuthModel, UserModel } from '@/models/users';
 import { AuthIdentity, AuthProvider, UserAuth } from '@/types/user';
 import { OAuthUser } from './oauthService';
 
@@ -86,6 +86,25 @@ export async function handleOAuthSignIn(
       lastLoginProvider: provider,
     });
 
+    // Create corresponding User record for the new OAuth user
+    try {
+      await UserModel.create({
+        authUser: newUser._id, // Reference to UserAuth record
+        email: newUser.email,
+        firstName: newUser.firstName,
+        lastName: newUser.lastName,
+        username: `${newUser.firstName.toLowerCase().replace(/\s+/g, '')}${newUser.lastName.toLowerCase().replace(/\s+/g, '')}_${Date.now()}`, // Generate unique username
+        isVerified: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+    } catch (error) {
+      // If UserModel creation fails, clean up the UserAuth record
+      console.error('UserModel creation error:', error);
+      await UserAuthModel.findByIdAndDelete(newUser._id);
+      throw new Error('Failed to create user profile. Please try again.');
+    }
+
     return {
       user: newUser,
       isNewUser: true,
@@ -163,6 +182,25 @@ export async function handleEmailSignUp(
       ],
       lastLoginProvider: 'email',
     });
+
+    // Create corresponding User record for the new email user
+    try {
+      await UserModel.create({
+        authUser: newUser._id, // Reference to UserAuth record
+        email: newUser.email,
+        firstName: newUser.firstName,
+        lastName: newUser.lastName,
+        username: `${newUser.firstName.toLowerCase().replace(/\s+/g, '')}${newUser.lastName.toLowerCase().replace(/\s+/g, '')}_${Date.now()}`, // Generate unique username
+        isVerified: false, // Email accounts need verification
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+    } catch (error) {
+      // If UserModel creation fails, clean up the UserAuth record
+      console.error('UserModel creation error:', error);
+      await UserAuthModel.findByIdAndDelete(newUser._id);
+      throw new Error('Failed to create user profile. Please try again.');
+    }
 
     return {
       user: newUser,

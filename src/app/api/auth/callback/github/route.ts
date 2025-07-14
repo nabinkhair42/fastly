@@ -1,9 +1,9 @@
-import { completeOAuthFlow } from '@/services/oauthService';
-import {
-  handleOAuthSignIn,
-  generateAuthTokens,
-} from '@/services/accountLinkingService';
 import dbConnect from '@/lib/dbConnect';
+import {
+  generateAuthTokens,
+  handleOAuthSignIn,
+} from '@/services/accountLinkingService';
+import { completeOAuthFlow } from '@/services/oauthService';
 import { NextRequest } from 'next/server';
 
 /**
@@ -75,6 +75,7 @@ export async function GET(request: NextRequest) {
 
     if (isNewUser) {
       successUrl.searchParams.set('isNewUser', 'true');
+      // UserModel is now created automatically by the account linking service
     }
     if (linkedProvider) {
       successUrl.searchParams.set('linkedProvider', linkedProvider);

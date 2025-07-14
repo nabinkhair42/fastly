@@ -34,6 +34,7 @@ export {
   useDeleteUser,
   userQueryKeys,
   useUpdateUserDetails,
+  useUserAuthStatus,
   useUserDetails,
 } from '@/hooks/useUserMutations';
 

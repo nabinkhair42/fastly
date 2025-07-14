@@ -46,20 +46,38 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // create user with data from userAuth
-    await UserModel.create({
+    // Check if UserModel already exists (should be created during account creation)
+    const existingUserModel = await UserModel.findOne({
       authUser: userAuth._id,
-      firstName: userAuth.firstName,
-      lastName: userAuth.lastName,
-      email: userAuth.email,
-      username: `${userAuth.firstName.toLowerCase()}_${Date.now()}`,
     });
+    if (!existingUserModel) {
+      // Create UserModel if it doesn't exist (fallback for legacy accounts)
+      await UserModel.create({
+        authUser: userAuth._id, // Reference to UserAuth record
+        firstName: userAuth.firstName,
+        lastName: userAuth.lastName,
+        email: userAuth.email,
+        username: `${userAuth.firstName.toLowerCase()}_${Date.now()}`,
+        isVerified: false, // Will be set to true below
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+    }
 
     // verify user and clear verification data
     userAuth.isVerified = true;
     userAuth.verificationCode = null;
     userAuth.verificationCodeExpiresAt = null;
     await userAuth.save();
+
+    // Also update the UserModel verification status
+    await UserModel.findOneAndUpdate(
+      { authUser: userAuth._id },
+      {
+        isVerified: true,
+        updatedAt: new Date(),
+      }
+    );
 
     // generate secure token pair
     const tokens = generateTokenPair(userAuth._id.toString(), userAuth.email);

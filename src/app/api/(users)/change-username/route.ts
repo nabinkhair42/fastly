@@ -95,10 +95,18 @@ export async function GET(request: NextRequest) {
       return sendResponse(error.message, 400);
     }
 
+    // Find current user's profile to get their UserModel _id
+    const currentUser = await UserModel.findOne({
+      authUser: authResult.user!.userId,
+    });
+    if (!currentUser) {
+      return sendResponse('User profile not found', 404);
+    }
+
     // Check if username is already taken (excluding current user)
     const existingUser = await UserModel.findOne({
       username: username.trim(),
-      _id: { $ne: authResult.user!.userId },
+      _id: { $ne: currentUser._id },
     });
     if (existingUser) {
       return sendResponse('Username already taken', 400);

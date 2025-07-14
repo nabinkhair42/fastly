@@ -47,6 +47,7 @@ export interface User {
 }
 
 export interface UserAuth {
+  save(): unknown;
   _id: string;
   email: string;
   password: string | null;

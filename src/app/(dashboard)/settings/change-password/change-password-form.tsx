@@ -12,15 +12,21 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useChangePassword, useUserAuthStatus } from '@/hooks/useUserMutations';
+import { ChangePasswordRequest } from '@/types/api';
 import { changePasswordSchema } from '@/zod/usersUpdate';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AlertCircle, Eye, EyeOff, Mail } from 'lucide-react';
+import { AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { FaGithub } from 'react-icons/fa6';
+import { Resolver, useForm } from 'react-hook-form';
+import { FaGithub, FaGoogle } from 'react-icons/fa6';
 import { z } from 'zod';
 
-type ChangePasswordFormData = z.infer<typeof changePasswordSchema>;
+// Create a flexible form data type that works for both scenarios
+type FlexiblePasswordFormData = {
+  currentPassword?: string;
+  newPassword: string;
+  confirmPassword: string;
+};
 
 // Create a flexible schema for OAuth users who might not have current password
 const createPasswordSchema = z
@@ -46,8 +52,8 @@ export default function ChangePasswordForm() {
   // Use different schema based on whether user has existing password
   const schema = hasPassword ? changePasswordSchema : createPasswordSchema;
 
-  const form = useForm<ChangePasswordFormData>({
-    resolver: zodResolver(schema),
+  const form = useForm<FlexiblePasswordFormData>({
+    resolver: zodResolver(schema) as Resolver<FlexiblePasswordFormData>,
     defaultValues: {
       currentPassword: '',
       newPassword: '',
@@ -56,8 +62,14 @@ export default function ChangePasswordForm() {
     mode: 'onChange',
   });
 
-  const onSubmit = (data: ChangePasswordFormData) => {
-    changePassword(data);
+  const onSubmit = (data: FlexiblePasswordFormData) => {
+    // Convert to the expected API format
+    const requestData: ChangePasswordRequest = {
+      currentPassword: data.currentPassword || '',
+      newPassword: data.newPassword,
+      confirmPassword: data.confirmPassword,
+    };
+    changePassword(requestData);
   };
 
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
@@ -92,14 +104,14 @@ export default function ChangePasswordForm() {
               <p className="text-blue-700 text-sm">
                 You currently sign in using{' '}
                 {availableLoginMethods
-                  .filter(m => m !== 'email')
-                  .map(method => (
+                  .filter((m: string) => m !== 'email')
+                  .map((method: string) => (
                     <span
                       key={method}
                       className="inline-flex items-center gap-1 mx-1"
                     >
                       {method === 'github' && <FaGithub className="h-3 w-3" />}
-                      {method === 'google' && <Mail className="h-3 w-3" />}
+                      {method === 'google' && <FaGoogle className="h-3 w-3" />}
                       <span className="capitalize">{method}</span>
                     </span>
                   ))}
