@@ -85,4 +85,5 @@ export interface UserProfile {
     font: Font;
   };
   dob: Date | null;
+  authMethod: AuthMethod;
 }

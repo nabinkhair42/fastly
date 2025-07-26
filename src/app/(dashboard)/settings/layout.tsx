@@ -1,16 +1,15 @@
-import { Metadata } from 'next';
-
+'use client';
 import { Fingerprint, Settings, UserCheck2Icon, UserPen } from 'lucide-react';
 import { SidebarNav } from './components/sidebar-nav';
+import { useAuthMethod } from '@/hooks/useUserMutations';
 
-export const metadata: Metadata = {
-  title: 'User Settings',
-  description: 'User settings for the dashboard.',
-};
+interface SettingsLayoutProps {
+  children: React.ReactNode;
+}
 
-// This will be dynamically generated based on user auth method
-const getSidebarNavItems = (authMethod: string) => {
-  const baseItems = [
+export default function SettingsLayout({ children }: SettingsLayoutProps) {
+  const authMethod = useAuthMethod();
+  const sidebarNavItems = [
     {
       icon: <Settings className="h-4 w-4" />,
       title: 'Profile',
@@ -26,25 +25,14 @@ const getSidebarNavItems = (authMethod: string) => {
       title: 'Account',
       href: '/settings/account',
     },
-  ];
-
-  // Only show Change Password for email-based users
-  if (authMethod === 'EMAIL') {
-    baseItems.push({
+    {
       icon: <Fingerprint className="h-4 w-4" />,
       title: 'Change Password',
       href: '/settings/change-password',
-    });
-  }
+      disabled: authMethod !== 'EMAIL',
+    },
+  ];
 
-  return baseItems;
-};
-
-interface SettingsLayoutProps {
-  children: React.ReactNode;
-}
-
-export default function SettingsLayout({ children }: SettingsLayoutProps) {
   return (
     <div className="space-y-6 p-4 pb-16 max-w-5xl mx-auto">
       <div className="flex flex-col lg:flex-row border rounded-xl overflow-hidden min-h-[500px]">

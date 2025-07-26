@@ -1,7 +1,7 @@
 import { requireAuth } from '@/lib/authMiddleware';
 import dbConnect from '@/lib/dbConnect';
 import { sendResponse } from '@/lib/sendResponse';
-import { UserModel } from '@/models/users';
+import { UserModel, UserAuthModel } from '@/models/users';
 import { UpdateUserDetailsRequest } from '@/types/api';
 import { updateUserDetailsSchema } from '@/zod/usersUpdate';
 import { NextRequest } from 'next/server';
@@ -19,6 +19,10 @@ export async function GET(request: NextRequest) {
       return sendResponse('User profile not found', 404);
     }
 
+    const userAuth = await UserAuthModel.findOne({ _id: user.authUser });
+
+    const authMethod = userAuth?.authMethod;
+
     return sendResponse('User details fetched successfully', 200, {
       user: {
         _id: user._id.toString(),
@@ -33,6 +37,7 @@ export async function GET(request: NextRequest) {
         preferences: user.preferences,
         dob: user.dob,
         hasChangedUsername: user.hasChangedUsername,
+        authMethod: authMethod,
       },
     });
   } catch (error: unknown) {

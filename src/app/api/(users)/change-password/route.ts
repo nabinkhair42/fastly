@@ -3,6 +3,7 @@ import { requireAuth } from '@/lib/authMiddleware';
 import dbConnect from '@/lib/dbConnect';
 import { sendResponse } from '@/lib/sendResponse';
 import { UserAuthModel } from '@/models/users';
+import { AuthMethod } from '@/types/user';
 import { changePasswordSchema } from '@/zod/usersUpdate';
 import { NextRequest } from 'next/server';
 
@@ -41,6 +42,14 @@ export async function POST(request: NextRequest) {
     const userAuth = await UserAuthModel.findById(authResult.user!.userId);
     if (!userAuth) {
       return sendResponse('User not found', 404);
+    }
+
+    // check if user uses email authentication
+    if (userAuth.authMethod !== AuthMethod.EMAIL) {
+      return sendResponse(
+        `User uses ${userAuth.authMethod} authentication. Please login and try again.`,
+        400
+      );
     }
 
     // Verify current password
