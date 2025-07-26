@@ -25,6 +25,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // check if user was created with OAuth (no password)
+    if (!userAuth.password) {
+      const authMethod =
+        userAuth.authMethod.charAt(0).toUpperCase() +
+        userAuth.authMethod.slice(1);
+      return sendResponse(
+        `This account was created with ${authMethod}. Please use ${authMethod} to login.`,
+        401
+      );
+    }
+
     // check if password is correct
     if (!password || !userAuth.password) {
       return sendResponse('Incorrect password, please try again', 401);

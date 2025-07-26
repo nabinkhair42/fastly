@@ -5,12 +5,13 @@ import { usePathname } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-
+import { toast } from 'sonner';
 interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {
   items: {
     href: string;
     title: string;
     icon: React.ReactNode;
+    disabled?: boolean;
   }[];
 }
 
@@ -32,8 +33,17 @@ export function SidebarNav({ className, items, ...props }: SidebarNavProps) {
           variant={'ghost'}
           className={cn(
             'text-left justify-start text-sm col-span-1 w-full',
-            pathname === item.href && 'bg-primary/10 hover:bg-primary/15'
+            pathname === item.href && 'bg-primary/10 hover:bg-primary/15',
+            item.disabled && 'opacity-50 cursor-not-allowed'
           )}
+          disabled={item.disabled}
+          onClick={() => {
+            if (item.disabled) {
+              toast.error(
+                'This feature is not available for your OAuth authentication method.'
+              );
+            }
+          }}
         >
           <Link key={item.href} href={item.href}>
             <div className="flex items-center gap-2">{item.icon}</div>

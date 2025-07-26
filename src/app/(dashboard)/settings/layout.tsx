@@ -1,41 +1,38 @@
-import { Metadata } from 'next';
-
+'use client';
 import { Fingerprint, Settings, UserCheck2Icon, UserPen } from 'lucide-react';
 import { SidebarNav } from './components/sidebar-nav';
-
-export const metadata: Metadata = {
-  title: 'User Settings',
-  description: 'User settings for the dashboard.',
-};
-
-const sidebarNavItems = [
-  {
-    icon: <Settings className="h-4 w-4" />,
-    title: 'Profile',
-    href: '/settings',
-  },
-  {
-    icon: <UserPen className="h-4 w-4" />,
-    title: 'Edit Profile',
-    href: '/settings/edit-profile',
-  },
-  {
-    icon: <UserCheck2Icon className="h-4 w-4" />,
-    title: 'Account',
-    href: '/settings/account',
-  },
-  {
-    icon: <Fingerprint className="h-4 w-4" />,
-    title: 'Change Password',
-    href: '/settings/change-password',
-  },
-];
+import { useAuthMethod } from '@/hooks/useUserMutations';
 
 interface SettingsLayoutProps {
   children: React.ReactNode;
 }
 
 export default function SettingsLayout({ children }: SettingsLayoutProps) {
+  const authMethod = useAuthMethod();
+  const sidebarNavItems = [
+    {
+      icon: <Settings className="h-4 w-4" />,
+      title: 'Profile',
+      href: '/settings',
+    },
+    {
+      icon: <UserPen className="h-4 w-4" />,
+      title: 'Edit Profile',
+      href: '/settings/edit-profile',
+    },
+    {
+      icon: <UserCheck2Icon className="h-4 w-4" />,
+      title: 'Account',
+      href: '/settings/account',
+    },
+    {
+      icon: <Fingerprint className="h-4 w-4" />,
+      title: 'Change Password',
+      href: '/settings/change-password',
+      disabled: authMethod !== 'EMAIL',
+    },
+  ];
+
   return (
     <div className="space-y-6 p-4 pb-16 max-w-5xl mx-auto">
       <div className="flex flex-col lg:flex-row border rounded-xl overflow-hidden min-h-[500px]">

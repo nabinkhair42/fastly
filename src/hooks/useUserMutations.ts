@@ -168,3 +168,14 @@ export const useDeleteUser = () => {
     },
   });
 };
+
+export const useAuthMethod = () => {
+  const { data: userDetails } = useUserDetails();
+
+  // Try to get auth method from user details first
+  if (userDetails?.data?.user?.authMethod) {
+    return userDetails.data.user.authMethod;
+  }
+
+  return 'EMAIL'; // Default to EMAIL
+};
