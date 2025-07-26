@@ -1,6 +1,5 @@
-import Link from 'next/link';
-import React from 'react';
 import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 const page = () => {
   return (
     <div className="flex flex-col items-center justify-center h-screen">

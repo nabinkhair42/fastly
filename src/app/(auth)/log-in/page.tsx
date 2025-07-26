@@ -20,11 +20,12 @@ import {
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { useLogin } from '@/hooks/useAuthMutations';
+import { handleOAuthError } from '@/lib/oauthErrorHandler';
 import { loginSchema } from '@/zod/authValidation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Eye, EyeOff, Fingerprint } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { OAuthButtons } from '../oauth-buttons';
@@ -34,7 +35,14 @@ type LoginFormData = z.infer<typeof loginSchema>;
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const loginMutation = useLogin();
+
+  // Handle OAuth error messages
+  useEffect(() => {
+    const error = searchParams.get('error');
+    handleOAuthError(error);
+  }, [searchParams]);
 
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),

@@ -8,28 +8,37 @@ export const metadata: Metadata = {
   description: 'User settings for the dashboard.',
 };
 
-const sidebarNavItems = [
-  {
-    icon: <Settings className="h-4 w-4" />,
-    title: 'Profile',
-    href: '/settings',
-  },
-  {
-    icon: <UserPen className="h-4 w-4" />,
-    title: 'Edit Profile',
-    href: '/settings/edit-profile',
-  },
-  {
-    icon: <UserCheck2Icon className="h-4 w-4" />,
-    title: 'Account',
-    href: '/settings/account',
-  },
-  {
-    icon: <Fingerprint className="h-4 w-4" />,
-    title: 'Change Password',
-    href: '/settings/change-password',
-  },
-];
+// This will be dynamically generated based on user auth method
+const getSidebarNavItems = (authMethod: string) => {
+  const baseItems = [
+    {
+      icon: <Settings className="h-4 w-4" />,
+      title: 'Profile',
+      href: '/settings',
+    },
+    {
+      icon: <UserPen className="h-4 w-4" />,
+      title: 'Edit Profile',
+      href: '/settings/edit-profile',
+    },
+    {
+      icon: <UserCheck2Icon className="h-4 w-4" />,
+      title: 'Account',
+      href: '/settings/account',
+    },
+  ];
+
+  // Only show Change Password for email-based users
+  if (authMethod === 'EMAIL') {
+    baseItems.push({
+      icon: <Fingerprint className="h-4 w-4" />,
+      title: 'Change Password',
+      href: '/settings/change-password',
+    });
+  }
+
+  return baseItems;
+};
 
 interface SettingsLayoutProps {
   children: React.ReactNode;

@@ -1,13 +1,13 @@
-import type { User, UserAuth } from '@/types/user';
+import { AuthMethod, type User, type UserAuth } from '@/types/user';
 import mongoose from 'mongoose';
 
 const authUserSchema = new mongoose.Schema({
   firstName: { type: String, default: null },
   lastName: { type: String, default: null },
   email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
+  password: { type: String, required: false },
   isVerified: { type: Boolean, default: false },
-  authMethod: { type: String, default: 'email' },
+  authMethod: { type: String, default: AuthMethod.EMAIL },
   verificationCode: { type: String, default: null },
   verificationCodeExpiresAt: { type: Date, default: null },
   resetPasswordToken: { type: String, default: null },
@@ -27,14 +27,14 @@ const userSchema = new mongoose.Schema({
     required: true,
   },
   firstName: { type: String, required: true },
-  lastName: { type: String, required: true },
+  lastName: { type: String, required: false, default: '' },
   email: { type: String, required: true, unique: true },
   username: { type: String, required: true, unique: true },
   avatar: { type: String, default: null },
   location: { type: Object, default: null },
   socialAccounts: { type: Array, default: [] },
   bio: { type: String, default: null },
-  hasChangedUsername: { type: Boolean, default: false }, // Track if username has been changed
+  hasChangedUsername: { type: Boolean, default: false },
   preferences: {
     theme: { type: String, default: 'system' },
     font: { type: String, default: 'system' },

@@ -1,4 +1,9 @@
-export type AuthMethod = 'email' | 'google' | 'facebook' | 'github';
+export enum AuthMethod {
+  EMAIL = 'email',
+  GOOGLE = 'google',
+  FACEBOOK = 'facebook',
+  GITHUB = 'github',
+}
 export type Theme = 'light' | 'dark' | 'system';
 export type Font = 'sans' | 'serif' | 'mono' | 'system';
 
