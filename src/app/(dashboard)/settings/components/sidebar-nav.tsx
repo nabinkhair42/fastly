@@ -18,6 +18,8 @@ interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {
 export function SidebarNav({ className, items, ...props }: SidebarNavProps) {
   const pathname = usePathname();
 
+  console.log('Disabled or Not', items);
+
   return (
     <nav
       className={cn(
@@ -40,7 +42,7 @@ export function SidebarNav({ className, items, ...props }: SidebarNavProps) {
           onClick={() => {
             if (item.disabled) {
               toast.error(
-                'This feature is not available for your OAuth authentication method.'
+                'Password change is only available for email-based accounts. OAuth users manage their passwords through their provider.'
               );
             }
           }}

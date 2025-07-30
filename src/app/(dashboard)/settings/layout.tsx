@@ -1,7 +1,9 @@
 'use client';
-import { Fingerprint, Settings, UserCheck2Icon, UserPen } from 'lucide-react';
-import { SidebarNav } from './components/sidebar-nav';
 import { useAuthMethod } from '@/hooks/useUserMutations';
+import { AuthMethod } from '@/types/user';
+import { Fingerprint, Settings, UserCheck2Icon, UserPen } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { SidebarNav } from './components/sidebar-nav';
 
 interface SettingsLayoutProps {
   children: React.ReactNode;
@@ -9,6 +11,16 @@ interface SettingsLayoutProps {
 
 export default function SettingsLayout({ children }: SettingsLayoutProps) {
   const authMethod = useAuthMethod();
+  const [disableChangePassword, setDisableChangePassword] = useState(false);
+  console.log('Auth Method', authMethod);
+  useEffect(() => {
+    if (authMethod === AuthMethod.EMAIL) {
+      setDisableChangePassword(false);
+    } else {
+      setDisableChangePassword(true);
+    }
+  }, [authMethod]);
+
   const sidebarNavItems = [
     {
       icon: <Settings className="h-4 w-4" />,
@@ -29,7 +41,7 @@ export default function SettingsLayout({ children }: SettingsLayoutProps) {
       icon: <Fingerprint className="h-4 w-4" />,
       title: 'Change Password',
       href: '/settings/change-password',
-      disabled: authMethod !== 'EMAIL',
+      disabled: disableChangePassword,
     },
   ];
 
