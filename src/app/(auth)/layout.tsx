@@ -1,7 +1,7 @@
 'use client';
 
 import ScreenLoader from '@/components/screen-loader';
-import { useRedirectIfAuthenticated } from '@/hooks/useRequireAuth';
+import { useRedirectIfAuthenticated } from '@/hooks/auth/useRequireAuth';
 
 export default function AuthLayout({
   children,

@@ -1,6 +1,6 @@
 'use client';
 
-import { tokenManager } from '@/lib/axios';
+import { tokenManager } from '@/lib/config/axios';
 import { AuthenticatedUser } from '@/types/user';
 import {
   createContext,

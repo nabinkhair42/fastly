@@ -1,6 +1,6 @@
 import { authenticateToken } from '@/helpers/jwtToken';
-import dbConnect from '@/lib/dbConnect';
-import { sendResponse } from '@/lib/sendResponse';
+import { sendResponse } from '@/lib/apis/sendResponse';
+import dbConnect from '@/lib/config/dbConnect';
 import { UserAuthModel } from '@/models/users';
 import type { AuthenticatedUser } from '@/types/user';
 import { NextRequest } from 'next/server';

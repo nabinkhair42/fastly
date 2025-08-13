@@ -18,7 +18,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { useResetPassword } from '@/hooks/useAuthMutations';
+import { useResetPassword } from '@/hooks/auth/useAuthMutations';
 import { resetPasswordRequestSchema } from '@/zod/authValidation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Eye, EyeOff, Lock } from 'lucide-react';

@@ -25,7 +25,10 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
-import { useUpdateUserDetails, useUserDetails } from '@/hooks/useUserMutations';
+import {
+  useUpdateUserDetails,
+  useUserDetails,
+} from '@/hooks/users/useUserMutations';
 import { useFont } from '@/providers/RootProvider';
 import { accountPreferencesSchema } from '@/zod/usersUpdate';
 import { DeleteUser } from '../components/delete-user';

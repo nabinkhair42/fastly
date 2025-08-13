@@ -1,7 +1,7 @@
 import { generateOtp } from '@/helpers/generateOtp';
 import { hashPassword } from '@/helpers/hashPassword';
-import dbConnect from '@/lib/dbConnect';
-import { sendResponse } from '@/lib/sendResponse';
+import { sendResponse } from '@/lib/apis/sendResponse';
+import dbConnect from '@/lib/config/dbConnect';
 import { sendVerificationEmail } from '@/mail-templates/emailService';
 import { UserAuthModel } from '@/models/users';
 import { createAccountSchema } from '@/zod/authValidation';

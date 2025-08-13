@@ -1,5 +1,5 @@
-import { requireAuth } from '@/lib/authMiddleware';
-import { sendResponse } from '@/lib/sendResponse';
+import { sendResponse } from '@/lib/apis/sendResponse';
+import { requireAuth } from '@/lib/auth/authMiddleware';
 import { NextRequest } from 'next/server';
 
 export async function POST(request: NextRequest) {

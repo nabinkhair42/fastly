@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import {
   GithubOAuthClickFunction,
   GoogleOAuthClickFunction,
-} from '@/lib/oAuth';
+} from '@/lib/apis/oAuth';
 import { useState } from 'react';
 import { FaGithub, FaGoogle } from 'react-icons/fa6';
 

@@ -1,4 +1,4 @@
-import api from '@/lib/axios';
+import api from '@/lib/config/axios';
 import {
   AvatarUploadResponse,
   ChangePasswordRequest,

@@ -1,7 +1,7 @@
 'use client';
 
 import { ThemeProvider } from '@/components/theme-provider';
-import { useUserDetails } from '@/hooks/useUserMutations';
+import { useUserDetails } from '@/hooks/users/useUserMutations';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useTheme } from 'next-themes';
 import { createContext, useContext, useEffect, useState } from 'react';

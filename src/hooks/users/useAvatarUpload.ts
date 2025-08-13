@@ -1,5 +1,5 @@
-import { useUserDetails } from '@/hooks/useUserMutations';
-import { useUploadThing } from '@/lib/uploadthing';
+import { useUserDetails } from '@/hooks/users/useUserMutations';
+import { useUploadThing } from '@/lib/apis/uploadthing/uploadThing';
 import { userService } from '@/services/userService';
 import { useCallback } from 'react';
 import { toast } from 'sonner';

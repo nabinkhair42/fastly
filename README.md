@@ -1,19 +1,27 @@
-## Not AI Generated
+# Next Gen - SaaS Starter Kit
 
-## Tech Stack
+Next Gen is a comprehensive starter kit providing a foundational layer for SaaS applications. It includes a robust authentication system with traditional email/password login and modern OAuth support for GitHub and Google.
 
-- Next.js
-- TypeScript
-- MongoDB
+## Features
 
-## Change Log
+- **Authentication System**
+  - Email/password registration and login
+  - OAuth integration (GitHub, Google)
+  - JWT-based authentication with refresh tokens
+  - Email verification and password reset
+  - Protected routes and middleware
 
-### First Commit: 07/08/2025
+- **User Management**
+  - User profile management
+  - Avatar upload with cropping
+  - Username and password changes
+  - Account deletion
 
-- Created a basic Next.js project
-- Added Husky for pre-commit hooks
-- Added Prettier for code formatting
-- Added ESLint for code linting
-- Added `create-account`, `log-in`, `email-verification`, `forgot-password`, `reset-password` API routes
-- Added Templates for Emails and Email Service using `nodemailer`
-- Added `create-account`, `log-in`, `email-verification`, `forgot-password`, `reset-password` API routes
+- **Modern Tech Stack**
+  - Next.js 14 with App Router
+  - TypeScript
+  - Tailwind CSS with shadcn/ui components
+  - MongoDB with Mongoose
+  - TanStack Query for data fetching
+  - Axios for API calls
+  - Nodemailer For Sending Emails

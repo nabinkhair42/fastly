@@ -1,7 +1,7 @@
-import { requireAuth } from '@/lib/authMiddleware';
-import dbConnect from '@/lib/dbConnect';
-import { sendResponse } from '@/lib/sendResponse';
-import { UserModel, UserAuthModel } from '@/models/users';
+import { sendResponse } from '@/lib/apis/sendResponse';
+import { requireAuth } from '@/lib/auth/authMiddleware';
+import dbConnect from '@/lib/config/dbConnect';
+import { UserAuthModel, UserModel } from '@/models/users';
 import { UpdateUserDetailsRequest } from '@/types/api';
 import { updateUserDetailsSchema } from '@/zod/usersUpdate';
 import { NextRequest } from 'next/server';

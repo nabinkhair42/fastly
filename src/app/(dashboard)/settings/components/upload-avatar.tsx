@@ -9,9 +9,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useAvatarCrop } from '@/hooks/useAvatarCrop';
-import { useAvatarUpload } from '@/hooks/useAvatarUpload';
-import { useUserDetails } from '@/hooks/useUserMutations';
+import { useAvatarCrop } from '@/hooks/ui/useAvatarCrop';
+import { useAvatarUpload } from '@/hooks/users/useAvatarUpload';
+import { useUserDetails } from '@/hooks/users/useUserMutations';
 import { Edit, Trash2, Upload } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import ReactCrop from 'react-image-crop';
