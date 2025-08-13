@@ -1,11 +1,11 @@
 'use client';
 import { Separator } from '@/components/ui/separator';
-import { useAuthMethod } from '@/hooks/useUserMutations';
+import { useAuthMethod } from '@/hooks/users/useUserMutations';
 import { AuthMethod } from '@/types/user';
 import { Fingerprint } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import ChangePasswordForm from './change-password-form';
 import { toast } from 'sonner';
+import ChangePasswordForm from './change-password-form';
 export default function SettingsChangePasswordPage() {
   const authMethod = useAuthMethod();
   const router = useRouter();

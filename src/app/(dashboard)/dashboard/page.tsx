@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { useUserDetails } from '@/hooks/useUserMutations';
+import { useUserDetails } from '@/hooks/users/useUserMutations';
 import { Calendar, Mail, User } from 'lucide-react';
 
 export default function UsersPage() {

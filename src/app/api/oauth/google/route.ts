@@ -1,6 +1,6 @@
 import { generateTokenPair } from '@/helpers/jwtToken';
-import dbConnect from '@/lib/dbConnect';
-import { googleOAuth } from '@/lib/oAuth';
+import { googleOAuth } from '@/lib/apis/oAuth';
+import dbConnect from '@/lib/config/dbConnect';
 import { UserAuthModel, UserModel } from '@/models/users';
 import { AuthMethod } from '@/types/user';
 import { NextRequest, NextResponse } from 'next/server';

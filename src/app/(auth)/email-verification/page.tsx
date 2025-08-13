@@ -20,7 +20,7 @@ import {
 import {
   useResendVerification,
   useVerifyEmail,
-} from '@/hooks/useAuthMutations';
+} from '@/hooks/auth/useAuthMutations';
 import { verifyEmailSchema } from '@/zod/authValidation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ChevronLeft, Mail, RotateCcw } from 'lucide-react';

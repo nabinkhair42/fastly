@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useDeleteUser } from '@/hooks/useUserMutations';
+import { useDeleteUser } from '@/hooks/users/useUserMutations';
 import { AlertTriangle, Eye, EyeOff, Trash } from 'lucide-react';
 import { useState } from 'react';
 

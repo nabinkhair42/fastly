@@ -19,7 +19,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { Textarea } from '@/components/ui/textarea';
-import { useProfileForm } from '@/hooks/useProfileForm';
+import { useProfileForm } from '@/hooks/users/useProfileForm';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import {

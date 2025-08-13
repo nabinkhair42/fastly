@@ -1,5 +1,5 @@
+import type { OurFileRouter } from '@/lib/apis/uploadthing/core';
 import { generateReactHelpers } from '@uploadthing/react';
-import type { OurFileRouter } from './uploadthing/core';
 
 // Export UploadThing components and hooks
 export const { useUploadThing, uploadFiles } =

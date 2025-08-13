@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { useUserDetails } from '@/hooks/useUserMutations';
+import { useUserDetails } from '@/hooks/users/useUserMutations';
 import {
   CalendarDays,
   Edit,

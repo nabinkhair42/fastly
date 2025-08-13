@@ -19,8 +19,8 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
-import { useLogin } from '@/hooks/useAuthMutations';
-import { handleOAuthError } from '@/lib/oauthErrorHandler';
+import { useLogin } from '@/hooks/auth/useAuthMutations';
+import { handleOAuthError } from '@/lib/auth/oauthErrorHandler';
 import { loginSchema } from '@/zod/authValidation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Eye, EyeOff, Fingerprint } from 'lucide-react';

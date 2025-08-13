@@ -8,8 +8,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useLogout } from '@/hooks/useAuthMutations';
-import { useUserDetails } from '@/hooks/useUserMutations';
+import { useLogout } from '@/hooks/auth/useAuthMutations';
+import { useUserDetails } from '@/hooks/users/useUserMutations';
 import { LogOut, Settings, User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 

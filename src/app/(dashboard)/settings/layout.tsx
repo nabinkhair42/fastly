@@ -1,5 +1,5 @@
 'use client';
-import { useAuthMethod } from '@/hooks/useUserMutations';
+import { useAuthMethod } from '@/hooks/users/useUserMutations';
 import { AuthMethod } from '@/types/user';
 import { Fingerprint, Settings, UserCheck2Icon, UserPen } from 'lucide-react';
 import { useEffect, useState } from 'react';

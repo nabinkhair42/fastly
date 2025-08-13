@@ -1,6 +1,6 @@
 import { generateOtp } from '@/helpers/generateOtp';
-import dbConnect from '@/lib/dbConnect';
-import { sendResponse } from '@/lib/sendResponse';
+import { sendResponse } from '@/lib/apis/sendResponse';
+import dbConnect from '@/lib/config/dbConnect';
 import { sendVerificationEmail } from '@/mail-templates/emailService';
 import { UserAuthModel } from '@/models/users';
 import { resendVerificationEmailSchema } from '@/zod/authValidation';

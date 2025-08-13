@@ -1,6 +1,6 @@
 import { generateTokenPair } from '@/helpers/jwtToken';
-import dbConnect from '@/lib/dbConnect';
-import { sendResponse } from '@/lib/sendResponse';
+import { sendResponse } from '@/lib/apis/sendResponse';
+import dbConnect from '@/lib/config/dbConnect';
 import { sendWelcomeEmail } from '@/mail-templates/emailService';
 import { UserAuthModel, UserModel } from '@/models/users';
 import { verifyEmailSchema } from '@/zod/authValidation';

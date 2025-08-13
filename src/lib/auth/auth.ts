@@ -1,8 +1,8 @@
 // Main auth exports - import everything from here for convenience
 
 // Core authentication
-export { useSession } from '@/hooks/useSession';
-export type { SessionData } from '@/hooks/useSession';
+export { useSession } from '@/hooks/auth/useSession';
+export type { SessionData } from '@/hooks/auth/useSession';
 export { useAuth } from '@/providers/AuthProvider';
 
 // Route protection
@@ -14,7 +14,7 @@ export {
   useAuthGuard,
   useRedirectIfAuthenticated,
   useRequireAuth,
-} from '@/hooks/useRequireAuth';
+} from '@/hooks/auth/useRequireAuth';
 
 // Authentication mutations
 export {
@@ -25,7 +25,7 @@ export {
   useResendVerification,
   useResetPassword,
   useVerifyEmail,
-} from '@/hooks/useAuthMutations';
+} from '@/hooks/auth/useAuthMutations';
 
 // User management
 export {
@@ -35,7 +35,7 @@ export {
   userQueryKeys,
   useUpdateUserDetails,
   useUserDetails,
-} from '@/hooks/useUserMutations';
+} from '@/hooks/users/useUserMutations';
 
 // Services (for direct API calls if needed)
 export { authService } from '@/services/authService';
@@ -60,4 +60,4 @@ export type {
 export type { UserProfile } from '@/types/user';
 
 // Utilities
-export { default as api, tokenManager } from '@/lib/axios';
+export { default as api, tokenManager } from '@/lib/config/axios';

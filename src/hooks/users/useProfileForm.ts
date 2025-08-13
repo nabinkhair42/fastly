@@ -3,12 +3,12 @@ import { useEffect, useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import { useDebounce } from '@/hooks/useDebounce';
+import { useDebounce } from '@/hooks/ui/useDebounce';
 import {
   useChangeUsername,
   useUpdateUserDetails,
   useUserDetails,
-} from '@/hooks/useUserMutations';
+} from '@/hooks/users/useUserMutations';
 import { userService } from '@/services/userService';
 import { profileFormInputSchema } from '@/zod/usersUpdate';
 

@@ -1,6 +1,6 @@
 import { verifyPassword } from '@/helpers/hashPassword';
-import { requireAuth } from '@/lib/authMiddleware';
-import { sendResponse } from '@/lib/sendResponse';
+import { sendResponse } from '@/lib/apis/sendResponse';
+import { requireAuth } from '@/lib/auth/authMiddleware';
 import { UserAuthModel, UserModel } from '@/models/users';
 import { deleteUserSchema } from '@/zod/usersUpdate';
 import { NextRequest } from 'next/server';

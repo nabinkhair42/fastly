@@ -1,6 +1,6 @@
 import { generateTokenPair, verifyRefreshToken } from '@/helpers/jwtToken';
-import dbConnect from '@/lib/dbConnect';
-import { sendResponse } from '@/lib/sendResponse';
+import { sendResponse } from '@/lib/apis/sendResponse';
+import dbConnect from '@/lib/config/dbConnect';
 import { UserAuthModel } from '@/models/users';
 import { refreshTokenSchema } from '@/zod/authValidation';
 import { NextRequest } from 'next/server';
