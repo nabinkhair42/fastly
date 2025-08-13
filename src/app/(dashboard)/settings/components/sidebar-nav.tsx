@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { toast } from 'sonner';
+import toast from 'react-hot-toast';
 interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {
   items: {
     href: string;

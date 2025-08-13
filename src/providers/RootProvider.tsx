@@ -5,7 +5,7 @@ import { useUserDetails } from '@/hooks/users/useUserMutations';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useTheme } from 'next-themes';
 import { createContext, useContext, useEffect, useState } from 'react';
-import { Toaster } from 'sonner';
+import { Toaster } from 'react-hot-toast';
 import AuthProvider, { useAuth } from './AuthProvider';
 
 // Simple font context
@@ -68,7 +68,15 @@ export default function RootProvider({
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <FontProvider>
             {children}
-            <Toaster position="top-center" richColors />
+            <Toaster
+              position="bottom-right"
+              toastOptions={{
+                style: {
+                  background: 'var(--sidebar)',
+                  color: 'var(--sidebar-foreground)',
+                },
+              }}
+            />
           </FontProvider>
         </ThemeProvider>
       </AuthProvider>

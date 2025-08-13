@@ -2,8 +2,7 @@ import { useUserDetails } from '@/hooks/users/useUserMutations';
 import { useUploadThing } from '@/lib/apis/uploadthing/uploadThing';
 import { userService } from '@/services/userService';
 import { useCallback } from 'react';
-import { toast } from 'sonner';
-
+import toast from 'react-hot-toast';
 export function useAvatarUpload() {
   const { startUpload, isUploading } = useUploadThing('avatarUploader', {
     onClientUploadComplete: res => {

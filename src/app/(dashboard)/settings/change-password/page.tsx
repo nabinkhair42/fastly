@@ -4,7 +4,7 @@ import { useAuthMethod } from '@/hooks/users/useUserMutations';
 import { AuthMethod } from '@/types/user';
 import { Fingerprint } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { toast } from 'sonner';
+import toast from 'react-hot-toast';
 import ChangePasswordForm from './change-password-form';
 export default function SettingsChangePasswordPage() {
   const authMethod = useAuthMethod();
