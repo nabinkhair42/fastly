@@ -1,5 +1,4 @@
-import { toast } from 'sonner';
-
+import toast from 'react-hot-toast';
 export const handleOAuthError = (error: string | null) => {
   if (!error) return;
 

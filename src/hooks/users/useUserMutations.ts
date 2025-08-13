@@ -11,8 +11,7 @@ import {
 } from '@/types/api';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import { toast } from 'sonner';
-
+import toast from 'react-hot-toast';
 // Query keys
 export const userQueryKeys = {
   userDetails: ['user', 'details'] as const,
