@@ -102,7 +102,7 @@ export default function EmailVerificationPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center">
+    <div className="flex items-center justify-center">
       <Card className="w-full max-w-md">
         <CardHeader>
           <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-muted">
@@ -124,10 +124,10 @@ export default function EmailVerificationPage() {
                 name="verificationCode"
                 render={({ field }) => (
                   <FormItem className="flex flex-col items-center justify-center">
-                    <FormControl className="flex flex-col justify-center">
+                    <FormControl className="flex flex-col justify-center w-full">
                       <InputOTP
                         placeholder="Enter 6-digit code"
-                        className="text-center text-lg"
+                        className="text-center text-lg w-full"
                         maxLength={6}
                         inputMode="numeric"
                         pattern={REGEXP_ONLY_DIGITS_AND_CHARS}

@@ -1,5 +1,6 @@
 'use client';
 
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -8,11 +9,12 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { useUserDetails } from '@/hooks/users/useUserMutations';
-import { Calendar, Mail, User } from 'lucide-react';
+import { Calendar, Mail, Settings, User } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 export default function UsersPage() {
   const { data: userDetails, isLoading } = useUserDetails();
-
+  const router = useRouter();
   return (
     <div className="min-h-screen bg-background">
       {/* Main Content */}
@@ -101,6 +103,17 @@ export default function UsersPage() {
               </div>
             </CardContent>
           </Card>
+        </div>
+
+        <div>
+          <Button
+            variant="outline"
+            className="mt-4"
+            onClick={() => router.push('/settings')}
+          >
+            <Settings className="h-4 w-4" />
+            Go to Settings
+          </Button>
         </div>
       </main>
     </div>

@@ -51,4 +51,10 @@ export const userService = {
     const response = await api.post('/upload-avatar', { avatar: avatarUrl });
     return response.data;
   },
+
+  // Delete user avatar from database
+  deleteAvatar: async (): Promise<AvatarUploadResponse> => {
+    const response = await api.delete('/upload-avatar');
+    return response.data;
+  },
 };

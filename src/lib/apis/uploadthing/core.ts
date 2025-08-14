@@ -1,4 +1,5 @@
 import { createUploadthing, type FileRouter } from 'uploadthing/next';
+import { UTApi } from 'uploadthing/server';
 
 const f = createUploadthing();
 
@@ -25,3 +26,6 @@ export const uploadRouter = {
 } satisfies FileRouter;
 
 export type OurFileRouter = typeof uploadRouter;
+
+// Export UTApi instance for server-side operations like file deletion
+export const utapi = new UTApi();

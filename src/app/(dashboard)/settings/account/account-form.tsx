@@ -108,7 +108,7 @@ export function AccountForm() {
                 >
                   <FormItem>
                     <FormLabel
-                      className={`[&:has([data-state=checked])>div]:border-primary ${
+                      className={`[&:has([data-state=checked])>div]:border-primary flex flex-col items-start ${
                         watchedTheme === 'light'
                           ? 'border-primary'
                           : 'border-muted'
@@ -133,7 +133,7 @@ export function AccountForm() {
                           </div>
                         </div>
                       </div>
-                      <span className="block w-full p-2 text-center font-normal">
+                      <span className="block w-full p-2 font-normal">
                         Light
                       </span>
                     </FormLabel>
@@ -141,7 +141,7 @@ export function AccountForm() {
 
                   <FormItem>
                     <FormLabel
-                      className={`[&:has([data-state=checked])>div]:border-primary ${
+                      className={`[&:has([data-state=checked])>div]:border-primary flex flex-col items-start ${
                         watchedTheme === 'dark'
                           ? 'border-primary'
                           : 'border-muted'
@@ -166,9 +166,7 @@ export function AccountForm() {
                           </div>
                         </div>
                       </div>
-                      <span className="block w-full p-2 text-center font-normal">
-                        Dark
-                      </span>
+                      <span className="block w-full p-2 font-normal">Dark</span>
                     </FormLabel>
                   </FormItem>
                 </RadioGroup>
@@ -210,7 +208,7 @@ export function AccountForm() {
           </Button>
         </form>
       </Form>
-      <div className="flex justify-end px-6 py-8 border-t">
+      <div className="flex px-6 py-8 border-t">
         <DeleteUser />
       </div>
     </div>
