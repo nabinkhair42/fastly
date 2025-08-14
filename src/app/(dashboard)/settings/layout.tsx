@@ -1,61 +1,21 @@
 'use client';
-import { useAuthMethod } from '@/hooks/users/useUserMutations';
-import { AuthMethod } from '@/types/user';
-import { Fingerprint, Settings, UserCheck2Icon, UserPen } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { SidebarNav } from './components/sidebar-nav';
-
+import SettingSidebar from '@/app/(dashboard)/settings/components/settings-sidebar';
+import { FloatingSidebarTrigger } from '@/components/ui/FloatingSidebarTrigger';
+import { SidebarProvider } from '@/components/ui/sidebar';
 interface SettingsLayoutProps {
   children: React.ReactNode;
 }
 
 export default function SettingsLayout({ children }: SettingsLayoutProps) {
-  const authMethod = useAuthMethod();
-  const [disableChangePassword, setDisableChangePassword] = useState(false);
-  console.log('Auth Method', authMethod);
-  useEffect(() => {
-    if (authMethod === AuthMethod.EMAIL) {
-      setDisableChangePassword(false);
-    } else {
-      setDisableChangePassword(true);
-    }
-  }, [authMethod]);
-
-  const sidebarNavItems = [
-    {
-      icon: <Settings className="h-4 w-4" />,
-      title: 'Profile',
-      href: '/settings',
-    },
-    {
-      icon: <UserPen className="h-4 w-4" />,
-      title: 'Edit Profile',
-      href: '/settings/edit-profile',
-    },
-    {
-      icon: <UserCheck2Icon className="h-4 w-4" />,
-      title: 'Account',
-      href: '/settings/account',
-    },
-    {
-      icon: <Fingerprint className="h-4 w-4" />,
-      title: 'Change Password',
-      href: '/settings/change-password',
-      disabled: disableChangePassword,
-    },
-  ];
-
   return (
-    <div className="space-y-6 p-4 pb-16 max-w-5xl mx-auto">
-      <div className="flex flex-col lg:flex-row border rounded-xl overflow-hidden min-h-[500px]">
-        {/* Sidebar */}
-        <aside className="w-full lg:w-1/4 bg-sidebar p-4 lg:rounded-l-xl rounded-t-xl lg:rounded-t-none border-b lg:border-b-0 lg:border-r">
-          <SidebarNav items={sidebarNavItems} />
-        </aside>
-
-        {/* Main Content */}
-        <div className="flex-1 py-8 overflow-y-auto">{children}</div>
+    <SidebarProvider defaultOpen={true}>
+      <SettingSidebar />
+      <div className="flex-1 flex flex-col min-w-0 relative overflow-hidden bg-background">
+        <div className="relative z-10 flex flex-1 flex-col min-w-0 max-w-6xl mx-left py-6">
+          <FloatingSidebarTrigger />
+          {children}
+        </div>
       </div>
-    </div>
+    </SidebarProvider>
   );
 }

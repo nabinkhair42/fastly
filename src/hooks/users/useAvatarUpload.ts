@@ -3,6 +3,7 @@ import { useUploadThing } from '@/lib/apis/uploadthing/uploadThing';
 import { userService } from '@/services/userService';
 import { useCallback } from 'react';
 import toast from 'react-hot-toast';
+
 export function useAvatarUpload() {
   const { startUpload, isUploading } = useUploadThing('avatarUploader', {
     onClientUploadComplete: res => {
@@ -46,8 +47,25 @@ export function useAvatarUpload() {
     [startUpload, refetch]
   );
 
+  const deleteAvatar = useCallback(async () => {
+    try {
+      // Delete avatar from database
+      await userService.deleteAvatar();
+
+      // Refetch user details to get updated avatar
+      await refetch();
+
+      toast.success('Avatar removed successfully!');
+    } catch (error) {
+      console.error('Avatar deletion failed:', error);
+      toast.error('Failed to remove avatar. Please try again.');
+      throw error;
+    }
+  }, [refetch]);
+
   return {
     uploadAvatar,
+    deleteAvatar,
     isUploading,
   };
 }
