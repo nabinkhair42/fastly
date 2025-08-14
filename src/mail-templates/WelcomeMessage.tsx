@@ -26,8 +26,8 @@ const WelcomeEmail = ({ firstName }: { firstName: string }) => {
         >
           <Section style={{ textAlign: 'center', marginBottom: '20px' }}>
             <Img
-              src="https://www.algodocs.dev/icon.svg"
-              alt="Company Logo"
+              src="https://starter.nabinkhair.com.np/icon.png"
+              alt="SaaS Starter"
               width="150"
               height="50"
               style={{ maxWidth: '100%' }}
@@ -57,7 +57,7 @@ const WelcomeEmail = ({ firstName }: { firstName: string }) => {
             <Row style={{ marginTop: '20px', justifyContent: 'center' }}>
               <Column style={{ textAlign: 'center' }}>
                 <Link
-                  href="https://yourcompany.com/login"
+                  href="https://starter.nabinkhair.com.np/log-in"
                   style={{
                     padding: '12px 20px',
                     backgroundColor: '#4CAF50',

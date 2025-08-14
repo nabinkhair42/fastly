@@ -31,8 +31,8 @@ const VerificationEmail = ({
         >
           <Section style={{ textAlign: 'center', marginBottom: '20px' }}>
             <Img
-              src="https://www.algodocs.dev/icon.svg"
-              alt="Company Logo"
+              src="https://starter.nabinkhair.com.np/icon.png"
+              alt="SaaS Starter"
               width="150"
               height="50"
               style={{ maxWidth: '100%' }}
