@@ -1,4 +1,5 @@
 import UserDropdown from '@/app/(dashboard)/components/user-dropdown';
+import { Logo } from '@/components/ui/logo';
 import {
   Sidebar,
   SidebarContent,
@@ -10,7 +11,7 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { useAuthMethod } from '@/hooks/users/useUserMutations';
-import { Lock, Pencil, SquareRoundCorner, User } from 'lucide-react';
+import { Lock, Pencil, User } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 
 const SettingSidebar = () => {
@@ -22,7 +23,7 @@ const SettingSidebar = () => {
     <Sidebar>
       <SidebarHeader className="p-3 flex flex-row justify-between items-center border-b h-13">
         <div className="flex items-center gap-2">
-          <SquareRoundCorner className="h-6 w-6" />
+          <Logo variant="colored" height={20} width={20} />
           <span className="text-lg font-semibold">Settings</span>
         </div>
       </SidebarHeader>
