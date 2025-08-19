@@ -12,9 +12,7 @@ const page = () => {
           variant="colored"
           className="mx-auto mb-6"
         />
-        <h1 className="text-4xl font-bold mb-2">
-          Welcome to SaaS Starter
-        </h1>
+        <h1 className="text-4xl font-bold mb-2">Welcome to SaaS Starter</h1>
         <p className="text-lg text-muted-foreground">
           Modern SaaS foundation built with Next.js & TypeScript
         </p>
