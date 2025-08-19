@@ -5,16 +5,7 @@ import { useCallback } from 'react';
 import toast from 'react-hot-toast';
 
 export function useAvatarUpload() {
-  const { startUpload, isUploading } = useUploadThing('avatarUploader', {
-    onClientUploadComplete: res => {
-      console.log('Files: ', res);
-      toast.success('Upload completed');
-    },
-    onUploadError: (error: Error) => {
-      console.error('Upload error:', error);
-      toast.error(`Upload failed: ${error.message}`);
-    },
-  });
+  const { startUpload, isUploading } = useUploadThing('avatarUploader');
   const { refetch } = useUserDetails();
 
   const uploadAvatar = useCallback(
@@ -29,18 +20,19 @@ export function useAvatarUpload() {
 
         const uploadedFile = uploadedFiles[0];
 
-        // Update user avatar in database
-        await userService.updateAvatar(uploadedFile.ufsUrl);
+        // Update user avatar in database with toast.promise
+        await toast.promise(userService.updateAvatar(uploadedFile.ufsUrl), {
+          loading: 'Updating avatar...',
+          success: 'Avatar updated successfully!',
+          error: 'Failed to update avatar. Please try again.',
+        });
 
         // Refetch user details to get updated avatar
         await refetch();
 
-        toast.success('Avatar updated successfully!');
-
         return uploadedFile.ufsUrl;
       } catch (error) {
         console.error('Avatar upload failed:', error);
-        toast.error('Failed to upload avatar. Please try again.');
         throw error;
       }
     },
@@ -49,16 +41,17 @@ export function useAvatarUpload() {
 
   const deleteAvatar = useCallback(async () => {
     try {
-      // Delete avatar from database
-      await userService.deleteAvatar();
+      // Delete avatar from database with toast.promise
+      await toast.promise(userService.deleteAvatar(), {
+        loading: 'Removing avatar...',
+        success: 'Avatar removed successfully!',
+        error: 'Failed to remove avatar. Please try again.',
+      });
 
       // Refetch user details to get updated avatar
       await refetch();
-
-      toast.success('Avatar removed successfully!');
     } catch (error) {
       console.error('Avatar deletion failed:', error);
-      toast.error('Failed to remove avatar. Please try again.');
       throw error;
     }
   }, [refetch]);

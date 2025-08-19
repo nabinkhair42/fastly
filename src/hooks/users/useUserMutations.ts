@@ -36,9 +36,15 @@ export const useUpdateUserDetails = () => {
   const { updateUser } = useAuth();
 
   return useMutation({
-    mutationFn: (data: UpdateUserDetailsRequest) =>
-      userService.updateUserDetails(data),
-    onSuccess: response => {
+    mutationFn: async (data: UpdateUserDetailsRequest) => {
+      return toast.promise(userService.updateUserDetails(data), {
+        loading: 'Updating profile...',
+        success: response =>
+          response.message || 'Profile updated successfully!',
+        error: 'Failed to update profile. Please try again.',
+      });
+    },
+    onSuccess: () => {
       // Invalidate and refetch user details
       queryClient.invalidateQueries({ queryKey: userQueryKeys.userDetails });
 
@@ -56,8 +62,6 @@ export const useUpdateUserDetails = () => {
           preferences: cachedUserDetails.data.user.preferences,
         });
       }
-
-      toast.success(response.message || 'Profile updated successfully!');
     },
     onError: (
       error: Error & { response?: { data?: { message?: string } } }
@@ -76,8 +80,14 @@ export const useChangeUsername = (onSuccessCallback?: () => void) => {
   const { updateUser } = useAuth();
 
   return useMutation({
-    mutationFn: (data: ChangeUsernameRequest) =>
-      userService.changeUsername(data),
+    mutationFn: async (data: ChangeUsernameRequest) => {
+      return toast.promise(userService.changeUsername(data), {
+        loading: 'Updating username...',
+        success: response =>
+          response.message || 'Username updated successfully!',
+        error: 'Failed to update username. Please try again.',
+      });
+    },
     onSuccess: async (response, variables) => {
       // Invalidate and refetch user details
       await queryClient.invalidateQueries({
@@ -98,8 +108,6 @@ export const useChangeUsername = (onSuccessCallback?: () => void) => {
           preferences: cachedUserDetails.data.user.preferences,
         });
       }
-
-      toast.success(response.message || 'Username updated successfully!');
 
       // Call the success callback after everything is updated
       if (onSuccessCallback) {
@@ -128,10 +136,13 @@ export const useCheckUsernameAvailability = () => {
 // Change password mutation
 export const useChangePassword = () => {
   return useMutation({
-    mutationFn: (data: ChangePasswordRequest) =>
-      userService.changePassword(data),
-    onSuccess: response => {
-      toast.success(response.message || 'Password changed successfully!');
+    mutationFn: async (data: ChangePasswordRequest) => {
+      return toast.promise(userService.changePassword(data), {
+        loading: 'Changing password...',
+        success: response =>
+          response.message || 'Password changed successfully!',
+        error: 'Failed to change password. Please try again.',
+      });
     },
     onError: (
       error: Error & { response?: { data?: { message?: string } } }
@@ -150,16 +161,25 @@ export const useDeleteUser = () => {
   const queryClient = useQueryClient();
   const router = useRouter();
   return useMutation({
-    mutationFn: (data: DeleteUserRequest) => userService.deleteUser(data),
-    onSuccess: response => {
+    mutationFn: async (data: DeleteUserRequest) => {
+      return toast.promise(userService.deleteUser(data), {
+        loading: 'Deleting account...',
+        success: response =>
+          response.message || 'Account deleted successfully!',
+        error: 'Failed to delete account. Please try again.',
+      });
+    },
+    onSuccess: () => {
       logout();
       queryClient.invalidateQueries({ queryKey: userQueryKeys.userDetails });
       router.push('/');
-      toast.success(response.message || 'Account deleted successfully!');
     },
     onError: (
       error: Error & { response?: { data?: { message?: string } } }
     ) => {
+      // Even if delete API fails, we should still clear local state
+      logout();
+      queryClient.clear();
       const message =
         error.response?.data?.message ||
         'Failed to delete account. Please try again.';

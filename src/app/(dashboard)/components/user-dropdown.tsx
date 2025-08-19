@@ -11,15 +11,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useLogout } from '@/hooks/auth/useAuthMutations';
 import { useUserDetails } from '@/hooks/users/useUserMutations';
-import {
-  ChevronRight,
-  LogOut,
-  LucideIcon,
-  MessageSquareDashed,
-  Settings,
-  User,
-} from 'lucide-react';
-import { usePathname, useRouter } from 'next/navigation';
+import { ChevronRight, LogOut, LucideIcon, Settings, User } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 interface MenuItem {
@@ -31,21 +24,12 @@ interface MenuItem {
 }
 
 const UserDropdown = ({ avatarOnly }: { avatarOnly?: boolean }) => {
-  const pathname = usePathname();
-  const isChatsPage = pathname.includes('/chats');
   const MenuList: MenuItem[] = [
     {
       label: 'Profile',
       icon: User,
       onClick: () => router.push('/settings'),
       description: 'View and manage your profile information.',
-    },
-    {
-      label: 'Go to Chats',
-      icon: MessageSquareDashed,
-      onClick: () => router.push('/chats'),
-      description: 'Go to your chats page.',
-      isVisible: !isChatsPage,
     },
     {
       label: 'Account Settings',
@@ -96,14 +80,14 @@ const UserDropdown = ({ avatarOnly }: { avatarOnly?: boolean }) => {
       <DropdownMenu>
         <DropdownMenuTrigger asChild className="cursor-pointer">
           {avatarOnly ? (
-            <Avatar className="h-8 w-8 cursor-pointer">
+            <Avatar className="h-8 w-8 cursor-pointer border">
               <AvatarImage src={userDetails?.data?.user?.avatar || ''} />
               <AvatarFallback>{avatarFallback}</AvatarFallback>
             </Avatar>
           ) : (
-            <div className="flex items-center gap-2 justify-between p-2">
-              <div className="flex items-center gap-2 cursor-pointer rounded-md hover:bg-accent transition-colors">
-                <Avatar className="h-8 w-8">
+            <div className="flex items-center gap-2 justify-between cursor-pointer rounded-md hover:bg-accent transition-colors p-2">
+              <div className="flex items-center gap-2">
+                <Avatar className="h-8 w-8 border">
                   <AvatarImage src={userDetails?.data?.user?.avatar || ''} />
                   <AvatarFallback>{avatarFallback}</AvatarFallback>
                 </Avatar>
@@ -117,9 +101,7 @@ const UserDropdown = ({ avatarOnly }: { avatarOnly?: boolean }) => {
                   </div>
                 </div>
               </div>
-              {!avatarOnly && (
-                <ChevronRight className="h-4 w-4 text-muted-foreground" />
-              )}
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
             </div>
           )}
         </DropdownMenuTrigger>

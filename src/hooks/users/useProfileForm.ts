@@ -11,6 +11,7 @@ import {
 } from '@/hooks/users/useUserMutations';
 import { userService } from '@/services/userService';
 import { profileFormInputSchema } from '@/zod/usersUpdate';
+import toast from 'react-hot-toast';
 
 type ProfileFormValues = z.infer<typeof profileFormInputSchema>;
 
@@ -88,16 +89,19 @@ export function useProfileForm() {
       setUsernameAvailable(null);
 
       // Use the service directly instead of the mutation hook
-      userService
-        .checkUsernameAvailability(debouncedUsername)
-        .then(() => {
+      toast.promise(userService.checkUsernameAvailability(debouncedUsername), {
+        loading: 'Checking username availability...',
+        success: () => {
           setUsernameAvailable(true);
           setCheckingUsername(false);
-        })
-        .catch(() => {
+          return 'Username is available!';
+        },
+        error: () => {
           setUsernameAvailable(false);
           setCheckingUsername(false);
-        });
+          return 'Username is not available';
+        },
+      });
     }
   }, [debouncedUsername, userDetails]);
 

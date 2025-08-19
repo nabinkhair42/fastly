@@ -10,13 +10,52 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useAvatarCrop } from '@/hooks/ui/useAvatarCrop';
+import {
+  ImageCrop,
+  ImageCropContent,
+  useImageCrop,
+} from '@/components/ui/image-crop';
 import { useAvatarUpload } from '@/hooks/users/useAvatarUpload';
 import { useUserDetails } from '@/hooks/users/useUserMutations';
-import { Edit, RotateCcw, RotateCw, Trash2, Upload } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
-import ReactCrop from 'react-image-crop';
-import 'react-image-crop/dist/ReactCrop.css';
+import { Edit, ImagePlay, Trash2, Upload, X } from 'lucide-react';
+import { useRef, useState } from 'react';
+
+// Custom component that can access the ImageCrop context
+const CropControls = ({
+  isUploading,
+  onClose,
+}: {
+  isUploading: boolean;
+  onClose: () => void;
+}) => {
+  const { applyCrop, completedCrop } = useImageCrop();
+
+  const handleUpload = async () => {
+    if (completedCrop) {
+      await applyCrop();
+    }
+  };
+
+  return (
+    <>
+      <div className="flex justify-end gap-2 items-center w-full border-t p-4">
+        <Button variant="destructive" onClick={onClose}>
+          <X className="h-4 w-4" />
+          Cancel
+        </Button>
+        <Button
+          disabled={isUploading || !completedCrop}
+          loading={isUploading}
+          loadingText="Uploading"
+          onClick={handleUpload}
+        >
+          <Upload className="h-4 w-4" />
+          Upload
+        </Button>
+      </div>
+    </>
+  );
+};
 
 export function UploadAvatar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -40,10 +79,14 @@ export function UploadAvatar() {
     }
   };
 
-  const handleUpload = async (croppedImageBlob: Blob) => {
+  const handleUpload = async (croppedImageDataUrl: string) => {
     try {
+      // Convert data URL to blob
+      const response = await fetch(croppedImageDataUrl);
+      const blob = await response.blob();
+
       // Convert blob to file
-      const file = new File([croppedImageBlob], 'avatar.png', {
+      const file = new File([blob], 'avatar.png', {
         type: 'image/png',
       });
 
@@ -94,7 +137,7 @@ export function UploadAvatar() {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-48">
             <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
-              <Upload className="h-4 w-4 mr-2" />
+              <Upload className="h-4 w-4" />
               Upload a photo
             </DropdownMenuItem>
             {defaultAvatar && (
@@ -102,7 +145,7 @@ export function UploadAvatar() {
                 onClick={() => setShowDeleteDialog(true)}
                 disabled={isDeleting}
               >
-                <Trash2 className="h-4 w-4 mr-2 text-destructive" />
+                <Trash2 className="h-4 w-4 text-destructive" />
                 <span className="text-destructive">Remove photo</span>
               </DropdownMenuItem>
             )}
@@ -124,12 +167,35 @@ export function UploadAvatar() {
             Crop your new profile picture
           </DialogTitle>
           {selectedFile && (
-            <ImageCropper
-              file={selectedFile}
-              onCrop={handleUpload}
-              onClose={handleClose}
-              isUploading={isUploading}
-            />
+            <div>
+              {/* Header */}
+              <div className="flex border-b gap-2 p-4">
+                <ImagePlay className="mt-1" />
+                <div className="flex flex-col">
+                  <h2 className="text-lg font-semibold">Upload Avatar</h2>
+                  <p className="text-sm text-muted-foreground">
+                    Crop and upload your new avatar
+                  </p>
+                </div>
+              </div>
+
+              {/* Crop Area */}
+              <div>
+                <ImageCrop
+                  file={selectedFile}
+                  onCrop={handleUpload}
+                  aspect={1}
+                  circularCrop
+                  className="flex flex-col gap-2"
+                >
+                  <ImageCropContent className="max-h-[50vh]" />
+                  <CropControls
+                    isUploading={isUploading}
+                    onClose={handleClose}
+                  />
+                </ImageCrop>
+              </div>
+            </div>
           )}
         </DialogContent>
       </Dialog>
@@ -147,140 +213,6 @@ export function UploadAvatar() {
           isLoading={isDeleting}
         />
       )}
-    </div>
-  );
-}
-
-function ImageCropper({
-  file,
-  onCrop,
-  onClose,
-  isUploading,
-}: {
-  file: File;
-  onCrop: (croppedImage: Blob) => void;
-  onClose: () => void;
-  isUploading: boolean;
-}) {
-  const [imageSrc, setImageSrc] = useState<string>('');
-  const {
-    crop,
-    setCrop,
-    completedCrop,
-    setCompletedCrop,
-    rotation,
-    setRotation,
-    rotateLeft,
-    rotateRight,
-    imageRef,
-    getCroppedImageBlob,
-  } = useAvatarCrop();
-
-  // Load image when file changes
-  useEffect(() => {
-    if (file) {
-      const reader = new FileReader();
-      reader.addEventListener('load', () => {
-        setImageSrc(reader.result?.toString() || '');
-      });
-      reader.readAsDataURL(file);
-    }
-  }, [file]);
-
-  const handleCropAndUpload = async () => {
-    try {
-      const croppedImageBlob = await getCroppedImageBlob();
-      onCrop(croppedImageBlob);
-    } catch (error) {
-      console.error('Failed to crop image:', error);
-    }
-  };
-
-  return (
-    <div className="relative">
-      {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b">
-        <h2 className="text-lg font-semibold">Crop your new profile picture</h2>
-      </div>
-
-      {/* Crop Area */}
-      <div className="p-4 flex items-center justify-center">
-        {imageSrc && (
-          <ReactCrop
-            crop={crop}
-            onChange={c => setCrop(c)}
-            onComplete={c => setCompletedCrop(c)}
-            aspect={1}
-            circularCrop
-            className="max-w-full max-h-[50vh] flex items-center justify-center"
-          >
-            {/* Using forwardRef with Image requires custom implementation */}
-            {/* We need to keep using img here because ReactCrop expects a standard img element */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              ref={imageRef as React.RefObject<HTMLImageElement>}
-              src={imageSrc}
-              alt="Crop preview"
-              className="max-w-full max-h-96 object-contain"
-              style={{
-                transform: `rotate(${rotation}deg)`,
-                transition: 'transform 0.3s ease',
-              }}
-            />
-          </ReactCrop>
-        )}
-      </div>
-
-      {/* Rotation Controls */}
-      <div className="px-4 py-2 border-t border-gray-200 bg-gray-50">
-        <div className="flex items-center justify-center gap-4">
-          <span className="text-sm text-gray-600">Rotate:</span>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={rotateLeft}
-            className="flex items-center gap-2"
-          >
-            <RotateCcw className="h-4 w-4" />
-          </Button>
-          <span className="text-sm font-medium text-gray-700 min-w-[3rem] text-center">
-            {rotation}°
-          </span>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={rotateRight}
-            className="flex items-center gap-2"
-          >
-            <RotateCw className="h-4 w-4" />
-          </Button>
-          {rotation !== 0 && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setRotation(0)}
-              className="text-gray-500 hover:text-gray-700"
-            >
-              Reset
-            </Button>
-          )}
-        </div>
-      </div>
-
-      {/* Footer */}
-      <div className="flex justify-between items-center p-4 border-t">
-        <Button variant="outline" onClick={onClose}>
-          Cancel
-        </Button>
-        <Button
-          onClick={handleCropAndUpload}
-          disabled={isUploading || !completedCrop}
-          loading={isUploading}
-          loadingText="Uploading"
-        >
-          Upload
-        </Button>
-      </div>
     </div>
   );
 }

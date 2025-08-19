@@ -187,11 +187,11 @@ export const changePasswordSchema = z.object({
     .min(8, { message: 'New password must be at least 8 characters long' })
     .max(255, { message: 'New password must be less than 255 characters' })
     .refine(
-      password => {
-        const passwordRegex =
-          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-        return passwordRegex.test(password);
-      },
+      val =>
+        /[a-z]/.test(val) && // at least one lowercase
+        /[A-Z]/.test(val) && // at least one uppercase
+        /\d/.test(val) && // at least one number
+        /[^A-Za-z0-9]/.test(val), // at least one special character
       {
         message:
           'New password must contain at least one uppercase letter, one lowercase letter, one number, and one special character',

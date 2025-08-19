@@ -11,7 +11,7 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { useAuthMethod } from '@/hooks/users/useUserMutations';
-import { Lock, Pencil, User } from 'lucide-react';
+import { Fingerprint, Lock, SquarePenIcon, User } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 
 const SettingSidebar = () => {
@@ -63,20 +63,20 @@ const getSidebarNavItems = (authMethod: string) => {
       icon: <User className="h-4 w-4" />,
     },
     {
-      title: 'Accounts',
-      href: '/settings/account',
-      icon: <Lock className="h-4 w-4" />,
-    },
-    {
       title: 'Edit Profile',
       href: '/settings/edit-profile',
-      icon: <Pencil className="h-4 w-4" />,
+      icon: <SquarePenIcon className="h-4 w-4" />,
     },
     {
       title: 'Change Password',
       href: '/settings/change-password',
-      icon: <Lock className="h-4 w-4" />,
+      icon: <Fingerprint className="h-4 w-4" />,
       isDisabled: authMethod === 'email',
+    },
+    {
+      title: 'Accounts',
+      href: '/settings/account',
+      icon: <Lock className="h-4 w-4" />,
     },
   ];
 };

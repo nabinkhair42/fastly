@@ -18,8 +18,6 @@ interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {
 export function SidebarNav({ className, items, ...props }: SidebarNavProps) {
   const pathname = usePathname();
 
-  console.log('Disabled or Not', items);
-
   return (
     <nav
       className={cn(
