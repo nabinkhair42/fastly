@@ -4,8 +4,8 @@ export const siteConfig = {
   name: 'SaaS Starter - Modern SaaS Foundation',
   description:
     'A comprehensive SaaS starter kit built with Next.js, TypeScript, and modern UI components. Features authentication, user management, and more.',
-  url: 'https://starter.nabinkhair.com.np',
-  ogImage: 'https://starter.nabinkhair.com.np/og-image.webp',
+  url: process.env.NEXT_PUBLIC_APP_URL || 'https://starter.nabinkhair.com.np',
+  ogImage: `${process.env.NEXT_PUBLIC_APP_URL || 'https://starter.nabinkhair.com.np'}/og-image.webp`,
   links: {
     github: 'https://github.com/nabinkhair42/saas-starter',
     twitter: 'https://twitter.com/khairnabin',
@@ -34,6 +34,13 @@ export const metadata: Metadata = {
     'UploadThing',
     'React Hook Form',
     'Zod',
+    'Full Stack',
+    'Open Source',
+    'Developer Tools',
+    'Web Application',
+    'Dashboard',
+    'SaaS Template',
+    'Boilerplate',
   ],
   authors: [
     {
@@ -65,6 +72,7 @@ export const metadata: Metadata = {
         width: 1200,
         height: 630,
         alt: siteConfig.name,
+        type: 'image/webp',
       },
     ],
   },
@@ -77,23 +85,41 @@ export const metadata: Metadata = {
     site: '@nabinkhair42',
   },
   icons: {
-    icon: '/icon.png',
+    icon: [
+      { url: '/icon.png', sizes: '32x32', type: 'image/png' },
+      { url: '/icon.png', sizes: '16x16', type: 'image/png' },
+    ],
     shortcut: '/icon.png',
-    apple: '/icon.png',
+    apple: [{ url: '/icon.png', sizes: '180x180', type: 'image/png' }],
   },
   manifest: '/site.webmanifest',
   robots: {
     index: true,
     follow: true,
+    nocache: false,
     googleBot: {
       index: true,
       follow: true,
       'max-video-preview': -1,
       'max-image-preview': 'large',
       'max-snippet': -1,
+      noimageindex: false,
+      notranslate: false,
     },
+  },
+  verification: {
+    // Add verification IDs when available
+    // google: 'your-google-verification-id',
+    // yandex: 'your-yandex-verification-id',
+    // bing: 'your-bing-verification-id',
   },
   category: 'technology',
   classification: 'SaaS Starter Kit',
   referrer: 'origin-when-cross-origin',
+  applicationName: 'SaaS Starter',
+  generator: 'Next.js',
+  abstract: 'Modern SaaS starter kit with authentication and user management',
+  archives: [siteConfig.links.github],
+  assets: [siteConfig.url],
+  bookmarks: [siteConfig.url],
 };
