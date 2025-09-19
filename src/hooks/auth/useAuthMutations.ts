@@ -1,5 +1,6 @@
 'use client';
 
+import { setLastUsedProviderCookie } from '@/hooks/auth/useLastUsedProvider';
 import { useAuth } from '@/providers/AuthProvider';
 import { authService } from '@/services/authService';
 import {
@@ -9,6 +10,7 @@ import {
   LoginRequest,
   ResetPasswordRequest,
 } from '@/types/api';
+import { AuthMethod } from '@/types/user';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 
@@ -27,6 +29,8 @@ export const useLogin = () => {
     onSuccess: response => {
       const { accessToken, refreshToken, user } = response.data;
       login(accessToken, refreshToken, user);
+      // Set email as the last used authentication method
+      setLastUsedProviderCookie(AuthMethod.EMAIL);
     },
     onError: (
       error: Error & { response?: { data?: { message?: string } } }
@@ -76,6 +80,8 @@ export const useVerifyEmail = (onSuccessCallback?: () => void) => {
     onSuccess: response => {
       const { accessToken, refreshToken, user } = response.data;
       login(accessToken, refreshToken, user);
+      // Set email as the last used authentication method
+      setLastUsedProviderCookie(AuthMethod.EMAIL);
       // Call the callback after auth state is updated
       if (onSuccessCallback) {
         onSuccessCallback();

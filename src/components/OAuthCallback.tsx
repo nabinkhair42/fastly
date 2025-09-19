@@ -1,6 +1,8 @@
 'use client';
 
+import { setLastUsedProviderCookie } from '@/hooks/auth/useLastUsedProvider';
 import { useAuth } from '@/providers/AuthProvider';
+import { AuthMethod } from '@/types/user';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useRef } from 'react';
 
@@ -16,6 +18,7 @@ export const OAuthCallback = () => {
 
     const accessToken = searchParams.get('accessToken');
     const refreshToken = searchParams.get('refreshToken');
+    const authMethod = searchParams.get('authMethod') as AuthMethod;
     const error = searchParams.get('error');
 
     if (error) {
@@ -43,6 +46,16 @@ export const OAuthCallback = () => {
           };
 
           login(accessToken, refreshToken, userData);
+
+          // Set the last used OAuth provider if available
+          if (
+            authMethod &&
+            (authMethod === AuthMethod.GITHUB ||
+              authMethod === AuthMethod.GOOGLE)
+          ) {
+            setLastUsedProviderCookie(authMethod);
+          }
+
           router.replace('/dashboard');
         } else {
           // Fallback: decode JWT token for minimal data
@@ -56,6 +69,16 @@ export const OAuthCallback = () => {
           };
 
           login(accessToken, refreshToken, userData);
+
+          // Set the last used OAuth provider if available
+          if (
+            authMethod &&
+            (authMethod === AuthMethod.GITHUB ||
+              authMethod === AuthMethod.GOOGLE)
+          ) {
+            setLastUsedProviderCookie(authMethod);
+          }
+
           router.replace('/dashboard');
         }
       } catch (error) {

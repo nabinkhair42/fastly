@@ -1,5 +1,6 @@
 'use client';
 
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -20,7 +21,9 @@ import {
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { useLogin } from '@/hooks/auth/useAuthMutations';
+import { useLastUsedProvider } from '@/hooks/auth/useLastUsedProvider';
 import { handleOAuthError } from '@/lib/auth/oauthErrorHandler';
+import { AuthMethod } from '@/types/user';
 import { loginSchema } from '@/zod/authValidation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Eye, EyeOff, Fingerprint } from 'lucide-react';
@@ -37,6 +40,7 @@ export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const loginMutation = useLogin();
+  const { isLastUsed } = useLastUsedProvider();
 
   // Handle OAuth error messages
   useEffect(() => {
@@ -130,12 +134,17 @@ export function LoginForm() {
 
             <Button
               type="submit"
-              className="w-full"
+              className="w-full relative"
               disabled={loginMutation.isPending}
               loading={loginMutation.isPending}
               loadingText="Logging In"
             >
               Log In
+              {isLastUsed(AuthMethod.EMAIL) && (
+                <Badge className="absolute right-1 top-1" variant={'secondary'}>
+                  Last Used
+                </Badge>
+              )}
             </Button>
           </form>
         </Form>
