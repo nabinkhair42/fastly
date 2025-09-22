@@ -1,41 +1,28 @@
-import { siteConfig } from '@/seo/metadata';
-import Link from 'next/link';
+import { Link } from 'lucide-react';
 
 export default function Footer() {
-  const year = new Date().getFullYear();
-  const author = siteConfig.author;
-
   return (
-    <footer className="border-t" aria-label="Site footer">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
-        <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-          <p className="text-sm text-muted-foreground">
-            © {year} {author}. All rights reserved.
+    <section className="bg-gradient-to-r py-32 from-black dark:via-emerald-800 to-black">
+      <div className="mx-auto max-w-5xl px-6">
+        <div className="text-center">
+          <h2 className="text-title text-balance text-4xl font-semibold lg:text-5xl">
+            Start Building your Product Today
+          </h2>
+          <p className="text-body mt-4">
+            We are working on building basic infrastructure for your next SaaS
+            app.
           </p>
-          <nav className="flex items-center gap-6 text-sm" aria-label="Footer">
-            <Link
-              href="/privacy"
-              className="text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Privacy
+
+          <div className="mt-12 flex flex-wrap justify-center gap-4">
+            <Link href="/" className="btn variant-primary sz-lg">
+              <span>Get Started</span>
             </Link>
-            <Link
-              href="/terms"
-              className="text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Terms
+            <Link href="/" className="btn variant-outlined sz-lg">
+              <span>Book Demo</span>
             </Link>
-            <Link
-              href={siteConfig.links.github}
-              target="_blank"
-              rel="noreferrer"
-              className="text-muted-foreground hover:text-foreground transition-colors"
-            >
-              GitHub
-            </Link>
-          </nav>
+          </div>
         </div>
       </div>
-    </footer>
+    </section>
   );
 }

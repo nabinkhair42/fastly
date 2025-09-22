@@ -24,7 +24,7 @@ export const OAuthWithGoogle = () => {
   return (
     <Button
       variant="outline"
-      className="h-14 relative"
+      className="relative"
       onClick={handleGoogleOAuth}
       disabled={isLoading}
     >
@@ -49,7 +49,7 @@ export const OAuthWithGithub = () => {
   return (
     <Button
       variant="outline"
-      className="h-14 relative"
+      className="relative"
       onClick={handleGithubOAuth}
       disabled={isLoading}
     >

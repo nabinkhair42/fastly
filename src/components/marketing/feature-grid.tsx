@@ -75,7 +75,7 @@ export default function FeatureGrid() {
       aria-labelledby="features-heading"
       className="py-16 sm:py-24"
     >
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
         <div className="max-w-2xl">
           <Badge variant="secondary">Core benefits</Badge>
           <h2

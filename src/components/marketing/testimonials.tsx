@@ -31,7 +31,7 @@ const testimonials: Testimonial[] = [
 export default function Testimonials() {
   return (
     <section aria-labelledby="testimonials-heading" className="py-16 sm:py-24">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
         <h2
           id="testimonials-heading"
           className="text-3xl sm:text-4xl font-bold tracking-tight"

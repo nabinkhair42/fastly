@@ -126,19 +126,19 @@ export const DeleteUser = () => {
           <div className="my-4 px-6">
             <ul className="space-y-2 text-sm">
               <li className="flex items-center gap-2">
-                <div className="h-1.5 w-1.5 rounded-full bg-destructive" />
+                <div className="h-1.5 w-1.5 rounded-full bg-primary" />
                 Your profile and personal information
               </li>
               <li className="flex items-center gap-2">
-                <div className="h-1.5 w-1.5 rounded-full bg-destructive" />
+                <div className="h-1.5 w-1.5 rounded-full bg-primary" />
                 All your data and content
               </li>
               <li className="flex items-center gap-2">
-                <div className="h-1.5 w-1.5 rounded-full bg-destructive" />
+                <div className="h-1.5 w-1.5 rounded-full bg-primary" />
                 Access to your account
               </li>
               <li className="flex items-center gap-2">
-                <div className="h-1.5 w-1.5 rounded-full bg-destructive" />
+                <div className="h-1.5 w-1.5 rounded-full bg-primary" />
                 All preferences and settings
               </li>
             </ul>
