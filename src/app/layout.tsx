@@ -1,18 +1,12 @@
-import { metadata } from '@/seo/metadata';
 import RootProvider from '@/providers/RootProvider';
+import { metadata } from '@/seo/metadata';
 import { Viewport } from 'next';
-import { Inter, JetBrains_Mono } from 'next/font/google';
+import { Noto_Sans } from 'next/font/google';
 import './globals.css';
 
-const inter = Inter({
+const noto = Noto_Sans({
   subsets: ['latin'],
-  variable: '--font-inter',
-  display: 'swap',
-});
-
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ['latin'],
-  variable: '--font-jetbrains-mono',
+  variable: '--font-noto',
   display: 'swap',
 });
 
@@ -37,10 +31,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${inter.variable} ${jetbrainsMono.variable}`}
-        suppressHydrationWarning
-      >
+      <body className={`${noto.variable}`} suppressHydrationWarning>
         <RootProvider>{children}</RootProvider>
       </body>
     </html>
