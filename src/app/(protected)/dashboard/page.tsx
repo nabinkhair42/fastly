@@ -4,7 +4,7 @@ import SettingsContent from './dashboard-content';
 export const metadata = generatePageMetadata({
   title: 'Settings',
   description:
-    'Manage your account settings, profile information, and preferences in SaaS Starter.',
+    'Manage your account settings, profile information, and preferences in Fastly.',
   keywords: [
     'settings',
     'profile',

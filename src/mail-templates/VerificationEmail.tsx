@@ -32,7 +32,7 @@ const VerificationEmail = ({
           <Section style={{ textAlign: 'center', marginBottom: '20px' }}>
             <Img
               src="https://starter.nabinkhair.com.np/icon.png"
-              alt="SaaS Starter"
+              alt="Fastly"
               width="150"
               height="50"
               style={{ maxWidth: '100%' }}

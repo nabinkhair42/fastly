@@ -1,6 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { CheckCircle2, MailCheck, Settings, UserPlus } from 'lucide-react';
+import Reveal from './reveal';
 
 type Step = {
   title: string;
@@ -53,23 +54,25 @@ export default function HowItWorks() {
         </div>
         <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {steps.map((s, idx) => (
-            <Card key={s.title} className="p-5">
-              <div className="flex items-start gap-3">
-                <s.Icon
-                  className="h-5 w-5 text-foreground/80"
-                  aria-hidden="true"
-                />
-                <div>
-                  <p className="text-sm text-muted-foreground">
-                    Step {idx + 1}
-                  </p>
-                  <h3 className="font-semibold">{s.title}</h3>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    {s.description}
-                  </p>
+            <Reveal key={s.title} delay={0.05 * idx}>
+              <Card className="p-5">
+                <div className="flex items-start gap-3">
+                  <s.Icon
+                    className="h-5 w-5 text-foreground/80"
+                    aria-hidden="true"
+                  />
+                  <div>
+                    <p className="text-sm text-muted-foreground">
+                      Step {idx + 1}
+                    </p>
+                    <h3 className="font-semibold">{s.title}</h3>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      {s.description}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            </Card>
+              </Card>
+            </Reveal>
           ))}
         </div>
       </div>

@@ -4,7 +4,7 @@ import { generatePageMetadata } from '@/seo/seo';
 export const metadata = generatePageMetadata({
   title: 'Create Account',
   description:
-    'Create a new SaaS Starter account to get started with our modern SaaS platform. Sign up in seconds and access all features.',
+    'Create a new Fastly account to get started with our modern SaaS platform. Sign up in seconds and access all features.',
   keywords: [
     'create account',
     'sign up',

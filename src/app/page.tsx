@@ -1,13 +1,14 @@
-import CTA from '@/components/marketing/CTA';
-import FAQ from '@/components/marketing/FAQ';
-import FeatureGrid from '@/components/marketing/FeatureGrid';
-import Footer from '@/components/marketing/Footer';
-import Hero from '@/components/marketing/Hero';
-import HowItWorks from '@/components/marketing/HowItWorks';
-import SiteHeader from '@/components/marketing/SiteHeader';
-import Testimonials from '@/components/marketing/Testimonials';
+import CTA from '@/components/marketing/cta';
+import FAQ from '@/components/marketing/faq';
+import FeatureGrid from '@/components/marketing/feature-grid';
+import Hero from '@/components/marketing/hero';
+import HowItWorks from '@/components/marketing/how-it-works';
+import PageShell from '@/components/marketing/page-shell';
+import SiteHeader from '@/components/marketing/site-header';
+import Testimonials from '@/components/marketing/testimonials';
 import { siteConfig } from '@/seo/metadata';
 import type { Metadata } from 'next';
+import { Footer } from 'react-day-picker';
 
 export const metadata: Metadata = {
   title: `Next Gen – ${siteConfig.name}`,
@@ -17,7 +18,7 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   return (
-    <>
+    <PageShell>
       <SiteHeader />
       <main>
         <Hero />
@@ -28,6 +29,6 @@ export default function HomePage() {
         <CTA />
       </main>
       <Footer />
-    </>
+    </PageShell>
   );
 }

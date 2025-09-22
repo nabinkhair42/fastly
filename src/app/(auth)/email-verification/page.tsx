@@ -4,7 +4,7 @@ import { generatePageMetadata } from '@/seo/seo';
 export const metadata = generatePageMetadata({
   title: 'Verify Email',
   description:
-    'Verify your email address to complete your SaaS Starter account setup and access all features.',
+    'Verify your email address to complete your Fastly account setup and access all features.',
   keywords: [
     'email verification',
     'verify email',

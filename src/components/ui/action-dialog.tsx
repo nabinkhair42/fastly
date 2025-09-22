@@ -7,8 +7,8 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { useEffect, useState } from 'react';
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
+import { Button } from './button';
+import { Input } from './input';
 interface ActionDialogProps {
   title: string;
   description: string;
@@ -62,8 +62,8 @@ export function ActionDialog({
 
   return (
     <Dialog open onOpenChange={onCancel}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
+      <DialogContent className="sm:max-w-md p-0">
+        <DialogHeader className="space-y-3 pt-4 px-6">
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription
             dangerouslySetInnerHTML={{
@@ -87,7 +87,7 @@ export function ActionDialog({
             children
           )}
         </div>
-        <DialogFooter>
+        <DialogFooter className="gap-2 p-4 px-6">
           <Button variant="outline" onClick={onCancel} disabled={isLoading}>
             {cancelText}
           </Button>

@@ -1,15 +1,16 @@
 import type { Metadata } from 'next';
 
 export const siteConfig = {
-  name: 'SaaS Starter - Modern SaaS Foundation',
+  name: 'Fastly - Modern SaaS Foundation',
   description:
-    'A comprehensive SaaS starter kit built with Next.js, TypeScript, and modern UI components. Features authentication, user management, and more.',
+    'A comprehensive Fastly kit built with Next.js, TypeScript, and modern UI components. Features authentication, user management, and more.',
   url: process.env.NEXT_PUBLIC_APP_URL || 'https://starter.nabinkhair.com.np',
   ogImage: `${process.env.NEXT_PUBLIC_APP_URL || 'https://starter.nabinkhair.com.np'}/og-image.webp`,
   links: {
     github: 'https://github.com/nabinkhair42/saas-starter',
     twitter: 'https://twitter.com/khairnabin',
   },
+  author: 'Nabin Khair',
 };
 
 export const metadata: Metadata = {
@@ -114,11 +115,11 @@ export const metadata: Metadata = {
     // bing: 'your-bing-verification-id',
   },
   category: 'technology',
-  classification: 'SaaS Starter Kit',
+  classification: 'Fastly Kit',
   referrer: 'origin-when-cross-origin',
-  applicationName: 'SaaS Starter',
+  applicationName: 'Fastly',
   generator: 'Next.js',
-  abstract: 'Modern SaaS starter kit with authentication and user management',
+  abstract: 'Modern Fastly kit with authentication and user management',
   archives: [siteConfig.links.github],
   assets: [siteConfig.url],
   bookmarks: [siteConfig.url],

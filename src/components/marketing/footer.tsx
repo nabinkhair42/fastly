@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 export default function Footer() {
   const year = new Date().getFullYear();
-  const author = siteConfig.authors?.[0]?.name || 'Author';
+  const author = siteConfig.author;
 
   return (
     <footer className="border-t" aria-label="Site footer">

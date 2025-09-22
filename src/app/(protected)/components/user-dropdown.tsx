@@ -1,5 +1,5 @@
 'use client';
-import { ActionDialog } from '@/components/ui/ActionDialog';
+import { ActionDialog } from '@/components/ui/action-dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   DropdownMenu,
@@ -28,13 +28,13 @@ export const UserDropdown = ({ avatarOnly }: { avatarOnly?: boolean }) => {
     {
       label: 'Profile',
       icon: User,
-      onClick: () => router.push('/settings'),
+      onClick: () => router.push('/edit-profile'),
       description: 'View and manage your profile information.',
     },
     {
       label: 'Account Settings',
       icon: Settings,
-      onClick: () => router.push('/settings/account'),
+      onClick: () => router.push('/account'),
       description: 'View and manage your account settings.',
     },
     {

@@ -4,7 +4,7 @@ import { generatePageMetadata } from '@/seo/seo';
 export const metadata = generatePageMetadata({
   title: 'Reset Password',
   description:
-    'Set a new password for your SaaS Starter account. Complete your password reset process securely.',
+    'Set a new password for your Fastly account. Complete your password reset process securely.',
   keywords: [
     'reset password',
     'new password',

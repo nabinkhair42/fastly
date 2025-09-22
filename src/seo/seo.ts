@@ -76,7 +76,7 @@ export function generateOrganizationStructuredData() {
   return {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'SaaS Starter',
+    name: 'Fastly',
     url: siteConfig.url,
     logo: `${siteConfig.url}/icon.png`,
     description: siteConfig.description,
@@ -106,7 +106,7 @@ export function generateWebApplicationStructuredData() {
     },
     creator: {
       '@type': 'Organization',
-      name: 'SaaS Starter',
+      name: 'Fastly',
       url: siteConfig.url,
     },
   };

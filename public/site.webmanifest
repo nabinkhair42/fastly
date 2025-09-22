@@ -1,7 +1,7 @@
 {
-  "name": "SaaS Starter - Modern SaaS Foundation",
-  "short_name": "SaaS Starter",
-  "description": "A comprehensive SaaS starter kit built with Next.js, TypeScript, and modern UI components",
+  "name": "Fastly - Modern SaaS Foundation",
+  "short_name": "Fastly",
+  "description": "A comprehensive Fastly kit built with Next.js, TypeScript, and modern UI components",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

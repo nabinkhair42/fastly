@@ -1,18 +1,18 @@
 import { UserDropdown } from '@/app/(protected)/components/user-dropdown';
-import { Logo } from '@/components/ui/logo';
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
+  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { useAuthMethod } from '@/hooks/users/useUserMutations';
-import { Fingerprint, Lock, SquarePenIcon, User } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
+import { GiCube } from 'react-icons/gi';
 
 export const AppSidebar = () => {
   const authMethod = useAuthMethod();
@@ -20,15 +20,20 @@ export const AppSidebar = () => {
   const pathname = usePathname();
   const router = useRouter();
   return (
-    <Sidebar>
-      <SidebarHeader className="p-3 flex flex-row justify-between items-center border-b h-13">
-        <div className="flex items-center gap-2">
-          <Logo variant="colored" height={20} width={20} />
-          <span className="text-lg font-semibold">Settings</span>
+    <Sidebar variant="inset">
+      <SidebarHeader className="flex flex-row justify-between items-center ">
+        <div className="flex items-center gap-2 pl-3">
+          <GiCube height={20} width={20} />
+          <span className="text-lg font-semibold">Fastly </span>
         </div>
       </SidebarHeader>
-      <SidebarContent className="h-svh">
+      <SidebarContent className="flex flex-col justify-between h-full">
         <SidebarGroup>
+          {/* Your App Important Pages Links */}
+          <SidebarGroupLabel>App Links</SidebarGroupLabel>
+        </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel>Settings</SidebarGroupLabel>
           <SidebarMenu>
             {sidebarNavItems.map(item => (
               <SidebarMenuItem key={item.href}>
@@ -37,8 +42,6 @@ export const AppSidebar = () => {
                   onClick={() => router.push(item.href)}
                   className="cursor-pointer"
                 >
-                  <div className="flex items-center gap-2">{item.icon}</div>
-
                   {item.title}
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -46,7 +49,7 @@ export const AppSidebar = () => {
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter className="p-2">
+      <SidebarFooter>
         <UserDropdown />
       </SidebarFooter>
     </Sidebar>
@@ -56,25 +59,21 @@ export const AppSidebar = () => {
 const getSidebarNavItems = (authMethod: string) => {
   return [
     {
-      title: 'Dashboard',
+      title: 'Profile',
       href: '/dashboard',
-      icon: <User className="h-4 w-4" />,
     },
     {
       title: 'Edit Profile',
       href: '/edit-profile',
-      icon: <SquarePenIcon className="h-4 w-4" />,
     },
     {
       title: 'Change Password',
       href: '/change-password',
-      icon: <Fingerprint className="h-4 w-4" />,
       isDisabled: authMethod === 'email',
     },
     {
       title: 'Accounts',
       href: '/account',
-      icon: <Lock className="h-4 w-4" />,
     },
   ];
 };

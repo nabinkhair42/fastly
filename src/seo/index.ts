@@ -1,6 +1,6 @@
 // Replace the content of this file with your site's metadata
 export const siteConfig = {
-  name: 'SaaS Starter',
+  name: 'Fastly',
   description:
     'A starter template for SaaS applications built with Next.js and Tailwind CSS.',
   url: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
@@ -22,7 +22,7 @@ export const siteConfig = {
     type: 'website',
     locale: 'en_US',
     url: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
-    site_name: 'SaaS Starter',
+    site_name: 'Fastly',
   },
 
   twitter: {

@@ -90,30 +90,14 @@ export const DeleteUser = () => {
 
   return (
     <div className="space-y-6">
-      {/* Warning Section */}
-      <div className="border-destructive bg-destructive/10 p-4 rounded-lg flex items-start gap-3">
-        <div className="mt-0.5">
-          <AlertTriangle className="h-5 w-5 text-destructive" />
-        </div>
-        <div className="space-y-2">
-          <p className="text-sm font-medium text-destructive">Danger Zone</p>
-          <p className="text-sm text-destructive/80">
-            This action is irreversible and will permanently delete your account
-            and all associated data. This includes your profile, settings, and
-            any content you&apos;ve created.
-          </p>
-        </div>
-      </div>
-
       {/* Delete Button */}
       <div className="pt-2">
         <Button
           variant="destructive"
-          size="lg"
           onClick={handleOpenDialog}
           className="w-full sm:w-auto"
         >
-          <Trash className="h-4 w-4 mr-2" />
+          <Trash className="h-4 w-4" />
           Delete Account
         </Button>
       </div>
@@ -225,7 +209,7 @@ export const DeleteUser = () => {
             )}
           </div>
 
-          <DialogFooter className="gap-2 p-4 px-6 border-t">
+          <DialogFooter className="gap-2 p-4 px-6 ">
             <DialogClose asChild>
               <Button
                 variant="outline"

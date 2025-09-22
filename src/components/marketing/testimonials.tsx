@@ -1,4 +1,5 @@
 import { Card } from '@/components/ui/card';
+import Reveal from './reveal';
 
 type Testimonial = {
   name: string;
@@ -38,14 +39,16 @@ export default function Testimonials() {
           What builders say
         </h2>
         <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-          {testimonials.map(t => (
-            <Card key={t.name} className="p-5">
-              <p className="text-sm text-muted-foreground">“{t.quote}”</p>
-              <div className="mt-4">
-                <p className="font-semibold">{t.name}</p>
-                <p className="text-sm text-muted-foreground">{t.role}</p>
-              </div>
-            </Card>
+          {testimonials.map((t, i) => (
+            <Reveal key={t.name} delay={0.05 * i}>
+              <Card className="p-5">
+                <p className="text-sm text-muted-foreground">“{t.quote}”</p>
+                <div className="mt-4">
+                  <p className="font-semibold">{t.name}</p>
+                  <p className="text-sm text-muted-foreground">{t.role}</p>
+                </div>
+              </Card>
+            </Reveal>
           ))}
         </div>
       </div>

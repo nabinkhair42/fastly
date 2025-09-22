@@ -4,7 +4,7 @@ import { generatePageMetadata } from '@/seo/seo';
 export const metadata = generatePageMetadata({
   title: 'Log In',
   description:
-    'Sign in to your SaaS Starter account to access your dashboard and manage your application.',
+    'Sign in to your Fastly account to access your dashboard and manage your application.',
   keywords: ['login', 'sign in', 'authentication', 'account access'],
   canonical: '/log-in',
 });

@@ -10,6 +10,7 @@ import {
   UserCog,
   Wrench,
 } from 'lucide-react';
+import Reveal from './reveal';
 
 type Feature = {
   title: string;
@@ -89,24 +90,23 @@ export default function FeatureGrid() {
           </p>
         </div>
         <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {features.map(f => (
-            <Card
-              key={f.title}
-              className="p-5 transition-colors hover:border-foreground/20"
-            >
-              <div className="flex items-start gap-3">
-                <f.Icon
-                  className="h-5 w-5 text-foreground/80"
-                  aria-hidden="true"
-                />
-                <div>
-                  <h3 className="font-semibold">{f.title}</h3>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    {f.description}
-                  </p>
+          {features.map((f, i) => (
+            <Reveal key={f.title} delay={0.04 * i}>
+              <Card className="p-5 transition-colors hover:border-foreground/20">
+                <div className="flex items-start gap-3">
+                  <f.Icon
+                    className="h-5 w-5 text-foreground/80"
+                    aria-hidden="true"
+                  />
+                  <div>
+                    <h3 className="font-semibold">{f.title}</h3>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      {f.description}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            </Card>
+              </Card>
+            </Reveal>
           ))}
         </div>
       </div>

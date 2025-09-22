@@ -4,8 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/providers/AuthProvider';
 import { siteConfig } from '@/seo/metadata';
-import { Github } from 'lucide-react';
 import Link from 'next/link';
+import { GiCube } from 'react-icons/gi';
+
+import { ThemeSwitcher } from '../ui/theme-switcher';
 
 export default function SiteHeader() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -23,48 +25,10 @@ export default function SiteHeader() {
               className="flex items-center gap-2"
               aria-label={siteConfig.name}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={siteConfig.ogImage ? '/icon.png' : '/icon.png'}
-                alt="Logo"
-                className="h-6 w-6"
-              />
-              <span className="font-semibold">{siteConfig.name}</span>
+              <GiCube height={30} width={30} />
+              <span className="font-semibold">Fastly</span>
             </Link>
           </div>
-
-          <nav
-            className="hidden md:flex items-center gap-6"
-            aria-label="Primary"
-          >
-            <Link
-              href="#features"
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Features
-            </Link>
-            <Link
-              href="#how-it-works"
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              How it works
-            </Link>
-            <Link
-              href="#faq"
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              FAQ
-            </Link>
-            <Link
-              href={siteConfig.links.github}
-              target="_blank"
-              rel="noreferrer"
-              className="text-sm inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <Github className="h-4 w-4" aria-hidden="true" />
-              GitHub
-            </Link>
-          </nav>
 
           <div className="flex items-center gap-2">
             {isLoading ? null : isAuthenticated ? (
@@ -81,6 +45,7 @@ export default function SiteHeader() {
                 </Button>
               </div>
             )}
+            <ThemeSwitcher />
           </div>
         </div>
       </div>

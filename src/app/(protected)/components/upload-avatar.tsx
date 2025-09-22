@@ -1,6 +1,6 @@
 'use client';
 
-import { ActionDialog } from '@/components/ui/ActionDialog';
+import { ActionDialog } from '@/components/ui/action-dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
@@ -180,7 +180,7 @@ export function UploadAvatar() {
               </div>
 
               {/* Crop Area */}
-              <div>
+              <div className="flex justify-center flex-col">
                 <ImageCrop
                   file={selectedFile}
                   onCrop={handleUpload}
