@@ -150,7 +150,7 @@ jobs:
               - 'src/mail-templates/**'
 
       - name: Auto-assign size labels
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         continue-on-error: true
         with:
           script: |
@@ -184,7 +184,7 @@ jobs:
             }
 
       - name: Auto-assign change-based labels
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         continue-on-error: true
         with:
           script: |
