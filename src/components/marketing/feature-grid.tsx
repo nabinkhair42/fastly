@@ -1,115 +1,102 @@
-import { Badge } from '@/components/ui/badge';
-import { Card } from '@/components/ui/card';
+import { ReactNode } from 'react';
 import {
-  Braces,
-  Database,
-  KeyRound,
-  MonitorSmartphone,
-  ShieldCheck,
-  UploadCloud,
-  UserCog,
-  Wrench,
-} from 'lucide-react';
-import Reveal from './reveal';
+  FaCloudUploadAlt,
+  FaCodeBranch,
+  FaUserCircle,
+  FaUserShield,
+} from 'react-icons/fa';
+import { SiJsonwebtokens, SiTypescript } from 'react-icons/si';
 
-type Feature = {
+type feature = {
   title: string;
   description: string;
   Icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
 };
 
-const features: Feature[] = [
+const features: feature[] = [
   {
-    title: 'Secure authentication',
+    title: 'Secure Authentication',
     description:
-      'Email + OAuth (Google, GitHub), verification, and password reset flows included.',
-    Icon: ShieldCheck,
+      'Email, Google, and GitHub login with verification, password reset, and OAuth support.',
+    Icon: FaUserShield,
   },
   {
-    title: 'Profiles that feel premium',
+    title: 'Customizable Profiles',
     description:
-      'Avatars, themes, fonts, social links, and one-time username change rules.',
-    Icon: UserCog,
+      'Avatars, themes, fonts, and social links with rules for one-time username changes.',
+    Icon: FaUserCircle,
   },
   {
-    title: 'Instant uploads',
+    title: 'Seamless Uploads',
     description:
-      'Client-side cropping with server cleanup using UploadThing for avatars.',
-    Icon: UploadCloud,
+      'Client-side image cropping with server cleanup for hassle-free avatar uploads.',
+    Icon: FaCloudUploadAlt,
   },
   {
-    title: 'Production APIs',
+    title: 'Robust APIs',
     description:
-      'Zod-validated route handlers with consistent response helpers.',
-    Icon: Braces,
+      'Zod-validated endpoints and consistent response helpers built for production.',
+    Icon: FaCodeBranch,
   },
   {
-    title: 'Type-safe data',
-    description: 'MongoDB/Mongoose models for auth and user data.',
-    Icon: Database,
+    title: 'Type-Safe Data',
+    description: 'MongoDB with Mongoose models, fully typed with TypeScript.',
+    Icon: SiTypescript,
   },
   {
-    title: 'Token security',
+    title: 'JWT Security',
     description:
-      'Access/refresh JWTs with automatic rotation and protected routes.',
-    Icon: KeyRound,
-  },
-  {
-    title: 'Modern UI',
-    description:
-      'Tailwind + shadcn/ui + Radix with responsive layouts and dark mode.',
-    Icon: MonitorSmartphone,
-  },
-  {
-    title: 'Founder-grade DX',
-    description:
-      'TypeScript, TanStack Query, RHF, Axios, ESLint/Prettier, Vercel-ready.',
-    Icon: Wrench,
+      'Access and refresh tokens with automatic rotation and protected routes.',
+    Icon: SiJsonwebtokens,
   },
 ];
 
 export default function FeatureGrid() {
   return (
-    <section
-      id="features"
-      aria-labelledby="features-heading"
-      className="py-16 sm:py-24"
-    >
-      <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-        <div className="max-w-2xl">
-          <Badge variant="secondary">Core benefits</Badge>
-          <h2
-            id="features-heading"
-            className="mt-3 text-3xl sm:text-4xl font-bold tracking-tight"
-          >
-            Everything you need to ship
+    <section className="py-16 md:py-32">
+      <div className="mx-auto max-w-5xl px-4 lg:px-0 space-y-8 md:space-y-16">
+        <div className="text-center">
+          <h2 className="text-balance text-4xl font-semibold lg:text-5xl">
+            Everything you need to build your SaaS
           </h2>
-          <p className="mt-2 text-muted-foreground">
-            A complete foundation so you can focus on your product, not
-            plumbing.
+          <p className="mt-4">
+            All of the essential features you need to build your SaaS product
+            faster.
           </p>
         </div>
-        <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {features.map((f, i) => (
-            <Reveal key={f.title} delay={0.04 * i}>
-              <Card className="p-5 transition-colors hover:border-foreground/20">
-                <div className="flex items-start gap-3">
-                  <f.Icon
-                    className="h-5 w-5 text-foreground/80"
-                    aria-hidden="true"
-                  />
-                  <div>
-                    <h3 className="font-semibold">{f.title}</h3>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      {f.description}
-                    </p>
-                  </div>
-                </div>
-              </Card>
-            </Reveal>
+        <div className="relative mx-auto grid divide-x divide-y border *:p-12 sm:grid-cols-2 lg:grid-cols-3">
+          {features.map((feature, index) => (
+            <div className="space-y-3 " key={index}>
+              <div className="flex flex-col gap-2">
+                <CardDecorator>
+                  <feature.Icon className="size-6" aria-hidden />
+                </CardDecorator>
+
+                <h3 className="font-medium text-center">{feature.title}</h3>
+              </div>
+
+              <div>
+                <p className="text-sm text-center text-muted-foreground">
+                  {feature.description}
+                </p>
+              </div>
+            </div>
           ))}
         </div>
       </div>
     </section>
   );
 }
+
+const CardDecorator = ({ children }: { children: ReactNode }) => (
+  <div className="mask-radial-from-40% mask-radial-to-60% relative mx-auto size-36 duration-200 [--color-border:color-mix(in_oklab,var(--color-zinc-950)10%,transparent)] group-hover:[--color-border:color-mix(in_oklab,var(--color-zinc-950)20%,transparent)] dark:[--color-border:color-mix(in_oklab,var(--color-white)15%,transparent)] dark:group-hover:[--color-border:color-mix(in_oklab,var(--color-white)20%,transparent)]">
+    <div
+      aria-hidden
+      className="absolute inset-0 bg-[linear-gradient(to_right,var(--color-border)_1px,transparent_1px),linear-gradient(to_bottom,var(--color-border)_1px,transparent_1px)] bg-[size:24px_24px] dark:opacity-50"
+    />
+
+    <div className="bg-background absolute inset-0 m-auto flex size-12 items-center justify-center border-l border-t">
+      {children}
+    </div>
+  </div>
+);
