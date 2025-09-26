@@ -42,6 +42,10 @@ export function LoginForm() {
   const loginMutation = useLogin();
   const { isLastUsed } = useLastUsedProvider();
 
+  const redirectTo =
+    new URLSearchParams(window.location.search).get('redirect') || '/dashboard';
+
+  console.log({ redirectTo });
   // Handle OAuth error messages
   useEffect(() => {
     const error = searchParams.get('error');
@@ -60,8 +64,8 @@ export function LoginForm() {
   const onSubmit = async (data: LoginFormData) => {
     try {
       await loginMutation.mutateAsync(data);
-      // Redirect to users page after successful login
-      router.push('/dashboard');
+      console.log('Redirecting to:', redirectTo);
+      router.push(redirectTo || '/dashboard');
     } catch (error) {
       console.error(error);
     }

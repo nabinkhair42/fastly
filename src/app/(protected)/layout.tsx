@@ -12,7 +12,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ProtectedRoute redirectTo="/log-in">
+    <ProtectedRoute>
       <SidebarProvider defaultOpen={true}>
         <AppSidebar />
         <div className="flex flex-col w-full border-l rounded-l-2xl">

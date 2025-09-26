@@ -22,7 +22,7 @@ import { Separator } from '@/components/ui/separator';
 import { useCreateAccount } from '@/hooks/auth/useAuthMutations';
 import { createAccountSchema } from '@/zod/authValidation';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Eye, EyeOff, User } from 'lucide-react';
+import { Eye, EyeOff, UserPlus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -74,7 +74,7 @@ export function CreateAccountForm() {
     <Card className="w-full max-w-md">
       <CardHeader>
         <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-muted">
-          <User className="h-6 w-6" />
+          <UserPlus className="h-6 w-6" />
         </div>
         <CardTitle className="text-2xl font-bold">Create Account</CardTitle>
         <CardDescription>
@@ -218,8 +218,8 @@ export function CreateAccountForm() {
 
         <OAuthButtons />
       </CardContent>
-      <CardFooter className="flex justify-center">
-        <div className="text-center text-sm">
+      <CardFooter className="flex items-center justify-center">
+        <div className="text-center text-sm text-muted-foreground">
           Already have an account?{' '}
           <Button
             variant="link"

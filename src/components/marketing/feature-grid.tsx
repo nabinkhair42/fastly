@@ -57,7 +57,7 @@ export default function FeatureGrid() {
       <div className="mx-auto max-w-5xl px-4 lg:px-0 space-y-8 md:space-y-16">
         <div className="text-center">
           <h2 className="text-balance text-4xl font-semibold lg:text-5xl">
-            Everything you need to build your SaaS
+            Existing Features
           </h2>
           <p className="mt-4">
             All of the essential features you need to build your SaaS product

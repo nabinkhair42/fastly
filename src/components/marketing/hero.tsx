@@ -24,9 +24,19 @@ export default function Hero() {
             <div className="flex flex-col items-center space-y-6 sm:space-y-8">
               {/* Announcement */}
               <Announcement>
-                <AnnouncementTag>Latest update</AnnouncementTag>
-                <AnnouncementTitle>
-                  Dashboard Updated
+                <AnnouncementTag className="bg-emerald-300">
+                  Latest update
+                </AnnouncementTag>
+                <AnnouncementTitle
+                  className="cursor-pointer"
+                  onClick={() =>
+                    window.open(
+                      'https://github.com/nabinkhair42/saas-starter',
+                      '_blank'
+                    )
+                  }
+                >
+                  Open Sourced on GitHub
                   <ArrowUpRightIcon
                     className="ml-1 shrink-0 text-muted-foreground"
                     size={16}
@@ -82,7 +92,7 @@ export default function Hero() {
               <div className="absolute inset-0 skew-x-[.56rad] translate-y-60 translate-x-80 translate-z-[50px]">
                 <RevealY delay={0.4}>
                   <Image
-                    className="rounded-[4px] border dark:hidden"
+                    className="rounded-[4px] border dark:hidden [mask-image:linear-gradient(to_right,black_50%,transparent_100%)]"
                     src="/demo/delete-light.png"
                     alt="Delete Account Hero Section"
                     width={2880}

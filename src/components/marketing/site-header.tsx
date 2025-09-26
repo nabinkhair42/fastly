@@ -3,10 +3,14 @@
 import { Separator } from '@/components/ui/separator';
 import { ThemeSwitcher } from '@/components/ui/theme-switcher';
 import { siteConfig } from '@/seo/metadata';
+import { ArrowUpRight } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { GiCube } from 'react-icons/gi';
+import { Button } from '../ui/button';
 
 export default function SiteHeader() {
+  const router = useRouter();
   return (
     <header
       className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60"
@@ -25,8 +29,16 @@ export default function SiteHeader() {
             </Link>
           </div>
 
-          <div>
+          <div className="flex items-center gap-4">
             <ThemeSwitcher />
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => router.push('/create-account')}
+            >
+              Get Started
+              <ArrowUpRight />
+            </Button>
           </div>
         </div>
       </div>

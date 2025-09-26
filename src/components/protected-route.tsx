@@ -2,13 +2,12 @@
 
 import { useSession } from '@/hooks/auth/useSession';
 import { Loader } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
   fallback?: React.ReactNode;
-  redirectTo?: string;
 }
 
 /**
@@ -18,16 +17,19 @@ interface ProtectedRouteProps {
 export default function ProtectedRoute({
   children,
   fallback,
-  redirectTo = '/log-in',
 }: ProtectedRouteProps) {
   const { isAuthenticated, isLoading } = useSession();
   const router = useRouter();
+  const pathname = usePathname();
+
+  // Redirect to login if not authenticated and add the link path where user wanted to go as param
+  const redirectToWithParam = `/log-in?redirect=${encodeURIComponent(pathname)}`;
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      router.push(redirectTo);
+      router.push(redirectToWithParam);
     }
-  }, [isAuthenticated, isLoading, router, redirectTo]);
+  }, [isAuthenticated, isLoading, router, redirectToWithParam]);
 
   // Show loading state while checking authentication
   if (isLoading) {
@@ -58,10 +60,7 @@ export function withProtectedRoute<T extends object>(
 ) {
   return function ProtectedComponent(props: T) {
     return (
-      <ProtectedRoute
-        redirectTo={options?.redirectTo}
-        fallback={options?.fallback}
-      >
+      <ProtectedRoute fallback={options?.fallback}>
         <Component {...props} />
       </ProtectedRoute>
     );

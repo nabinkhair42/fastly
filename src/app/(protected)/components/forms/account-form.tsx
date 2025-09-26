@@ -214,10 +214,13 @@ export function AccountForm() {
               />
 
               {/* Submit Button */}
-              <Button type="submit" disabled={updateUserDetails.isPending}>
-                {updateUserDetails.isPending
-                  ? 'Updating...'
-                  : 'Update preferences'}
+              <Button
+                type="submit"
+                disabled={updateUserDetails.isPending}
+                loading={updateUserDetails.isPending}
+                loadingText="Updating"
+              >
+                Update Preferences
               </Button>
             </form>
           </Form>

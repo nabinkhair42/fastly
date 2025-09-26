@@ -38,10 +38,9 @@ export const useUpdateUserDetails = () => {
   return useMutation({
     mutationFn: async (data: UpdateUserDetailsRequest) => {
       return toast.promise(userService.updateUserDetails(data), {
-        loading: 'Updating profile...',
-        success: response =>
-          response.message || 'Profile updated successfully!',
-        error: 'Failed to update profile. Please try again.',
+        loading: 'Updating profile',
+        success: response => response.message,
+        error: response => response.message,
       });
     },
     onSuccess: () => {
@@ -63,12 +62,8 @@ export const useUpdateUserDetails = () => {
         });
       }
     },
-    onError: (
-      error: Error & { response?: { data?: { message?: string } } }
-    ) => {
-      const message =
-        error.response?.data?.message ||
-        'Failed to update profile. Please try again.';
+    onError: (error: Error & { response: { data: { message: string } } }) => {
+      const message = error.response.data.message;
       toast.error(message);
     },
   });
@@ -82,10 +77,9 @@ export const useChangeUsername = (onSuccessCallback?: () => void) => {
   return useMutation({
     mutationFn: async (data: ChangeUsernameRequest) => {
       return toast.promise(userService.changeUsername(data), {
-        loading: 'Updating username...',
-        success: response =>
-          response.message || 'Username updated successfully!',
-        error: 'Failed to update username. Please try again.',
+        loading: 'Updating username',
+        success: response => response.message,
+        error: response => response.message,
       });
     },
     onSuccess: async (response, variables) => {
@@ -114,12 +108,8 @@ export const useChangeUsername = (onSuccessCallback?: () => void) => {
         onSuccessCallback();
       }
     },
-    onError: (
-      error: Error & { response?: { data?: { message?: string } } }
-    ) => {
-      const message =
-        error.response?.data?.message ||
-        'Failed to update username. Please try again.';
+    onError: (error: Error & { response: { data: { message: string } } }) => {
+      const message = error.response.data.message;
       toast.error(message);
     },
   });
@@ -138,18 +128,13 @@ export const useChangePassword = () => {
   return useMutation({
     mutationFn: async (data: ChangePasswordRequest) => {
       return toast.promise(userService.changePassword(data), {
-        loading: 'Changing password...',
-        success: response =>
-          response.message || 'Password changed successfully!',
-        error: 'Failed to change password. Please try again.',
+        loading: 'Changing password',
+        success: response => response.message,
+        error: response => response.message,
       });
     },
-    onError: (
-      error: Error & { response?: { data?: { message?: string } } }
-    ) => {
-      const message =
-        error.response?.data?.message ||
-        'Failed to change password. Please try again.';
+    onError: (error: Error & { response: { data: { message: string } } }) => {
+      const message = error.response.data.message;
       toast.error(message);
     },
   });
@@ -163,10 +148,9 @@ export const useDeleteUser = () => {
   return useMutation({
     mutationFn: async (data: DeleteUserRequest) => {
       return toast.promise(userService.deleteUser(data), {
-        loading: 'Deleting account...',
-        success: response =>
-          response.message || 'Account deleted successfully!',
-        error: 'Failed to delete account. Please try again.',
+        loading: 'Deleting account',
+        success: response => response.message,
+        error: response => response.message,
       });
     },
     onSuccess: () => {
@@ -174,15 +158,11 @@ export const useDeleteUser = () => {
       queryClient.invalidateQueries({ queryKey: userQueryKeys.userDetails });
       router.push('/');
     },
-    onError: (
-      error: Error & { response?: { data?: { message?: string } } }
-    ) => {
+    onError: (error: Error & { response: { data: { message: string } } }) => {
       // Even if delete API fails, we should still clear local state
       logout();
       queryClient.clear();
-      const message =
-        error.response?.data?.message ||
-        'Failed to delete account. Please try again.';
+      const message = error.response.data.message;
       toast.error(message);
     },
   });

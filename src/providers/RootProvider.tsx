@@ -69,7 +69,7 @@ export default function RootProvider({
           <FontProvider>
             {children}
             <Toaster
-              position="bottom-right"
+              position="top-center"
               toastOptions={{
                 style: {
                   background: 'var(--sidebar)',

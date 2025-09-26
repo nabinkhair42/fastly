@@ -42,7 +42,7 @@ export default function IntegrationsSection() {
             </div>
           </div>
 
-          <div className="-mx-6 px-6 [mask-image:radial-gradient(ellipse_100%_100%_at_50%_0%,#000_70%,transparent_100%)] sm:mx-auto sm:max-w-md md:-mx-6 md:ml-auto md:mr-0">
+          <div className="-mx-6 [mask-image:radial-gradient(ellipse_100%_100%_at_50%_0%,#000_70%,transparent_100%)] sm:mx-auto sm:max-w-md md:-mx-6 md:ml-auto md:mr-0">
             <div className="bg-background dark:bg-muted/50 rounded-2xl border p-3 shadow-lg md:pb-12 bg-[repeating-linear-gradient(-45deg,var(--color-border),var(--color-border)_1px,transparent_1px,transparent_6px)]">
               <div className="grid grid-cols-2 gap-2">
                 <Integration

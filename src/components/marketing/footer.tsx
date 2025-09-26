@@ -15,10 +15,13 @@ export default function Footer() {
             app.
           </p>
           <div className="mt-12 flex flex-wrap justify-center gap-4">
-            <Link href="/">
+            <Link
+              href="https://github.com/nabinkhair42/saas-starter"
+              target="_blank"
+            >
               <SiGithub />
             </Link>
-            <Link href="/">
+            <Link href="https://x.com/khairnabin">
               <FaXTwitter />
             </Link>
           </div>
