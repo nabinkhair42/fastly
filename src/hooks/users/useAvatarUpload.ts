@@ -22,9 +22,9 @@ export function useAvatarUpload() {
 
         // Update user avatar in database with toast.promise
         await toast.promise(userService.updateAvatar(uploadedFile.ufsUrl), {
-          loading: 'Updating avatar...',
-          success: 'Avatar updated successfully!',
-          error: 'Failed to update avatar. Please try again.',
+          loading: 'Updating avatar',
+          success: response => response.message,
+          error: response => response.message,
         });
 
         // Refetch user details to get updated avatar
@@ -43,9 +43,9 @@ export function useAvatarUpload() {
     try {
       // Delete avatar from database with toast.promise
       await toast.promise(userService.deleteAvatar(), {
-        loading: 'Removing avatar...',
-        success: 'Avatar removed successfully!',
-        error: 'Failed to remove avatar. Please try again.',
+        loading: 'Removing avatar',
+        success: response => response.message,
+        error: response => response.message,
       });
 
       // Refetch user details to get updated avatar

@@ -1,4 +1,4 @@
-# Next Gen - SaaS Starter Kit
+# Next Gen - Fastly Kit
 
 Next Gen is a comprehensive starter kit providing a foundational layer for SaaS applications. It includes a robust authentication system with traditional email/password login and modern OAuth support for GitHub and Google.
 

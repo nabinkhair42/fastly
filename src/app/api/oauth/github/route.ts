@@ -185,6 +185,7 @@ export async function GET(request: NextRequest) {
     );
     redirectUrl.searchParams.set('accessToken', tokens.accessToken);
     redirectUrl.searchParams.set('refreshToken', tokens.refreshToken);
+    redirectUrl.searchParams.set('authMethod', AuthMethod.GITHUB);
 
     // Include user data in URL params
     redirectUrl.searchParams.set('userId', userAuth._id.toString());

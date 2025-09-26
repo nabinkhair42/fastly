@@ -19,7 +19,7 @@ export default function AuthLayout({
   }
 
   return (
-    <div className="bg-background min-h-screen place-content-center">
+    <div className="bg-background min-h-[100svh] place-content-center">
       <div className="mx-auto px-4 py-8">{children}</div>
     </div>
   );

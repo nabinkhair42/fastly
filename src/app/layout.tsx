@@ -1,19 +1,28 @@
-import { metadata } from '@/lib/metadata';
 import RootProvider from '@/providers/RootProvider';
-import { Inter, JetBrains_Mono } from 'next/font/google';
+import { metadata } from '@/seo/metadata';
+import { Viewport } from 'next';
+import { Noto_Sans } from 'next/font/google';
 import './globals.css';
 
-const inter = Inter({
+const noto = Noto_Sans({
   subsets: ['latin'],
-  variable: '--font-inter',
-});
-
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ['latin'],
-  variable: '--font-jetbrains-mono',
+  variable: '--font-noto',
+  display: 'swap',
 });
 
 export { metadata };
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+    { media: '(prefers-color-scheme: dark)', color: '#000000' },
+  ],
+  colorScheme: 'light dark',
+};
 
 export default function RootLayout({
   children,
@@ -22,10 +31,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${inter.variable} ${jetbrainsMono.variable}`}
-        suppressHydrationWarning
-      >
+      <body className={`${noto.variable}`} suppressHydrationWarning>
         <RootProvider>{children}</RootProvider>
       </body>
     </html>

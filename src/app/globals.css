@@ -160,3 +160,7 @@
     Arial, sans-serif;
   font-weight: 400;
 }
+
+.button-shadow {
+  @apply shadow-[inset_0px_1.5px_0px_rgba(255,255,255,0.15)];
+}
