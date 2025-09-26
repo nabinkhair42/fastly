@@ -1,5 +1,6 @@
 'use client';
 
+import { OAuthButtons } from '@/app/(auth)/components/auth-buttons';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -22,16 +23,17 @@ import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { useLogin } from '@/hooks/auth/useAuthMutations';
 import { useLastUsedProvider } from '@/hooks/auth/useLastUsedProvider';
+import { useSafeRedirect } from '@/hooks/auth/useSafeRedirect';
+import { useSession } from '@/hooks/auth/useSession';
 import { handleOAuthError } from '@/lib/auth/oauthErrorHandler';
 import { AuthMethod } from '@/types/user';
 import { loginSchema } from '@/zod/authValidation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Eye, EyeOff, Fingerprint } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { OAuthButtons } from '../auth-buttons';
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
@@ -41,16 +43,27 @@ export function LoginForm() {
   const searchParams = useSearchParams();
   const loginMutation = useLogin();
   const { isLastUsed } = useLastUsedProvider();
+  const { isAuthenticated } = useSession();
 
-  const redirectTo =
-    new URLSearchParams(window.location.search).get('redirect') || '/dashboard';
+  const redirectTo = useSafeRedirect('/dashboard');
 
-  console.log({ redirectTo });
+  const hasRedirectedRef = useRef(false);
+
+  useEffect(() => {
+    hasRedirectedRef.current = false;
+  }, [isAuthenticated, redirectTo]);
+
   // Handle OAuth error messages
   useEffect(() => {
     const error = searchParams.get('error');
     handleOAuthError(error);
   }, [searchParams]);
+  useEffect(() => {
+    if (isAuthenticated && !hasRedirectedRef.current) {
+      hasRedirectedRef.current = true;
+      router.replace(redirectTo);
+    }
+  }, [isAuthenticated, redirectTo, router]);
 
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -64,8 +77,7 @@ export function LoginForm() {
   const onSubmit = async (data: LoginFormData) => {
     try {
       await loginMutation.mutateAsync(data);
-      console.log('Redirecting to:', redirectTo);
-      router.push(redirectTo || '/dashboard');
+      // Redirect will be handled by the auth effect above once the session updates
     } catch (error) {
       console.error(error);
     }

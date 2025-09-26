@@ -2,13 +2,15 @@
 
 import ScreenLoader from '@/components/screen-loader';
 import { useRedirectIfAuthenticated } from '@/hooks/auth/useRequireAuth';
+import { useSafeRedirect } from '@/hooks/auth/useSafeRedirect';
 
 export default function AuthLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { shouldShow, isLoading } = useRedirectIfAuthenticated('/dashboard');
+  const redirectTarget = useSafeRedirect('/dashboard');
+  const { shouldShow, isLoading } = useRedirectIfAuthenticated(redirectTarget);
 
   if (isLoading) {
     return <ScreenLoader />;
