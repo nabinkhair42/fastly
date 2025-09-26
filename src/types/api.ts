@@ -76,13 +76,13 @@ export interface ChangeUsernameRequest {
 }
 
 export interface ChangePasswordRequest {
-  currentPassword: string;
+  currentPassword?: string;
   newPassword: string;
   confirmPassword: string;
 }
 
 export interface DeleteUserRequest {
-  password: string;
+  password?: string;
 }
 
 export interface UserDetailsResponse {

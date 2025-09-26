@@ -36,20 +36,28 @@ export const useRequireAuth = (options: UseRequireAuthOptions = {}) => {
  * Hook that redirects authenticated users away from auth pages
  * Useful for login/signup pages that authenticated users shouldn't access
  */
-export const useRedirectIfAuthenticated = (redirectTo: string = '/') => {
+export const useRedirectIfAuthenticated = (
+  redirectTo: string = '/',
+  options: { enabled?: boolean } = {}
+) => {
+  const { enabled = true } = options;
   const { isAuthenticated, isLoading } = useSession();
   const router = useRouter();
 
   useEffect(() => {
+    if (!enabled) {
+      return;
+    }
+
     if (!isLoading && isAuthenticated) {
       router.push(redirectTo);
     }
-  }, [isAuthenticated, isLoading, router, redirectTo]);
+  }, [enabled, isAuthenticated, isLoading, router, redirectTo]);
 
   return {
     isAuthenticated,
     isLoading,
-    shouldShow: !isLoading && !isAuthenticated,
+    shouldShow: !isLoading && (!isAuthenticated || !enabled),
   };
 };
 

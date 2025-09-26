@@ -22,6 +22,7 @@ export async function GET(request: NextRequest) {
     const userAuth = await UserAuthModel.findOne({ _id: user.authUser });
 
     const authMethod = userAuth?.authMethod;
+    const hasPassword = Boolean(userAuth?.password);
 
     return sendResponse('User details fetched successfully', 200, {
       user: {
@@ -38,6 +39,7 @@ export async function GET(request: NextRequest) {
         dob: user.dob,
         hasChangedUsername: user.hasChangedUsername,
         authMethod: authMethod,
+        hasPassword,
       },
     });
   } catch (error: unknown) {

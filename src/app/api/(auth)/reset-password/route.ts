@@ -2,7 +2,6 @@ import { hashPassword } from '@/helpers/hashPassword';
 import { sendResponse } from '@/lib/apis/sendResponse';
 import dbConnect from '@/lib/config/dbConnect';
 import { UserAuthModel } from '@/models/users';
-import { AuthMethod } from '@/types/user';
 import { resetPasswordRequestSchema } from '@/zod/authValidation';
 import { NextRequest } from 'next/server';
 
@@ -28,14 +27,6 @@ export async function POST(request: NextRequest) {
     const userAuth = await UserAuthModel.findOne({ email });
     if (!userAuth) {
       return sendResponse('User not found. Please sign up first.', 404);
-    }
-
-    // check if user uses email authentication: wont be required but for safety
-    if (userAuth.authMethod !== AuthMethod.EMAIL) {
-      return sendResponse(
-        `User uses ${userAuth.authMethod} authentication. Please login try logging in with email.`,
-        400
-      );
     }
 
     // check if reset password token is valid

@@ -2,8 +2,8 @@
 
 import { useSession } from '@/hooks/auth/useSession';
 import { Loader } from 'lucide-react';
-import { usePathname, useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useMemo } from 'react';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -21,9 +21,13 @@ export default function ProtectedRoute({
   const { isAuthenticated, isLoading } = useSession();
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
 
-  // Redirect to login if not authenticated and add the link path where user wanted to go as param
-  const redirectToWithParam = `/log-in?redirect=${encodeURIComponent(pathname)}`;
+  const redirectToWithParam = useMemo(() => {
+    const query = searchParams.toString();
+    const target = query ? `${pathname}?${query}` : pathname;
+    return `/log-in?redirect=${encodeURIComponent(target)}`;
+  }, [pathname, searchParams]);
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {

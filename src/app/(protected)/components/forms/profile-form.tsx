@@ -201,7 +201,7 @@ export function ProfileForm() {
   }
 
   return (
-    <div className="flex flex-col gap-3 lg:gap-0 lg:flex-row">
+    <div className="flex flex-col gap-3 lg:flex-row">
       <div className="w-full max-w-md">
         <h3 className="font-medium">Profile Settings</h3>
         <p className="text-muted-foreground text-sm">

@@ -89,7 +89,7 @@ export function AccountForm() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-3 lg:gap-0 lg:flex-row">
+      <div className="flex flex-col gap-3 lg:flex-row">
         <div className="w-full max-w-md">
           <h3 className="font-medium">Account Settings</h3>
           <p className="text-muted-foreground text-sm">

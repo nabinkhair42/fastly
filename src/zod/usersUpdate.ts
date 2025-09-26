@@ -173,34 +173,37 @@ export const deleteUserSchema = z.object({
   password: z
     .string()
     .min(8, { message: 'Password must be at least 8 characters long' })
-    .max(255, { message: 'Password must be less than 255 characters' }),
+    .max(255, { message: 'Password must be less than 255 characters' })
+    .optional(),
 });
 
-// Schema for password change
+const passwordFieldSchema = z
+  .string()
+  .min(8, { message: 'Password must be at least 8 characters long' })
+  .max(255, { message: 'Password must be less than 255 characters' })
+  .refine(
+    val =>
+      /[a-z]/.test(val) && // at least one lowercase
+      /[A-Z]/.test(val) && // at least one uppercase
+      /\d/.test(val) && // at least one number
+      /[^A-Za-z0-9]/.test(val), // at least one special character
+    {
+      message:
+        'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character',
+    }
+  );
+
+// Schema for password change when current password is required
 export const changePasswordSchema = z.object({
-  currentPassword: z
-    .string()
-    .min(8, { message: 'Current password must be at least 8 characters long' })
-    .max(255, { message: 'Current password must be less than 255 characters' }),
-  newPassword: z
-    .string()
-    .min(8, { message: 'New password must be at least 8 characters long' })
-    .max(255, { message: 'New password must be less than 255 characters' })
-    .refine(
-      val =>
-        /[a-z]/.test(val) && // at least one lowercase
-        /[A-Z]/.test(val) && // at least one uppercase
-        /\d/.test(val) && // at least one number
-        /[^A-Za-z0-9]/.test(val), // at least one special character
-      {
-        message:
-          'New password must contain at least one uppercase letter, one lowercase letter, one number, and one special character',
-      }
-    ),
-  confirmPassword: z
-    .string()
-    .min(8, { message: 'Confirm password must be at least 8 characters long' })
-    .max(255, { message: 'Confirm password must be less than 255 characters' }),
+  currentPassword: passwordFieldSchema,
+  newPassword: passwordFieldSchema,
+  confirmPassword: passwordFieldSchema,
+});
+
+// Schema for setting an initial password when none exists
+export const setPasswordSchema = z.object({
+  newPassword: passwordFieldSchema,
+  confirmPassword: passwordFieldSchema,
 });
 
 // Schema for account preferences

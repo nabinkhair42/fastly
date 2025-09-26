@@ -86,4 +86,5 @@ export interface UserProfile {
   };
   dob: Date | null;
   authMethod: AuthMethod;
+  hasPassword?: boolean;
 }

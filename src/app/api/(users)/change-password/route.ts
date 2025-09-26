@@ -3,31 +3,41 @@ import { sendResponse } from '@/lib/apis/sendResponse';
 import { requireAuth } from '@/lib/auth/authMiddleware';
 import dbConnect from '@/lib/config/dbConnect';
 import { UserAuthModel } from '@/models/users';
-import { AuthMethod } from '@/types/user';
-import { changePasswordSchema } from '@/zod/usersUpdate';
+import { changePasswordSchema, setPasswordSchema } from '@/zod/usersUpdate';
 import { NextRequest } from 'next/server';
 
 export async function POST(request: NextRequest) {
   await dbConnect();
 
   try {
+    const body = await request.json();
+    const { currentPassword, newPassword, confirmPassword } = body;
+
     // Authenticate user
     const authResult = await requireAuth(request);
     if (!authResult.success) {
       return authResult.response;
     }
 
-    const { currentPassword, newPassword, confirmPassword } =
-      await request.json();
+    // Find user auth by authenticated user ID
+    const userAuth = await UserAuthModel.findById(authResult.user!.userId);
+    if (!userAuth) {
+      return sendResponse('User not found', 404);
+    }
 
-    // Validate request body
-    const { error } = changePasswordSchema.safeParse({
+    const hasExistingPassword = Boolean(userAuth.password);
+    const validationSchema = hasExistingPassword
+      ? changePasswordSchema
+      : setPasswordSchema;
+
+    const validationResult = validationSchema.safeParse({
       currentPassword,
       newPassword,
       confirmPassword,
     });
-    if (error) {
-      return sendResponse(error.message, 400);
+
+    if (!validationResult.success) {
+      return sendResponse(validationResult.error.message, 400);
     }
 
     // Check if new password and confirm password match
@@ -38,44 +48,31 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Find user auth by authenticated user ID
-    const userAuth = await UserAuthModel.findById(authResult.user!.userId);
-    if (!userAuth) {
-      return sendResponse('User not found', 404);
-    }
+    if (hasExistingPassword) {
+      if (!currentPassword || !userAuth.password) {
+        return sendResponse('Current password is required', 400);
+      }
 
-    // check if user uses email authentication
-    if (userAuth.authMethod !== AuthMethod.EMAIL) {
-      return sendResponse(
-        `User uses ${userAuth.authMethod} authentication. Please login and try again.`,
-        400
+      const isCurrentPasswordValid = await verifyPassword(
+        currentPassword,
+        userAuth.password
       );
-    }
 
-    // Verify current password
-    if (!currentPassword || !userAuth.password) {
-      return sendResponse('Current password is required', 400);
-    }
+      if (!isCurrentPasswordValid) {
+        return sendResponse('Current password is incorrect', 400);
+      }
 
-    const isCurrentPasswordValid = await verifyPassword(
-      currentPassword,
-      userAuth.password
-    );
-    if (!isCurrentPasswordValid) {
-      return sendResponse('Current password is incorrect', 400);
-    }
-
-    // Check if new password is different from current password
-    if (!newPassword) {
-      return sendResponse('New password is required', 400);
-    }
-
-    const isSamePassword = await verifyPassword(newPassword, userAuth.password);
-    if (isSamePassword) {
-      return sendResponse(
-        'New password must be different from current password',
-        400
+      const isSamePassword = await verifyPassword(
+        newPassword,
+        userAuth.password
       );
+
+      if (isSamePassword) {
+        return sendResponse(
+          'New password must be different from current password',
+          400
+        );
+      }
     }
 
     // Hash new password
@@ -87,7 +84,9 @@ export async function POST(request: NextRequest) {
     await userAuth.save();
 
     return sendResponse('Password changed successfully', 200, {
-      message: 'Your password has been updated successfully',
+      message: hasExistingPassword
+        ? 'Your password has been updated successfully'
+        : 'Password added successfully. You can now sign in with email too.',
     });
   } catch (error: unknown) {
     if (error instanceof Error) {
