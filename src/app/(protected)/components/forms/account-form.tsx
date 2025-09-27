@@ -32,6 +32,7 @@ import {
 } from '@/hooks/users/useUserMutations';
 import { useFont } from '@/providers/RootProvider';
 import { accountPreferencesSchema } from '@/zod/usersUpdate';
+import { ActiveSessions } from '../active-sessions';
 import { DeleteUser } from '../delete-user';
 
 type AccountFormValues = z.infer<typeof accountPreferencesSchema>;
@@ -224,6 +225,18 @@ export function AccountForm() {
               </Button>
             </form>
           </Form>
+        </div>
+      </div>
+      <Separator />
+      <div className="flex flex-col gap-3 lg:gap-0 lg:flex-row">
+        <div className="w-full max-w-md">
+          <h3 className="font-medium">Active Sessions</h3>
+          <p className="text-muted-foreground text-sm">
+            Manage devices that have recently accessed your account.
+          </p>
+        </div>
+        <div className="w-full">
+          <ActiveSessions />
         </div>
       </div>
       <Separator />

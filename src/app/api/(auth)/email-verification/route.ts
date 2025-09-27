@@ -1,5 +1,6 @@
 import { generateTokenPair } from '@/helpers/jwtToken';
 import { sendResponse } from '@/lib/apis/sendResponse';
+import { createUserSession } from '@/lib/auth/sessionTracker';
 import dbConnect from '@/lib/config/dbConnect';
 import { sendWelcomeEmail } from '@/mail-templates/emailService';
 import { UserAuthModel, UserModel } from '@/models/users';
@@ -64,12 +65,26 @@ export async function POST(request: NextRequest) {
     // generate secure token pair
     const tokens = generateTokenPair(userAuth._id.toString(), userAuth.email);
 
+    const session = await createUserSession({
+      userAuthId: userAuth._id.toString(),
+      authMethod: userAuth.authMethod,
+      request,
+    });
+
     // send welcome email
     await sendWelcomeEmail(userAuth.email, tokens.accessToken);
 
     return sendResponse('Email verified successfully', 200, {
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,
+      session: {
+        sessionId: session.sessionId,
+        createdAt: session.createdAt.toISOString(),
+        browser: session.browser,
+        os: session.os,
+        device: session.device,
+        ipAddress: session.ipAddress,
+      },
       user: {
         id: userAuth._id,
         email: userAuth.email,

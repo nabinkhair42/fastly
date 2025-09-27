@@ -1,5 +1,6 @@
 import { authenticateToken } from '@/helpers/jwtToken';
 import { sendResponse } from '@/lib/apis/sendResponse';
+import { touchSession } from '@/lib/auth/sessionTracker';
 import dbConnect from '@/lib/config/dbConnect';
 import { UserAuthModel } from '@/models/users';
 import type { AuthenticatedUser } from '@/types/user';
@@ -38,6 +39,24 @@ export const authenticate = async (
       return {
         success: false,
         response: sendResponse('Account not verified', 403),
+      };
+    }
+
+    const sessionId = request.headers.get('x-session-id');
+
+    if (!sessionId) {
+      return {
+        success: false,
+        response: sendResponse('Session context missing', 401),
+      };
+    }
+
+    const activeSession = await touchSession(decoded.userId, sessionId);
+
+    if (!activeSession) {
+      return {
+        success: false,
+        response: sendResponse('Session revoked. Please log in again.', 401),
       };
     }
 

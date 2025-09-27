@@ -4,8 +4,10 @@ import {
   ChangePasswordRequest,
   ChangeUsernameRequest,
   DeleteUserRequest,
+  RevokeSessionRequest,
   UpdateUserDetailsRequest,
   UserDetailsResponse,
+  UserSessionsResponse,
 } from '@/types/api';
 
 // User Service Functions
@@ -43,6 +45,18 @@ export const userService = {
   // Delete user account
   deleteUser: async (data: DeleteUserRequest) => {
     const response = await api.delete('/delete-user', { data });
+    return response.data;
+  },
+
+  // Get active login sessions
+  getSessions: async (): Promise<UserSessionsResponse> => {
+    const response = await api.get('/sessions');
+    return response.data;
+  },
+
+  // Revoke a specific session
+  revokeSession: async (data: RevokeSessionRequest) => {
+    const response = await api.delete('/sessions', { data });
     return response.data;
   },
 

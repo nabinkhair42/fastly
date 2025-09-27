@@ -30,6 +30,7 @@ export const OAuthCallback = () => {
 
     if (accessToken && refreshToken) {
       try {
+        const sessionIdFromParams = searchParams.get('sessionId') || undefined;
         let redirectTarget: string | undefined;
         if (typeof window !== 'undefined') {
           const storedRedirect = localStorage.getItem('oauth_redirect');
@@ -56,7 +57,9 @@ export const OAuthCallback = () => {
             username,
           };
 
-          login(accessToken, refreshToken, userData);
+          login(accessToken, refreshToken, userData, {
+            sessionId: sessionIdFromParams,
+          });
 
           // Set the last used OAuth provider if available
           if (
@@ -79,7 +82,9 @@ export const OAuthCallback = () => {
             username: '',
           };
 
-          login(accessToken, refreshToken, userData);
+          login(accessToken, refreshToken, userData, {
+            sessionId: sessionIdFromParams,
+          });
 
           // Set the last used OAuth provider if available
           if (
@@ -104,6 +109,7 @@ export const OAuthCallback = () => {
   return (
     <div className="flex items-center justify-center min-h-[100svh]">
       <div className="text-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
         <p className="mt-4 text-muted-foreground">
           Completing authentication...
         </p>

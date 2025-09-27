@@ -40,8 +40,10 @@ export const useLogin = () => {
       });
     },
     onSuccess: response => {
-      const { accessToken, refreshToken, user } = response.data;
-      login(accessToken, refreshToken, user);
+      const { accessToken, refreshToken, user, session } = response.data;
+      login(accessToken, refreshToken, user, {
+        sessionId: session?.sessionId,
+      });
       // Set email as the last used authentication method
       setLastUsedProviderCookie(AuthMethod.EMAIL);
     },
@@ -98,8 +100,10 @@ export const useVerifyEmail = (onSuccessCallback?: () => void) => {
       });
     },
     onSuccess: response => {
-      const { accessToken, refreshToken, user } = response.data;
-      login(accessToken, refreshToken, user);
+      const { accessToken, refreshToken, user, session } = response.data;
+      login(accessToken, refreshToken, user, {
+        sessionId: session?.sessionId,
+      });
       // Set email as the last used authentication method
       setLastUsedProviderCookie(AuthMethod.EMAIL);
       // Call the callback after auth state is updated

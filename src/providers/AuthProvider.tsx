@@ -17,7 +17,8 @@ interface AuthContextType {
   login: (
     accessToken: string,
     refreshToken: string,
-    user: AuthenticatedUser
+    user: AuthenticatedUser,
+    options?: { sessionId?: string }
   ) => void;
   logout: () => void;
   updateUser: (user: AuthenticatedUser) => void;
@@ -67,19 +68,38 @@ export default function AuthProvider({ children }: AuthProviderProps) {
   const login = (
     accessToken: string,
     refreshToken: string,
-    userData: AuthenticatedUser
+    userData: AuthenticatedUser,
+    options?: { sessionId?: string }
   ) => {
-    tokenManager.setTokens(accessToken, refreshToken);
+    tokenManager.setTokens(accessToken, refreshToken, options?.sessionId);
     localStorage.setItem('user', JSON.stringify(userData));
+    if (options?.sessionId) {
+      localStorage.setItem('sessionId', options.sessionId);
+    }
     setUser(userData);
   };
 
   const logout = () => {
     // Get token before clearing it
     const accessToken = tokenManager.getAccessToken();
+    const sessionId = tokenManager.getSessionId();
 
     tokenManager.clearTokens();
     setUser(null);
+
+    if (sessionId && accessToken) {
+      fetch('/api/sessions', {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+          'X-Session-Id': sessionId,
+        },
+        body: JSON.stringify({ sessionId }),
+      }).catch(() => {
+        /* swallow errors */
+      });
+    }
 
     // Optional: Call logout API to invalidate tokens on server
     // This is fire-and-forget, don't wait for response
@@ -89,6 +109,11 @@ export default function AuthProvider({ children }: AuthProviderProps) {
         headers: {
           Authorization: `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
+          ...(sessionId
+            ? {
+                'X-Session-Id': sessionId,
+              }
+            : {}),
         },
       }).catch(() => {
         // Ignore errors, user is logging out anyway

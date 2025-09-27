@@ -1,5 +1,6 @@
 import { generateTokenPair, verifyRefreshToken } from '@/helpers/jwtToken';
 import { sendResponse } from '@/lib/apis/sendResponse';
+import { touchSession } from '@/lib/auth/sessionTracker';
 import dbConnect from '@/lib/config/dbConnect';
 import { UserAuthModel } from '@/models/users';
 import { refreshTokenSchema } from '@/zod/authValidation';
@@ -28,6 +29,16 @@ export async function POST(request: NextRequest) {
 
     if (!userAuth.isVerified) {
       return sendResponse('Account not verified', 403);
+    }
+
+    const sessionId = request.headers.get('x-session-id');
+    if (!sessionId) {
+      return sendResponse('Session context missing', 401);
+    }
+
+    const activeSession = await touchSession(decoded.userId, sessionId);
+    if (!activeSession) {
+      return sendResponse('Session revoked. Please log in again.', 401);
     }
 
     // Generate new token pair

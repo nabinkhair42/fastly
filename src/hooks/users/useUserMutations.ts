@@ -15,6 +15,7 @@ import toast from 'react-hot-toast';
 // Query keys
 export const userQueryKeys = {
   userDetails: ['user', 'details'] as const,
+  sessions: ['user', 'sessions'] as const,
 };
 
 type ApiError = Error & {
@@ -195,6 +196,42 @@ export const useDeleteUser = () => {
         getErrorMessage(
           error,
           'Unable to delete the account right now. Please try again later.'
+        )
+      );
+    },
+  });
+};
+
+export const useUserSessions = () => {
+  const { isAuthenticated } = useAuth();
+
+  return useQuery({
+    queryKey: userQueryKeys.sessions,
+    queryFn: () => userService.getSessions(),
+    enabled: isAuthenticated,
+    staleTime: 60 * 1000,
+    refetchInterval: 5 * 60 * 1000,
+  });
+};
+
+export const useRevokeSession = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (sessionId: string) =>
+      toast.promise(userService.revokeSession({ sessionId }), {
+        loading: 'Revoking session',
+        success: response => response.message,
+        error: response => response.message,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: userQueryKeys.sessions });
+    },
+    onError: (error: ApiError) => {
+      toast.error(
+        getErrorMessage(
+          error,
+          'Unable to revoke the session right now. Please try again later.'
         )
       );
     },

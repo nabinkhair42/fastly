@@ -88,3 +88,17 @@ export interface UserProfile {
   authMethod: AuthMethod;
   hasPassword?: boolean;
 }
+
+export interface UserSession {
+  sessionId: string;
+  authMethod: AuthMethod;
+  userAgent: string;
+  browser: string;
+  os: string;
+  device: string;
+  ipAddress: string;
+  location?: string | null;
+  createdAt: string;
+  lastActiveAt: string;
+  revokedAt?: string | null;
+}

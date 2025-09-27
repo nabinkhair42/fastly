@@ -1,6 +1,7 @@
 import { verifyPassword } from '@/helpers/hashPassword';
 import { generateTokenPair } from '@/helpers/jwtToken';
 import { sendResponse } from '@/lib/apis/sendResponse';
+import { createUserSession } from '@/lib/auth/sessionTracker';
 import dbConnect from '@/lib/config/dbConnect';
 import { UserAuthModel } from '@/models/users';
 import { loginSchema } from '@/zod/authValidation';
@@ -58,9 +59,23 @@ export async function POST(request: NextRequest) {
     // generate secure token pair
     const tokens = generateTokenPair(userAuth._id.toString(), userAuth.email);
 
+    const session = await createUserSession({
+      userAuthId: userAuth._id.toString(),
+      authMethod: userAuth.authMethod,
+      request,
+    });
+
     return sendResponse('Login successful', 200, {
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,
+      session: {
+        sessionId: session.sessionId,
+        createdAt: session.createdAt.toISOString(),
+        browser: session.browser,
+        os: session.os,
+        device: session.device,
+        ipAddress: session.ipAddress,
+      },
       user: {
         id: userAuth._id,
         email: userAuth.email,
