@@ -44,22 +44,40 @@ export const getGoogleAuthUrl = (state: string) => {
   return `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
 };
 
-export const GithubOAuthClickFunction = () => {
+const storeRedirectTarget = (redirect?: string) => {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  if (redirect) {
+    localStorage.setItem('oauth_redirect', redirect);
+  } else {
+    localStorage.removeItem('oauth_redirect');
+  }
+};
+
+interface OAuthClickOptions {
+  redirect?: string;
+}
+
+export const GithubOAuthClickFunction = (options: OAuthClickOptions = {}) => {
   const state = generateState();
   // Store state in localStorage for verification
   if (typeof window !== 'undefined') {
     localStorage.setItem('oauth_state', state);
   }
+  storeRedirectTarget(options.redirect);
   const authUrl = getGitHubAuthUrl(state);
   window.location.href = authUrl;
 };
 
-export const GoogleOAuthClickFunction = () => {
+export const GoogleOAuthClickFunction = (options: OAuthClickOptions = {}) => {
   const state = generateState();
   // Store state in localStorage for verification
   if (typeof window !== 'undefined') {
     localStorage.setItem('oauth_state', state);
   }
+  storeRedirectTarget(options.redirect);
   const authUrl = getGoogleAuthUrl(state);
   window.location.href = authUrl;
 };

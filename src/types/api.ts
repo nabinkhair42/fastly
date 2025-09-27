@@ -1,4 +1,9 @@
-import { AuthenticatedUser, SocialAccountUrl, UserProfile } from '@/types/user';
+import {
+  AuthenticatedUser,
+  SocialAccountUrl,
+  UserProfile,
+  UserSession,
+} from '@/types/user';
 
 // Authentication API interfaces
 export interface LoginRequest {
@@ -13,6 +18,7 @@ export interface LoginResponse {
   data: {
     accessToken: string;
     refreshToken: string;
+    session?: SessionSummary;
     user: AuthenticatedUser;
   };
 }
@@ -43,6 +49,15 @@ export interface ResetPasswordRequest {
 
 export interface RefreshTokenRequest {
   refreshToken: string;
+}
+
+export interface SessionSummary {
+  sessionId: string;
+  createdAt: string;
+  browser: string;
+  os: string;
+  device: string;
+  ipAddress: string;
 }
 
 export interface AuthResponse {
@@ -76,13 +91,13 @@ export interface ChangeUsernameRequest {
 }
 
 export interface ChangePasswordRequest {
-  currentPassword: string;
+  currentPassword?: string;
   newPassword: string;
   confirmPassword: string;
 }
 
 export interface DeleteUserRequest {
-  password: string;
+  password?: string;
 }
 
 export interface UserDetailsResponse {
@@ -90,6 +105,17 @@ export interface UserDetailsResponse {
   data: {
     user: UserProfile;
   };
+}
+
+export interface UserSessionsResponse {
+  message: string;
+  data: {
+    sessions: UserSession[];
+  };
+}
+
+export interface RevokeSessionRequest {
+  sessionId: string;
 }
 
 export interface AvatarUploadResponse {

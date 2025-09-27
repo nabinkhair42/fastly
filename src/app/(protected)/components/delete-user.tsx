@@ -12,12 +12,29 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useDeleteUser } from '@/hooks/users/useUserMutations';
+import { useDeleteUser, useUserDetails } from '@/hooks/users/useUserMutations';
+import { AuthMethod } from '@/types/user';
 import { AlertTriangle, Eye, EyeOff, Trash } from 'lucide-react';
 import { useState } from 'react';
 
+const METHOD_LABELS: Record<AuthMethod, string> = {
+  [AuthMethod.EMAIL]: 'Email',
+  [AuthMethod.GOOGLE]: 'Google',
+  [AuthMethod.FACEBOOK]: 'Facebook',
+  [AuthMethod.GITHUB]: 'GitHub',
+};
+
+type ApiError = Error & {
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
+};
+
 export const DeleteUser = () => {
   const deleteUser = useDeleteUser();
+  const { data, isLoading } = useUserDetails();
   const [isOpen, setIsOpen] = useState(false);
   const [confirmationText, setConfirmationText] = useState('');
   const [password, setPassword] = useState('');
@@ -27,21 +44,30 @@ export const DeleteUser = () => {
     confirmation?: string;
   }>({});
 
+  const user = data?.data?.user;
+  const authMethod = user?.authMethod ?? AuthMethod.EMAIL;
+  const providerLabel = METHOD_LABELS[authMethod];
+  const hasPassword = Boolean(user?.hasPassword);
+  const requiresPassword = hasPassword;
+
   const isConfirmed = confirmationText === 'DELETE';
-  const isPasswordValid = password.length >= 8;
-  const canDelete = isConfirmed && isPasswordValid && !deleteUser.isPending;
+  const isPasswordValid = requiresPassword ? password.length >= 8 : true;
+  const canDelete =
+    isConfirmed && isPasswordValid && !deleteUser.isPending && !isLoading;
 
   const validateForm = () => {
     const newErrors: { password?: string; confirmation?: string } = {};
 
-    // Using constants for error messages to avoid false security warnings
-    const ERROR_REQUIRED = 'Password is required';
-    const ERROR_TOO_SHORT = 'Password must be at least 8 characters';
+    if (requiresPassword) {
+      // Using constants for error messages to avoid false security warnings
+      const ERROR_REQUIRED = 'Password is required';
+      const ERROR_TOO_SHORT = 'Password must be at least 8 characters';
 
-    if (!password) {
-      newErrors.password = ERROR_REQUIRED;
-    } else if (password.length < 8) {
-      newErrors.password = ERROR_TOO_SHORT;
+      if (!password) {
+        newErrors.password = ERROR_REQUIRED;
+      } else if (password.length < 8) {
+        newErrors.password = ERROR_TOO_SHORT;
+      }
     }
 
     if (!confirmationText) {
@@ -57,21 +83,22 @@ export const DeleteUser = () => {
   const handleDelete = () => {
     if (!validateForm()) return;
 
-    deleteUser.mutate(
-      { password },
-      {
-        onSuccess: () => {
-          setConfirmationText('');
+    deleteUser.mutate(requiresPassword ? { password } : {}, {
+      onSuccess: () => {
+        setConfirmationText('');
+        setPassword('');
+        setErrors({});
+        setShowPassword(false);
+        setIsOpen(false);
+      },
+      onError: (error: ApiError) => {
+        if (requiresPassword) {
           setPassword('');
-          setErrors({});
-          setIsOpen(false);
-        },
-        onError: () => {
-          setPassword('');
-          setErrors({ password: 'Incorrect password' });
-        },
-      }
-    );
+          const message = error.response?.data?.message || 'Incorrect password';
+          setErrors({ password: message });
+        }
+      },
+    });
   };
 
   const handleCancel = () => {
@@ -86,7 +113,17 @@ export const DeleteUser = () => {
     setConfirmationText('');
     setPassword('');
     setErrors({});
+    setShowPassword(false);
   };
+
+  if (isLoading || !user) {
+    return (
+      <div className="space-y-2">
+        <div className="h-10 w-40 rounded-md bg-muted animate-pulse" />
+        <div className="h-10 w-full rounded-md bg-muted animate-pulse" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -96,6 +133,7 @@ export const DeleteUser = () => {
           variant="destructive"
           onClick={handleOpenDialog}
           className="w-full sm:w-auto"
+          disabled={isLoading}
         >
           <Trash className="h-4 w-4" />
           Delete Account
@@ -144,43 +182,52 @@ export const DeleteUser = () => {
             </ul>
           </div>
 
-          {/* Password Input */}
-          <div className="space-y-2 px-6">
-            <Label htmlFor="password" className="text-sm font-medium">
-              Enter your password to confirm:
-            </Label>
-            <div className="relative">
-              <Input
-                id="password"
-                type={showPassword ? 'text' : 'password'}
-                value={password}
-                onChange={e => {
-                  setPassword(e.target.value);
-                  if (errors.password)
-                    setErrors(prev => ({ ...prev, password: undefined }));
-                }}
-                placeholder="Enter your password"
-                className={`pr-10 ${errors.password ? 'border-destructive focus:ring-destructive focus:border-destructive' : ''}`}
-                autoComplete="current-password"
-              />
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 p-0 hover:bg-transparent"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? (
-                  <EyeOff className="h-4 w-4" />
-                ) : (
-                  <Eye className="h-4 w-4" />
-                )}
-              </Button>
+          {requiresPassword ? (
+            <div className="space-y-2 px-6">
+              <Label htmlFor="password" className="text-sm font-medium">
+                Enter your password to confirm:
+              </Label>
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={e => {
+                    setPassword(e.target.value);
+                    if (errors.password)
+                      setErrors(prev => ({ ...prev, password: undefined }));
+                  }}
+                  placeholder="Enter your password"
+                  className={`pr-10 ${errors.password ? 'border-destructive focus:ring-destructive focus:border-destructive' : ''}`}
+                  autoComplete="current-password"
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 p-0 hover:bg-transparent"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
+              {errors.password && (
+                <p className="text-sm text-destructive">{errors.password}</p>
+              )}
             </div>
-            {errors.password && (
-              <p className="text-sm text-destructive">{errors.password}</p>
-            )}
-          </div>
+          ) : (
+            <div className="space-y-2 px-6 text-sm text-muted-foreground">
+              <p>
+                You signed in with {providerLabel}. Since you don&apos;t have a
+                password on this account, confirming this action will delete it
+                immediately.
+              </p>
+            </div>
+          )}
 
           {/* Confirmation Input */}
           <div className="space-y-2 px-6">

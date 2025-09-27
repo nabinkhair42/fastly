@@ -29,10 +29,24 @@ export const tokenManager = {
     return null;
   },
 
-  setTokens: (accessToken: string, refreshToken: string) => {
+  getSessionId: () => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('sessionId');
+    }
+    return null;
+  },
+
+  setTokens: (
+    accessToken: string,
+    refreshToken: string,
+    sessionId?: string
+  ) => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('accessToken', accessToken);
       localStorage.setItem('refreshToken', refreshToken);
+      if (sessionId) {
+        localStorage.setItem('sessionId', sessionId);
+      }
     }
   },
 
@@ -41,6 +55,7 @@ export const tokenManager = {
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
       localStorage.removeItem('user');
+      localStorage.removeItem('sessionId');
     }
   },
 };
@@ -51,6 +66,10 @@ api.interceptors.request.use(
     const token = tokenManager.getAccessToken();
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
+    }
+    const sessionId = tokenManager.getSessionId();
+    if (sessionId && config.headers) {
+      config.headers['X-Session-Id'] = sessionId;
     }
     return config;
   },
@@ -65,6 +84,23 @@ api.interceptors.response.use(
       _retry?: boolean;
     };
 
+    const responseStatus = error.response?.status;
+    const serverMessage = (
+      error.response?.data as { message?: string } | undefined
+    )?.message;
+
+    if (responseStatus === 401) {
+      const normalizedMessage = serverMessage?.toLowerCase() ?? '';
+      if (
+        normalizedMessage.includes('session revoked') ||
+        normalizedMessage.includes('session context missing')
+      ) {
+        tokenManager.clearTokens();
+        window.location.href = '/log-in';
+        return Promise.reject(error);
+      }
+    }
+
     // Skip 401 handling for authentication endpoints
     const isAuthEndpoint =
       originalRequest.url?.includes('/log-in') ||
@@ -73,23 +109,35 @@ api.interceptors.response.use(
       originalRequest.url?.includes('/forgot-password') ||
       originalRequest.url?.includes('/reset-password');
 
-    if (
-      error.response?.status === 401 &&
-      !originalRequest._retry &&
-      !isAuthEndpoint
-    ) {
+    if (responseStatus === 401 && !originalRequest._retry && !isAuthEndpoint) {
       originalRequest._retry = true;
 
       const refreshToken = tokenManager.getRefreshToken();
       if (refreshToken) {
         try {
-          const response = await axios.post('/api/auth/refresh-token', {
-            refreshToken,
-          });
+          const sessionId = tokenManager.getSessionId();
+          const response = await axios.post(
+            '/api/auth/refresh-token',
+            {
+              refreshToken,
+            },
+            {
+              headers: sessionId
+                ? {
+                    'X-Session-Id': sessionId,
+                  }
+                : undefined,
+            }
+          );
 
           const { accessToken, refreshToken: newRefreshToken } =
             response.data.data;
-          tokenManager.setTokens(accessToken, newRefreshToken);
+          const existingSessionId = tokenManager.getSessionId();
+          tokenManager.setTokens(
+            accessToken,
+            newRefreshToken,
+            existingSessionId ?? undefined
+          );
 
           // Retry original request with new token
           if (originalRequest.headers) {

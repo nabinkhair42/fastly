@@ -2,6 +2,7 @@
 
 import { Badge } from '@/components/ui/badge';
 import { useLastUsedProvider } from '@/hooks/auth/useLastUsedProvider';
+import { useSafeRedirect } from '@/hooks/auth/useSafeRedirect';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -12,13 +13,17 @@ import { AuthMethod } from '@/types/user';
 import { useState } from 'react';
 import { FaGithub, FaGoogle } from 'react-icons/fa6';
 
-export const OAuthWithGoogle = () => {
+interface OAuthButtonProps {
+  redirectTo: string;
+}
+
+export const OAuthWithGoogle = ({ redirectTo }: OAuthButtonProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const { isLastUsed } = useLastUsedProvider();
 
   const handleGoogleOAuth = () => {
     setIsLoading(true);
-    GoogleOAuthClickFunction();
+    GoogleOAuthClickFunction({ redirect: redirectTo });
   };
 
   return (
@@ -37,13 +42,13 @@ export const OAuthWithGoogle = () => {
   );
 };
 
-export const OAuthWithGithub = () => {
+export const OAuthWithGithub = ({ redirectTo }: OAuthButtonProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const { isLastUsed } = useLastUsedProvider();
 
   const handleGithubOAuth = () => {
     setIsLoading(true);
-    GithubOAuthClickFunction();
+    GithubOAuthClickFunction({ redirect: redirectTo });
   };
 
   return (
@@ -63,10 +68,12 @@ export const OAuthWithGithub = () => {
 };
 
 export const OAuthButtons = () => {
+  const redirectTo = useSafeRedirect('/dashboard');
+
   return (
     <div className="flex flex-col gap-2">
-      <OAuthWithGoogle />
-      <OAuthWithGithub />
+      <OAuthWithGoogle redirectTo={redirectTo} />
+      <OAuthWithGithub redirectTo={redirectTo} />
     </div>
   );
 };

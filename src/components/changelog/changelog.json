@@ -1,0 +1,281 @@
+[
+  {
+    "version": "v1.0.0",
+    "date": "September 27, 2025",
+    "title": "General availability release",
+    "description": "Graduated the starter kit to v1.0.0 with production-ready session controls, hardened auth flows, and polished developer tooling.",
+    "type": "version",
+    "image": "/changelog/general-availability-release.png",
+    "changes": [
+      {
+        "type": "new",
+        "description": "Shipped cross-device session management so users can review active logins and revoke any device instantly."
+      },
+      {
+        "type": "improved",
+        "description": "Refined account settings journeys and OAuth redirects to avoid accidental sign-out loops."
+      },
+      {
+        "type": "improved",
+        "description": "Unified auth mutation toasts and empty states for a consistent developer-facing experience."
+      },
+      {
+        "type": "fixed",
+        "description": "Patched token rotation edge cases uncovered during release hardening."
+      }
+    ]
+  },
+  {
+    "version": "v0.9.0",
+    "date": "September 27, 2025",
+    "title": "Account settings and redirect improvements",
+    "description": "Focused on removing friction throughout authentication flows: cleaner redirect handling, clearer account feedback, and tighter OAuth guardrails.",
+    "type": "improved",
+    "changes": [
+      {
+        "type": "new",
+        "description": "Introduced a `useSafeRedirect` hook and wired it across auth forms to prevent unsafe navigation targets."
+      },
+      {
+        "type": "improved",
+        "description": "Streamlined password and email update screens with concise validation messaging."
+      },
+      {
+        "type": "improved",
+        "description": "Smoothed OAuth callback handling so GitHub and Google logins land on the intended destination every time."
+      },
+      {
+        "type": "fixed",
+        "description": "Eliminated stale session race conditions occurring during rapid provider switching."
+      }
+    ]
+  },
+  {
+    "version": "v0.8.2",
+    "date": "September 26, 2025",
+    "title": "Developer dashboard refresh",
+    "description": "Rebuilt the authenticated dashboard to spotlight developer-centric context with a new hero, account snapshot, and accessible quick actions.",
+    "type": "new",
+    "image": "/changelog/developer-dashboard-refresh.png",
+    "changes": [
+      {
+        "type": "new",
+        "description": "Introduced a hero layout with account badges, quick actions, and username status indicators."
+      },
+      {
+        "type": "new",
+        "description": "Added preference summary blocks that surface theme, font, and username change availability."
+      },
+      {
+        "type": "improved",
+        "description": "Standardized protected dashboard spacing with shadcn tokens for a calmer reading rhythm."
+      },
+      {
+        "type": "fixed",
+        "description": "Gracefully handle missing profile documents with refresh and edit shortcuts."
+      }
+    ]
+  },
+  {
+    "version": "v0.7.1",
+    "date": "September 18, 2025",
+    "title": "Changelog timeline upgrade",
+    "description": "Modernized the changelog experience with a tracing beam timeline, sticky release metadata, and tidy typography.",
+    "type": "improved",
+    "image": "/changelog/changelog-timeline-upgrade.png",
+    "changes": [
+      {
+        "type": "new",
+        "description": "Embedded the tracing beam animation from the UI library to guide readers through releases."
+      },
+      {
+        "type": "improved",
+        "description": "Grouped change bullets by category with consistent spacing and iconography."
+      },
+      {
+        "type": "improved",
+        "description": "Added release count and last-updated badges to the header for quick context."
+      },
+      {
+        "type": "fixed",
+        "description": "Resolved mobile badge wrapping and ensured titles remain visible while scrolling."
+      }
+    ]
+  },
+  {
+    "version": "v0.6.0",
+    "date": "August 30, 2025",
+    "title": "Starter kit baseline release",
+    "description": "Cut the first public-ready build of the SaaS starter with authentication, uploads, email flows, and polished marketing pages.",
+    "type": "version",
+    "changes": [
+      {
+        "type": "new",
+        "description": "Email + OAuth auth flows with verification, password reset, and JWT rotation."
+      },
+      {
+        "type": "new",
+        "description": "Avatar upload pipeline using UploadThing with client-side cropping."
+      },
+      {
+        "type": "improved",
+        "description": "Safe redirect helpers across auth routes to avoid stray dashboard loops."
+      },
+      {
+        "type": "improved",
+        "description": "SEO-ready marketing pages featuring hero, feature grid, tech stack, and FAQ blocks."
+      },
+      {
+        "type": "fixed",
+        "description": "Stabilized token refresh flow to recover gracefully from expired sessions."
+      }
+    ]
+  },
+  {
+    "version": "v0.5.3",
+    "date": "July 12, 2025",
+    "title": "Stability patch and polishing",
+    "description": "Addressed early adopter feedback with OAuth callback hardening, upload resiliency, and UI tidy ups.",
+    "type": "fixed",
+    "changes": [
+      {
+        "type": "fixed",
+        "description": "Corrected OAuth callback redirects to honor safe return paths."
+      },
+      {
+        "type": "fixed",
+        "description": "Resolved avatar deletion edge cases that left orphaned UploadThing files."
+      },
+      {
+        "type": "improved",
+        "description": "Clarified onboarding copy and FAQ answers on the marketing site."
+      },
+      {
+        "type": "improved",
+        "description": "Smoothed email templates with consistent typography and fallbacks."
+      }
+    ]
+  },
+  {
+    "version": "v0.5.0",
+    "date": "July 01, 2025",
+    "title": "Landing page and brand uplift",
+    "description": "Rolled out the public marketing surface with refreshed branding, iconography, and messaging tuned for the starter kit audience.",
+    "type": "new",
+    "changes": [
+      {
+        "type": "new",
+        "description": "Published a marketing landing page with hero, feature grid, FAQ, and footer calls-to-action."
+      },
+      {
+        "type": "new",
+        "description": "Added a collection of polished logo components for tech stack callouts."
+      },
+      {
+        "type": "improved",
+        "description": "Unified typography tokens across marketing sections for better readability."
+      },
+      {
+        "type": "fixed",
+        "description": "Tidied responsive spacing to prevent content clipping on small screens."
+      }
+    ]
+  },
+  {
+    "version": "v0.4.0",
+    "date": "June 15, 2025",
+    "title": "Authentication UX overhaul",
+    "description": "Polished the core auth experience with streamlined forms, clearer feedback, and reusable toast patterns.",
+    "type": "improved",
+    "changes": [
+      {
+        "type": "new",
+        "description": "Introduced reusable toast helpers to surface success and error states across auth flows."
+      },
+      {
+        "type": "improved",
+        "description": "Refined sign-in and sign-up layouts with better spacing, hint text, and validation messages."
+      },
+      {
+        "type": "improved",
+        "description": "Simplified forgot-password and verification handoffs to reduce drop-off."
+      },
+      {
+        "type": "fixed",
+        "description": "Resolved inconsistent focus rings between dark and light themes."
+      }
+    ]
+  },
+  {
+    "version": "v0.3.0",
+    "date": "May 20, 2025",
+    "title": "Database and email foundation",
+    "description": "Laid the groundwork for persistent auth with MongoDB models, transactional email templates, and verification flows.",
+    "type": "new",
+    "changes": [
+      {
+        "type": "new",
+        "description": "Defined Mongoose models for auth users, sessions, and profile documents with TypeScript safety."
+      },
+      {
+        "type": "new",
+        "description": "Added email verification, welcome, and forgot-password templates powered by React Email."
+      },
+      {
+        "type": "improved",
+        "description": "Centralized JWT helpers for access/refresh token generation and validation."
+      },
+      {
+        "type": "fixed",
+        "description": "Patched early nodemailer configuration issues that blocked local delivery."
+      }
+    ]
+  },
+  {
+    "version": "v0.2.0",
+    "date": "April 08, 2025",
+    "title": "Core scaffolding and UI shell",
+    "description": "Established the Next.js App Router foundation with shadcn/ui primitives, theme switching, and protected route plumbing.",
+    "type": "outline",
+    "changes": [
+      {
+        "type": "new",
+        "description": "Bootstrapped Root and Auth providers with TanStack Query, theme handling, and session context."
+      },
+      {
+        "type": "improved",
+        "description": "Composed marketing hero, feature grid, and footer components as reusable blocks."
+      },
+      {
+        "type": "improved",
+        "description": "Implemented protected route HOC plus middleware-ready helpers for server APIs."
+      },
+      {
+        "type": "fixed",
+        "description": "Eliminated hydration warnings when toggling between light and dark themes."
+      }
+    ]
+  },
+  {
+    "version": "v0.1.0",
+    "date": "March 01, 2025",
+    "title": "Project initiation",
+    "description": "Initial commit of the SaaS starter skeleton including linting, formatting, and foundational configuration.",
+    "type": "outline",
+    "image": "/changelog/project-initiation.png",
+    "changes": [
+      {
+        "type": "new",
+        "description": "Configured Next.js 14 App Router with TypeScript, ESLint, Prettier, and Turbopack dev tooling."
+      },
+      {
+        "type": "new",
+        "description": "Added Tailwind CSS with shadcn/ui setup for rapid interface development."
+      },
+      {
+        "type": "fixed",
+        "description": "Resolved initial PNPM workspace quirks and ensured scripts run across Windows and macOS."
+      }
+    ]
+  }
+]

@@ -1,21 +1,21 @@
 import { generatePageMetadata } from '@/seo/seo';
-import SettingsContent from './dashboard-content';
+import DashboardContent from './dashboard-content';
 
 export const metadata = generatePageMetadata({
-  title: 'Settings',
+  title: 'Dashboard',
   description:
-    'Manage your account settings, profile information, and preferences in Fastly.',
+    'SaaS Starter Kit dashboard - Your development environment overview and getting started guide.',
   keywords: [
-    'settings',
-    'profile',
-    'account management',
-    'preferences',
-    'user profile',
+    'dashboard',
+    'saas starter',
+    'development',
+    'getting started',
+    'developer tools',
   ],
-  canonical: '/settings',
-  noIndex: true, // Don't index private settings pages
+  canonical: '/dashboard',
+  noIndex: true, // Don't index private dashboard pages
 });
 
-export default function SettingsPage() {
-  return <SettingsContent />;
+export default function DashboardPage() {
+  return <DashboardContent />;
 }

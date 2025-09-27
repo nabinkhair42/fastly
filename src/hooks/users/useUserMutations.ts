@@ -15,6 +15,19 @@ import toast from 'react-hot-toast';
 // Query keys
 export const userQueryKeys = {
   userDetails: ['user', 'details'] as const,
+  sessions: ['user', 'sessions'] as const,
+};
+
+type ApiError = Error & {
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
+};
+
+const getErrorMessage = (error: ApiError, fallback: string) => {
+  return error.response?.data?.message ?? fallback;
 };
 
 // Get user details query
@@ -62,9 +75,13 @@ export const useUpdateUserDetails = () => {
         });
       }
     },
-    onError: (error: Error & { response: { data: { message: string } } }) => {
-      const message = error.response.data.message;
-      toast.error(message);
+    onError: (error: ApiError) => {
+      toast.error(
+        getErrorMessage(
+          error,
+          'Unable to update your profile right now. Please try again later.'
+        )
+      );
     },
   });
 };
@@ -108,9 +125,13 @@ export const useChangeUsername = (onSuccessCallback?: () => void) => {
         onSuccessCallback();
       }
     },
-    onError: (error: Error & { response: { data: { message: string } } }) => {
-      const message = error.response.data.message;
-      toast.error(message);
+    onError: (error: ApiError) => {
+      toast.error(
+        getErrorMessage(
+          error,
+          'Unable to update username right now. Please try again later.'
+        )
+      );
     },
   });
 };
@@ -125,6 +146,8 @@ export const useCheckUsernameAvailability = () => {
 
 // Change password mutation
 export const useChangePassword = () => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async (data: ChangePasswordRequest) => {
       return toast.promise(userService.changePassword(data), {
@@ -133,9 +156,16 @@ export const useChangePassword = () => {
         error: response => response.message,
       });
     },
-    onError: (error: Error & { response: { data: { message: string } } }) => {
-      const message = error.response.data.message;
-      toast.error(message);
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: userQueryKeys.userDetails });
+    },
+    onError: (error: ApiError) => {
+      toast.error(
+        getErrorMessage(
+          error,
+          'Unable to update password right now. Please try again later.'
+        )
+      );
     },
   });
 };
@@ -158,12 +188,52 @@ export const useDeleteUser = () => {
       queryClient.invalidateQueries({ queryKey: userQueryKeys.userDetails });
       router.push('/');
     },
-    onError: (error: Error & { response: { data: { message: string } } }) => {
+    onError: (error: ApiError) => {
       // Even if delete API fails, we should still clear local state
       logout();
       queryClient.clear();
-      const message = error.response.data.message;
-      toast.error(message);
+      toast.error(
+        getErrorMessage(
+          error,
+          'Unable to delete the account right now. Please try again later.'
+        )
+      );
+    },
+  });
+};
+
+export const useUserSessions = () => {
+  const { isAuthenticated } = useAuth();
+
+  return useQuery({
+    queryKey: userQueryKeys.sessions,
+    queryFn: () => userService.getSessions(),
+    enabled: isAuthenticated,
+    staleTime: 60 * 1000,
+    refetchInterval: 5 * 60 * 1000,
+  });
+};
+
+export const useRevokeSession = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (sessionId: string) =>
+      toast.promise(userService.revokeSession({ sessionId }), {
+        loading: 'Revoking session',
+        success: response => response.message,
+        error: response => response.message,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: userQueryKeys.sessions });
+    },
+    onError: (error: ApiError) => {
+      toast.error(
+        getErrorMessage(
+          error,
+          'Unable to revoke the session right now. Please try again later.'
+        )
+      );
     },
   });
 };

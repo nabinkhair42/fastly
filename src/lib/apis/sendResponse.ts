@@ -6,5 +6,10 @@ export const sendResponse = (
   data?: unknown,
   error?: unknown
 ) => {
-  return NextResponse.json({ message, data, error }, { status });
+  if (error) {
+    // Log the detailed error server-side but avoid leaking implementation details to clients
+    console.error('[API Error]', error);
+  }
+
+  return NextResponse.json({ message, data }, { status });
 };

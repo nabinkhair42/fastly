@@ -1,6 +1,7 @@
 'use client';
 
 import { setLastUsedProviderCookie } from '@/hooks/auth/useLastUsedProvider';
+import { sanitizeRedirect } from '@/hooks/auth/useSafeRedirect';
 import { useAuth } from '@/providers/AuthProvider';
 import { AuthMethod } from '@/types/user';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -29,6 +30,17 @@ export const OAuthCallback = () => {
 
     if (accessToken && refreshToken) {
       try {
+        const sessionIdFromParams = searchParams.get('sessionId') || undefined;
+        let redirectTarget: string | undefined;
+        if (typeof window !== 'undefined') {
+          const storedRedirect = localStorage.getItem('oauth_redirect');
+          if (storedRedirect) {
+            redirectTarget = sanitizeRedirect(storedRedirect);
+          }
+          localStorage.removeItem('oauth_redirect');
+        }
+        const resolvedRedirect = redirectTarget ?? '/dashboard';
+
         // Get user data from URL parameters
         const userId = searchParams.get('userId');
         const email = searchParams.get('email');
@@ -45,7 +57,9 @@ export const OAuthCallback = () => {
             username,
           };
 
-          login(accessToken, refreshToken, userData);
+          login(accessToken, refreshToken, userData, {
+            sessionId: sessionIdFromParams,
+          });
 
           // Set the last used OAuth provider if available
           if (
@@ -56,7 +70,7 @@ export const OAuthCallback = () => {
             setLastUsedProviderCookie(authMethod);
           }
 
-          router.replace('/dashboard');
+          router.replace(resolvedRedirect);
         } else {
           // Fallback: decode JWT token for minimal data
           const tokenPayload = JSON.parse(atob(accessToken.split('.')[1]));
@@ -68,7 +82,9 @@ export const OAuthCallback = () => {
             username: '',
           };
 
-          login(accessToken, refreshToken, userData);
+          login(accessToken, refreshToken, userData, {
+            sessionId: sessionIdFromParams,
+          });
 
           // Set the last used OAuth provider if available
           if (
@@ -79,7 +95,7 @@ export const OAuthCallback = () => {
             setLastUsedProviderCookie(authMethod);
           }
 
-          router.replace('/dashboard');
+          router.replace(resolvedRedirect);
         }
       } catch (error) {
         console.error('OAuth callback error:', error);
@@ -93,7 +109,6 @@ export const OAuthCallback = () => {
   return (
     <div className="flex items-center justify-center min-h-[100svh]">
       <div className="text-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
         <p className="mt-4 text-muted-foreground">
           Completing authentication...
         </p>

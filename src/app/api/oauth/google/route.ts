@@ -1,5 +1,6 @@
 import { generateTokenPair } from '@/helpers/jwtToken';
 import { googleOAuth } from '@/lib/apis/oAuth';
+import { createUserSession } from '@/lib/auth/sessionTracker';
 import dbConnect from '@/lib/config/dbConnect';
 import { UserAuthModel, UserModel } from '@/models/users';
 import { AuthMethod } from '@/types/user';
@@ -178,6 +179,12 @@ export async function GET(request: NextRequest) {
     // Generate JWT tokens
     const tokens = generateTokenPair(userAuth._id.toString(), userAuth.email);
 
+    const session = await createUserSession({
+      userAuthId: userAuth._id.toString(),
+      authMethod: AuthMethod.GOOGLE,
+      request,
+    });
+
     // Redirect to OAuth callback page with tokens and user data
     const redirectUrl = new URL(
       `${process.env.NEXT_PUBLIC_APP_URL}/oauth-callback`
@@ -185,6 +192,11 @@ export async function GET(request: NextRequest) {
     redirectUrl.searchParams.set('accessToken', tokens.accessToken);
     redirectUrl.searchParams.set('refreshToken', tokens.refreshToken);
     redirectUrl.searchParams.set('authMethod', AuthMethod.GOOGLE);
+    redirectUrl.searchParams.set('sessionId', session.sessionId);
+    redirectUrl.searchParams.set(
+      'sessionCreatedAt',
+      session.createdAt.toISOString()
+    );
 
     // Include user data in URL params
     redirectUrl.searchParams.set('userId', userAuth._id.toString());

@@ -13,13 +13,19 @@ export async function DELETE(request: NextRequest) {
       return authResult.response;
     }
 
-    const { password } = await request.json();
-
-    // Validate request body
-    const { error } = deleteUserSchema.safeParse({ password });
-    if (error) {
-      return sendResponse(error.message, 400);
+    let requestBody: unknown;
+    try {
+      requestBody = await request.json();
+    } catch {
+      requestBody = {};
     }
+
+    const parsedBody = deleteUserSchema.safeParse(requestBody);
+    if (!parsedBody.success) {
+      return sendResponse(parsedBody.error.message, 400);
+    }
+
+    const { password } = parsedBody.data;
 
     // Find user by authenticated ID
     const userAuth = await UserAuthModel.findById(authResult.user!.userId);
@@ -27,14 +33,17 @@ export async function DELETE(request: NextRequest) {
       return sendResponse('User not found', 404);
     }
 
-    // Verify password
-    if (!password || !userAuth.password) {
-      return sendResponse('Password is required', 400);
-    }
+    const userHasPassword = Boolean(userAuth.password);
 
-    const isPasswordValid = await verifyPassword(password, userAuth.password);
-    if (!isPasswordValid) {
-      return sendResponse('Incorrect password', 400);
+    if (userHasPassword) {
+      if (!password) {
+        return sendResponse('Password is required to delete your account', 400);
+      }
+
+      const isPasswordValid = await verifyPassword(password, userAuth.password);
+      if (!isPasswordValid) {
+        return sendResponse('Incorrect password', 400);
+      }
     }
 
     // Delete user profile (if exists)

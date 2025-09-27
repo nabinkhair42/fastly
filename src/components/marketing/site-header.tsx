@@ -36,7 +36,7 @@ export default function SiteHeader() {
               variant="outline"
               onClick={() => router.push('/create-account')}
             >
-              Get Started
+              Demo App
               <ArrowUpRight />
             </Button>
           </div>
