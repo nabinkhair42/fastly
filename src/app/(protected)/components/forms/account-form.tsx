@@ -25,6 +25,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
+import ScreenLoader from '@/components/screen-loader';
 import { Separator } from '@/components/ui/separator';
 import {
   useUpdateUserDetails,
@@ -85,7 +86,7 @@ export function AccountForm() {
   }
 
   if (isLoading) {
-    return <div className="px-6">Loading...</div>;
+    return <ScreenLoader />;
   }
 
   return (

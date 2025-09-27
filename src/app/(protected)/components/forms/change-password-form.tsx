@@ -149,7 +149,7 @@ function CreatePasswordForm({ providerLabel }: { providerLabel?: string }) {
             type="submit"
             disabled={isPending}
             loading={isPending}
-            loadingText="Saving Password..."
+            loadingText="Saving Password"
           >
             Save Password
           </Button>
@@ -231,7 +231,16 @@ function PasswordFields<
           <FormItem>
             <FormLabel>Confirm Password</FormLabel>
             <FormControl>
-              <Input type="password" {...field} />
+              <div className="relative">
+                <Input
+                  type={showNewPassword ? 'text' : 'password'}
+                  {...field}
+                />
+                <ToggleButton
+                  isActive={showNewPassword}
+                  onClick={onToggleShowNewPassword}
+                />
+              </div>
             </FormControl>
             <FormDescription>Re-enter the new password.</FormDescription>
             <FormMessage />

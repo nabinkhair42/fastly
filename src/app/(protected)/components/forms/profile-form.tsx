@@ -1,6 +1,7 @@
 'use client';
 
 import { UploadAvatar } from '@/app/(protected)/components/upload-avatar';
+import ScreenLoader from '@/components/screen-loader';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import {
@@ -197,7 +198,7 @@ export function ProfileForm() {
   } = useProfileForm();
 
   if (isLoading) {
-    return <div className="px-6">Loading...</div>;
+    return <ScreenLoader />;
   }
 
   return (

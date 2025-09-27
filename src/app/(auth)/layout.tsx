@@ -1,5 +1,7 @@
 'use client';
 
+import { Suspense } from 'react';
+
 import ScreenLoader from '@/components/screen-loader';
 import { useRedirectIfAuthenticated } from '@/hooks/auth/useRequireAuth';
 import { useSafeRedirect } from '@/hooks/auth/useSafeRedirect';
@@ -10,6 +12,14 @@ export default function AuthLayout({
 }: {
   children: React.ReactNode;
 }) {
+  return (
+    <Suspense fallback={<ScreenLoader />}>
+      <AuthLayoutContent>{children}</AuthLayoutContent>
+    </Suspense>
+  );
+}
+
+function AuthLayoutContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const redirectTarget = useSafeRedirect('/dashboard');
   const shouldDisableRedirect = pathname === '/oauth-callback';

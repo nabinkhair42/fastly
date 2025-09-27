@@ -93,15 +93,15 @@ export default function Hero() {
                 <RevealY delay={0.4}>
                   <Image
                     className="rounded-[4px] border dark:hidden [mask-image:linear-gradient(to_right,black_50%,transparent_100%)]"
-                    src="/demo/delete-light.png"
-                    alt="Delete Account Hero Section"
+                    src="/demo/accounts-light.png"
+                    alt="Account Hero Section"
                     width={2880}
                     height={2074}
                   />
                   <Image
                     className="rounded-[4px] hidden border dark:block"
-                    src="/demo/delete-dark.png"
-                    alt="Delete Account Hero Section"
+                    src="/demo/accounts-dark.png"
+                    alt="Account Hero Section"
                     width={2880}
                     height={2074}
                   />
