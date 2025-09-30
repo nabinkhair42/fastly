@@ -7,13 +7,12 @@ const changelogBadgeVariants = cva(
   {
     variants: {
       variant: {
-        new: 'border-transparent bg-changelog-new text-changelog-new-foreground shadow hover:bg-changelog-new/80',
+        new: 'bg-changelog-new text-changelog-new-foreground hover:bg-changelog-new/80',
         improved:
-          'border-transparent bg-changelog-improved text-changelog-improved-foreground shadow hover:bg-changelog-improved/80',
+          'border bg-changelog-improved text-changelog-improved-foreground hover:bg-changelog-improved/80',
         fixed:
-          'border-transparent bg-changelog-fixed text-changelog-fixed-foreground shadow hover:bg-changelog-fixed/80',
-        version:
-          'border-transparent bg-primary text-primary-foreground shadow hover:bg-primary/80',
+          'bg-changelog-fixed text-changelog-fixed-foreground hover:bg-changelog-fixed/80',
+        version: 'bg-primary text-primary-foreground hover:bg-primary/80',
         outline: 'text-foreground',
       },
     },

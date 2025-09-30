@@ -5,6 +5,7 @@
     "title": "UI/UX Enhancements and Profile Features",
     "description": "Refined dashboard layout for better consistency, added location fields to profiles, and improved form interactions with searchable dropdowns and confirmation dialogs.",
     "type": "improved",
+    "image": "/changelog/ui-ux-enhancements-and-profile-features.png",
     "changes": [
       {
         "type": "improved",
