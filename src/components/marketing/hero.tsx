@@ -8,7 +8,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { ContainerTextFlip } from '@/components/ui/text-flip';
 import { useDownload } from '@/hooks/download';
-import { ArrowUpRight, ArrowUpRightIcon } from 'lucide-react';
+import { ArrowUpRightIcon, Download } from 'lucide-react';
 import Image from 'next/image';
 import Reveal, { RevealY } from './reveal';
 
@@ -79,7 +79,7 @@ export default function Hero() {
                   loadingText="Preparing Download"
                 >
                   Create First SaaS App
-                  <ArrowUpRight className="h-5 w-5" aria-hidden="true" />
+                  <Download className="h-5 w-5" aria-hidden="true" />
                 </Button>
               </div>
             </div>
