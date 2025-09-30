@@ -1,0 +1,33 @@
+# Build outputs
+.next/
+dist/
+build/
+
+# Dependencies
+node_modules/
+
+# Environment files
+.env*
+
+# Logs
+*.log
+
+# Database
+*.sqlite
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+
+# Misc
+coverage/
+*.tsbuildinfo
+
+# Package manager
+pnpm-lock.yaml
+yarn.lock
+package-lock.json 
