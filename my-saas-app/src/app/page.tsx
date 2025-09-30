@@ -1,4 +1,4 @@
-import LandingPage from '@/components/landing-page';
+import LandingPage from '@/components/landing-page/index';
 import { siteConfig } from '@/seo/metadata';
 import type { Metadata } from 'next';
 

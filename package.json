@@ -47,7 +47,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@uploadthing/react": "7.3.2",
     "archiver": "^7.0.1",
-    "axios": "1.10.0",
+    "axios": "1.12.2",
     "bcrypt": "^6.0.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
