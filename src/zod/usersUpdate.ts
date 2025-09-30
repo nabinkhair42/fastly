@@ -1,5 +1,28 @@
 import { z } from 'zod';
 
+const locationSchema = z.object({
+  address: z
+    .string()
+    .max(120, { message: 'Address must be less than 120 characters' })
+    .optional(),
+  city: z
+    .string()
+    .max(60, { message: 'City must be less than 60 characters' })
+    .optional(),
+  state: z
+    .string()
+    .max(60, { message: 'State must be less than 60 characters' })
+    .optional(),
+  country: z
+    .string()
+    .max(60, { message: 'Country must be less than 60 characters' })
+    .optional(),
+  zipCode: z
+    .string()
+    .max(20, { message: 'ZIP / Postal code must be less than 20 characters' })
+    .optional(),
+});
+
 // Schema for checking username availability
 export const checkUsernameSchema = z.object({
   username: z
@@ -90,6 +113,7 @@ export const updateUserDetailsSchema = z.object({
       }
       return val;
     }),
+  location: locationSchema.nullable().optional(),
 });
 
 // Schema for profile form with social accounts
@@ -128,6 +152,7 @@ export const profileFormSchema = z.object({
     )
     .optional(),
   dob: z.date().optional(),
+  location: locationSchema.optional(),
 });
 
 // Input schema for the form (before transformation)
@@ -166,6 +191,7 @@ export const profileFormInputSchema = z.object({
     )
     .optional(),
   dob: z.date().optional(),
+  location: locationSchema.optional(),
 });
 
 // Schema for user account deletion

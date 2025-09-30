@@ -1,5 +1,36 @@
 [
   {
+    "version": "v1.1.0",
+    "date": "September 30, 2025",
+    "title": "UI/UX Enhancements and Profile Features",
+    "description": "Refined dashboard layout for better consistency, added location fields to profiles, and improved form interactions with searchable dropdowns and confirmation dialogs.",
+    "type": "improved",
+    "image": "/changelog/ui-ux-enhancements-and-profile-features.png",
+    "changes": [
+      {
+        "type": "improved",
+        "description": "Streamlined dashboard UI with consistent spacing, removed redundant data displays, and balanced section padding for a cleaner experience."
+      },
+      {
+        "type": "new",
+        "description": "Added location fields (address, city, state, country, ZIP) to the profile form with a quick reset option."
+      },
+      {
+        "type": "improved",
+        "description": "Enhanced social account selector with a searchable command palette dropdown for easier platform selection."
+      },
+      {
+        "type": "new",
+        "description": "Implemented confirmation dialogs for session revocation to prevent accidental actions."
+      },
+      {
+        "type": "improved",
+        "description": "Wrapped auth layouts and protected routes with Suspense boundaries to fix useSearchParams prerender errors."
+      }
+    ]
+  },
+
+  {
     "version": "v1.0.0",
     "date": "September 27, 2025",
     "title": "General availability release",

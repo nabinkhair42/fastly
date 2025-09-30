@@ -3,6 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { Bug, CalendarDays, Package, Sparkles, Zap } from 'lucide-react';
 import Image from 'next/image';
+import { GoDotFill } from 'react-icons/go';
 
 export type ChangelogEntryType =
   | 'new'
@@ -59,7 +60,7 @@ const entryTypeLabels: Record<ChangelogEntryType, string> = {
 
 export function Changelog({ entries, className }: ChangelogProps) {
   return (
-    <div className={cn('w-full max-w-5xl mx-auto px-4', className)}>
+    <div className={cn('w-full max-w-5xl mx-auto px-4 lg:px-0', className)}>
       {/* Header */}
       <section className="mb-16 space-y-6">
         <div className="space-y-3">
@@ -102,10 +103,10 @@ export function Changelog({ entries, className }: ChangelogProps) {
           const entryTypeLabel = entryTypeLabels[entry.type];
 
           return (
-            <article key={`${entry.version}-${index}`} className="">
-              <div className="flex flex-col md:flex-row gap-6">
+            <article key={`${entry.version}-${index}`}>
+              <div className="flex flex-col md:flex-row gap-6 ">
                 {/* version number and title */}
-                <aside className="md:sticky md:top-28 md:w-60">
+                <aside className="sticky top-28 md:w-60">
                   <div className="flex flex-col gap-2">
                     <div className="flex flex-wrap items-center gap-2">
                       <ChangelogBadge
@@ -134,19 +135,19 @@ export function Changelog({ entries, className }: ChangelogProps) {
 
                 {/* version details */}
 
-                <section className="flex-1 space-y-6 max-w-xl">
+                <section className="flex-1 space-y-6">
                   <p className="text-base leading-relaxed text-muted-foreground">
                     {entry.description}
                   </p>
 
                   {entry.image && (
-                    <div className="overflow-hidden rounded border border-border/60 bg-muted">
+                    <div className="overflow-hidden bg-[repeating-linear-gradient(-45deg,var(--color-border),var(--color-border)_1px,transparent_1px,transparent_6px)] rounded-md border bg-muted">
                       <Image
                         src={entry.image}
                         alt={entry.title}
                         width={1280}
                         height={720}
-                        className="h-80 aspect-video object-fit"
+                        className="aspect-video object-fit"
                       />
                     </div>
                   )}
@@ -176,9 +177,9 @@ export function Changelog({ entries, className }: ChangelogProps) {
                               {descriptions.map((description, idx) => (
                                 <li
                                   key={`${type}-${idx}`}
-                                  className="flex items-start gap-3"
+                                  className="flex gap-3 items-center"
                                 >
-                                  <span className="mt-2 h-px w-6 flex-shrink-0 bg-border/70" />
+                                  <GoDotFill />
                                   <span className="text-foreground">
                                     {description}
                                   </span>

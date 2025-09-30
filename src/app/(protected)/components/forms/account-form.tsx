@@ -25,7 +25,9 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
-import ScreenLoader from '@/components/screen-loader';
+import { ActiveSessions } from '@/app/(protected)/components/active-sessions';
+import DashboardSkeleton from '@/app/(protected)/components/dashboard-skeleton';
+import { DeleteUser } from '@/app/(protected)/components/delete-user';
 import { Separator } from '@/components/ui/separator';
 import {
   useUpdateUserDetails,
@@ -33,8 +35,6 @@ import {
 } from '@/hooks/users/useUserMutations';
 import { useFont } from '@/providers/RootProvider';
 import { accountPreferencesSchema } from '@/zod/usersUpdate';
-import { ActiveSessions } from '../active-sessions';
-import { DeleteUser } from '../delete-user';
 
 type AccountFormValues = z.infer<typeof accountPreferencesSchema>;
 
@@ -86,7 +86,7 @@ export function AccountForm() {
   }
 
   if (isLoading) {
-    return <ScreenLoader />;
+    return <DashboardSkeleton />;
   }
 
   return (

@@ -35,7 +35,7 @@ export const UserDropdown = ({ avatarOnly }: { avatarOnly?: boolean }) => {
       label: 'Account Settings',
       icon: Settings,
       onClick: () => router.push('/account'),
-      description: 'View and manage your account settings.',
+      description: 'Manage your account settings and preferences.',
     },
     {
       label: 'Logout',

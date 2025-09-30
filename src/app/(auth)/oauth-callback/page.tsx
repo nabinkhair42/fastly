@@ -1,4 +1,4 @@
-import { OAuthCallback } from '@/components/oauth-callback';
+import { OAuthCallback } from '@/components/auth/oauth-callback';
 import ScreenLoader from '@/components/screen-loader';
 import { Suspense } from 'react';
 

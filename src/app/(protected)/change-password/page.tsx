@@ -1,5 +1,6 @@
 'use client';
 
+import DashboardSkeleton from '@/app/(protected)/components/dashboard-skeleton';
 import ChangePasswordForm from '@/app/(protected)/components/forms/change-password-form';
 import { useUserDetails } from '@/hooks/users/useUserMutations';
 import { AuthMethod } from '@/types/user';
@@ -16,12 +17,7 @@ export default function SettingsChangePasswordPage() {
   const user = data?.data?.user;
 
   if (isLoading || !user) {
-    return (
-      <div className="space-y-4">
-        <div className="h-6 w-48 rounded-md bg-muted animate-pulse" />
-        <div className="h-40 rounded-lg bg-muted animate-pulse" />
-      </div>
-    );
+    return <DashboardSkeleton />;
   }
 
   const authMethod = user.authMethod ?? AuthMethod.EMAIL;

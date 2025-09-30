@@ -1,5 +1,6 @@
 'use client';
 
+import { ActionDialog } from '@/components/ui/action-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { CardContent } from '@/components/ui/card';
@@ -105,6 +106,9 @@ export const ActiveSessions = () => {
   const revokeSession = useRevokeSession();
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [sessionToRevoke, setSessionToRevoke] = useState<UserSession | null>(
+    null
+  );
   const scrollAreaId = useId();
 
   useEffect(() => {
@@ -139,43 +143,102 @@ export const ActiveSessions = () => {
 
   const sessions = useMemo(() => data?.data.sessions ?? [], [data]);
 
+  const isSessionBeingRevoked = (sessionId: string) =>
+    revokeSession.isPending && sessionToRevoke?.sessionId === sessionId;
+
+  const handleConfirmRevoke = () => {
+    if (!sessionToRevoke) return;
+
+    revokeSession.mutate(sessionToRevoke.sessionId, {
+      onSettled: () => {
+        setSessionToRevoke(null);
+      },
+    });
+  };
+
+  const handleCancelRevoke = () => {
+    if (revokeSession.isPending) return;
+    setSessionToRevoke(null);
+  };
+
   const scrollMaskClass = isScrolled
     ? '[mask-image:linear-gradient(to_bottom,transparent,black_12%,black_88%,transparent)]'
     : '[mask-image:linear-gradient(to_bottom,black,black_88%,transparent)]';
 
   return (
-    <ScrollArea
-      id={scrollAreaId}
-      className={cn('h-72 border-none shadow-none', scrollMaskClass)}
-    >
-      <CardContent className="space-y-3">
-        {isLoading && (
-          <div className="space-y-3">
-            <SessionSkeleton />
-            <SessionSkeleton />
-          </div>
-        )}
+    <>
+      <ScrollArea
+        id={scrollAreaId}
+        className={cn('h-72 border-none shadow-none', scrollMaskClass)}
+      >
+        <CardContent className="space-y-3">
+          {isLoading && (
+            <div className="space-y-3">
+              <SessionSkeleton />
+              <SessionSkeleton />
+            </div>
+          )}
 
-        {!isLoading && sessions.length === 0 && (
-          <div className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">
-            No recent sessions found.
-          </div>
-        )}
+          {!isLoading && sessions.length === 0 && (
+            <div className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">
+              No recent sessions found.
+            </div>
+          )}
 
-        {!isLoading && sessions.length > 0 && (
-          <div className="space-y-3">
-            {sessions.map(session => (
-              <SessionRow
-                key={session.sessionId}
-                session={session}
-                isCurrent={session.sessionId === currentSessionId}
-                isRevoking={revokeSession.isPending}
-                onRevoke={() => revokeSession.mutate(session.sessionId)}
-              />
-            ))}
+          {!isLoading && sessions.length > 0 && (
+            <div className="space-y-3">
+              {sessions.map(session => (
+                <SessionRow
+                  key={session.sessionId}
+                  session={session}
+                  isCurrent={session.sessionId === currentSessionId}
+                  isRevoking={isSessionBeingRevoked(session.sessionId)}
+                  onRevoke={() => setSessionToRevoke(session)}
+                />
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </ScrollArea>
+
+      {sessionToRevoke ? (
+        <ActionDialog
+          title="Revoke this session?"
+          description="Revoking will immediately sign this device out and require the user to log in again."
+          confirmText="Revoke session"
+          cancelText="Keep session"
+          isActionDestructive
+          isLoading={revokeSession.isPending}
+          loadingText="Revoking..."
+          onConfirm={handleConfirmRevoke}
+          onCancel={handleCancelRevoke}
+        >
+          <div className="px-6 pb-4 text-sm text-muted-foreground">
+            <p>
+              <span className="font-medium text-foreground">Browser:</span>{' '}
+              {sessionToRevoke.browser !== 'Unknown'
+                ? sessionToRevoke.browser
+                : 'Unknown browser'}
+            </p>
+            <p>
+              <span className="font-medium text-foreground">Device:</span>{' '}
+              {sessionToRevoke.device !== 'Unknown device'
+                ? sessionToRevoke.device
+                : 'Unknown device'}
+            </p>
+            <p>
+              <span className="font-medium text-foreground">IP:</span>{' '}
+              {sessionToRevoke.ipAddress || 'Unknown'}
+            </p>
+            <p>
+              <span className="font-medium text-foreground">Last active:</span>{' '}
+              {formatDistanceToNow(new Date(sessionToRevoke.lastActiveAt), {
+                addSuffix: true,
+              })}
+            </p>
           </div>
-        )}
-      </CardContent>
-    </ScrollArea>
+        </ActionDialog>
+      ) : null}
+    </>
   );
 };
