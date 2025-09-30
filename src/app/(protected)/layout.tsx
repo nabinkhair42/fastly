@@ -3,7 +3,7 @@
 import { Suspense } from 'react';
 
 import { AppSidebar } from '@/app/(protected)/components/app-sidebar';
-import ProtectedRoute from '@/components/protected-route';
+import ProtectedRoute from '@/components/auth/protected-route';
 import ScreenLoader from '@/components/screen-loader';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import TopNavbar from './components/top-navbar';

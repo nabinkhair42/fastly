@@ -1,6 +1,7 @@
 import {
   AuthenticatedUser,
   SocialAccountUrl,
+  UserLocation,
   UserProfile,
   UserSession,
 } from '@/types/user';
@@ -84,6 +85,7 @@ export interface UpdateUserDetailsRequest {
     font?: string;
   };
   dob?: Date;
+  location?: Partial<UserLocation> | null;
 }
 
 export interface ChangeUsernameRequest {

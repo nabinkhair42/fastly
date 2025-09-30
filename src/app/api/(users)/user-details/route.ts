@@ -6,6 +6,26 @@ import { UpdateUserDetailsRequest } from '@/types/api';
 import { updateUserDetailsSchema } from '@/zod/usersUpdate';
 import { NextRequest } from 'next/server';
 
+const normalizeLocationInput = (
+  location: UpdateUserDetailsRequest['location'] | undefined
+): UpdateUserDetailsRequest['location'] => {
+  if (location === null || location === undefined) {
+    return null;
+  }
+
+  const trimmed = {
+    address: location.address?.trim() ?? '',
+    city: location.city?.trim() ?? '',
+    state: location.state?.trim() ?? '',
+    country: location.country?.trim() ?? '',
+    zipCode: location.zipCode?.trim() ?? '',
+  };
+
+  const hasValues = Object.values(trimmed).some(value => value.length > 0);
+
+  return hasValues ? trimmed : null;
+};
+
 export async function GET(request: NextRequest) {
   await dbConnect();
   try {
@@ -65,8 +85,15 @@ export async function POST(request: NextRequest) {
       return sendResponse(validationResult.error.message, 400);
     }
 
-    const { firstName, lastName, bio, socialAccounts, preferences, dob } =
-      validationResult.data;
+    const {
+      firstName,
+      lastName,
+      bio,
+      socialAccounts,
+      preferences,
+      dob,
+      location,
+    } = validationResult.data;
 
     // Find user by authenticated user ID
     const user = await UserModel.findOne({ authUser: authResult.user!.userId });
@@ -97,6 +124,15 @@ export async function POST(request: NextRequest) {
     }
     if (dob !== undefined) {
       updateFields.dob = dob;
+    }
+    if (location !== undefined) {
+      const normalizedLocation = normalizeLocationInput(location);
+      const currentLocation = normalizeLocationInput(user.location);
+      if (
+        JSON.stringify(normalizedLocation) !== JSON.stringify(currentLocation)
+      ) {
+        updateFields.location = normalizedLocation;
+      }
     }
     // Only update if there are actual changes
     if (Object.keys(updateFields).length === 0) {

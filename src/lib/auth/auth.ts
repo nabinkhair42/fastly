@@ -9,7 +9,7 @@ export { useAuth } from '@/providers/AuthProvider';
 export {
   default as ProtectedRoute,
   withProtectedRoute,
-} from '@/components/protected-route';
+} from '@/components/auth/protected-route';
 export {
   useAuthGuard,
   useRedirectIfAuthenticated,

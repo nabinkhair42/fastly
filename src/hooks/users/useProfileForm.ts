@@ -10,10 +10,50 @@ import {
   useUserDetails,
 } from '@/hooks/users/useUserMutations';
 import { userService } from '@/services/userService';
+import { UpdateUserDetailsRequest } from '@/types/api';
 import { profileFormInputSchema } from '@/zod/usersUpdate';
 import toast from 'react-hot-toast';
 
 type ProfileFormValues = z.infer<typeof profileFormInputSchema>;
+type ProfileFormLocation = NonNullable<ProfileFormValues['location']>;
+
+const EMPTY_LOCATION: ProfileFormLocation = {
+  address: '',
+  city: '',
+  state: '',
+  country: '',
+  zipCode: '',
+};
+
+const locationFromUser = (
+  location: Partial<ProfileFormLocation> | null | undefined
+): ProfileFormLocation => ({
+  address: location?.address ?? '',
+  city: location?.city ?? '',
+  state: location?.state ?? '',
+  country: location?.country ?? '',
+  zipCode: location?.zipCode ?? '',
+});
+
+const normalizeLocation = (
+  location: Partial<ProfileFormLocation> | null | undefined
+): ProfileFormLocation | null => {
+  if (!location) {
+    return null;
+  }
+
+  const trimmed: ProfileFormLocation = {
+    address: location.address?.trim() ?? '',
+    city: location.city?.trim() ?? '',
+    state: location.state?.trim() ?? '',
+    country: location.country?.trim() ?? '',
+    zipCode: location.zipCode?.trim() ?? '',
+  };
+
+  const hasValues = Object.values(trimmed).some(value => value.length > 0);
+
+  return hasValues ? trimmed : null;
+};
 
 export function useProfileForm() {
   const { data: userDetails, isLoading } = useUserDetails();
@@ -36,6 +76,7 @@ export function useProfileForm() {
       bio: '',
       socialAccounts: [],
       dob: undefined,
+      location: { ...EMPTY_LOCATION },
     },
     mode: 'onChange',
   });
@@ -61,6 +102,7 @@ export function useProfileForm() {
             url: account.url,
           })) || [],
         dob: user.dob ? new Date(user.dob) : undefined,
+        location: locationFromUser(user.location),
       });
       setUsernameValue(initialUsername);
     }
@@ -113,13 +155,25 @@ export function useProfileForm() {
         provider: account.provider,
       })) || [];
 
-    updateUserDetails.mutate({
+    const user = userDetails?.data?.user;
+    const nextLocation = normalizeLocation(data.location);
+    const currentLocation = normalizeLocation(locationFromUser(user?.location));
+    const locationHasChanged =
+      JSON.stringify(nextLocation) !== JSON.stringify(currentLocation);
+
+    const payload: UpdateUserDetailsRequest = {
       firstName: data.firstName,
       lastName: data.lastName,
       bio: data.bio,
       socialAccounts,
       dob: data.dob,
-    });
+    };
+
+    if (locationHasChanged) {
+      payload.location = nextLocation;
+    }
+
+    updateUserDetails.mutate(payload);
   };
 
   const handleSubmit = (data: ProfileFormValues) => {

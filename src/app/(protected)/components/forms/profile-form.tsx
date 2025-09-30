@@ -1,9 +1,16 @@
 'use client';
 
+import DashboardSkeleton from '@/app/(protected)/components/dashboard-skeleton';
 import { UploadAvatar } from '@/app/(protected)/components/upload-avatar';
-import ScreenLoader from '@/components/screen-loader';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from '@/components/ui/command';
 import {
   Form,
   FormControl,
@@ -19,15 +26,19 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { Textarea } from '@/components/ui/textarea';
 import { useProfileForm } from '@/hooks/users/useProfileForm';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import {
   CalendarIcon,
+  Check,
   CheckCircle,
   ChevronDown,
   Loader2,
+  MapPin,
+  RotateCcw,
   Trash2,
   XCircle,
 } from 'lucide-react';
@@ -108,73 +119,72 @@ function SocialInput({
   onUrlChange: (url: string) => void;
   placeholder?: string;
 }) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [open, setOpen] = useState(false);
   const selectedPlatform =
     SOCIAL_PLATFORMS[provider as keyof typeof SOCIAL_PLATFORMS];
   const Icon = selectedPlatform?.icon || FaGlobe;
   const dynamicPlaceholder = selectedPlatform?.placeholder || placeholder;
 
   return (
-    <div className="relative">
-      <div className="relative">
-        <Input
-          value={url}
-          onChange={e => onUrlChange(e.target.value)}
-          placeholder={dynamicPlaceholder}
-          className="pl-12 pr-10"
-        />
-
-        {/* Platform Icon */}
-        <div className="absolute left-3 top-1/2 transform -translate-y-1/2 flex items-center justify-center">
-          <Icon className="h-4 w-4 text-muted-foreground" />
-        </div>
-
-        {/* Dropdown Trigger */}
-        <button
-          type="button"
-          onClick={() => setIsOpen(!isOpen)}
-          className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center justify-center hover:bg-muted rounded-sm p-1 transition-colors"
-        >
-          <ChevronDown
-            className={cn(
-              'h-3 w-3 text-muted-foreground transition-transform',
-              isOpen && 'rotate-180'
-            )}
-          />
-        </button>
-      </div>
-
-      {/* Dropdown Content */}
-      {isOpen && (
-        <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-popover border rounded-md shadow-md">
-          <div className="grid grid-cols-5 gap-1 p-2">
-            {Object.entries(SOCIAL_PLATFORMS).map(
-              ([key, { icon: PlatformIcon, label }]) => (
-                <button
-                  key={key}
-                  type="button"
-                  onClick={() => {
-                    onProviderChange(key);
-                    setIsOpen(false);
-                  }}
-                  className={cn(
-                    'flex items-center justify-center p-2 rounded-sm hover:bg-accent transition-colors',
-                    provider === key && 'bg-accent'
+    <div className="flex flex-col gap-2 sm:flex-row">
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            type="button"
+            variant="outline"
+            role="combobox"
+            aria-expanded={open}
+            className="flex w-full items-center justify-between gap-3 sm:w-48"
+          >
+            <span className="flex flex-1 items-center gap-2 truncate">
+              <Icon className="h-4 w-4 text-muted-foreground" />
+              <span className="truncate text-sm">
+                {selectedPlatform?.label ?? 'Select platform'}
+              </span>
+            </span>
+            <ChevronDown className="h-3 w-3 text-muted-foreground" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-[260px] p-0" align="start">
+          <Command>
+            <CommandInput placeholder="Search platforms..." className="h-9" />
+            <CommandEmpty>No platform found.</CommandEmpty>
+            <CommandGroup>
+              <ScrollArea className="max-h-60">
+                <div className="py-1">
+                  {Object.entries(SOCIAL_PLATFORMS).map(
+                    ([key, { icon: PlatformIcon, label }]) => {
+                      const isSelected = provider === key;
+                      return (
+                        <CommandItem
+                          key={key}
+                          value={`${label} ${key}`}
+                          onSelect={() => {
+                            onProviderChange(key);
+                            setOpen(false);
+                          }}
+                        >
+                          <PlatformIcon className="h-4 w-4 text-muted-foreground" />
+                          <span className="flex-1 text-sm">{label}</span>
+                          {isSelected && (
+                            <Check className="h-4 w-4 text-primary" />
+                          )}
+                        </CommandItem>
+                      );
+                    }
                   )}
-                  title={label}
-                >
-                  <PlatformIcon className="h-4 w-4" />
-                </button>
-              )
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Backdrop to close dropdown */}
-      {isOpen && (
-        <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
-      )}
+                </div>
+              </ScrollArea>
+            </CommandGroup>
+          </Command>
+        </PopoverContent>
+      </Popover>
+      <Input
+        value={url}
+        onChange={e => onUrlChange(e.target.value)}
+        placeholder={dynamicPlaceholder}
+        className="sm:flex-1"
+      />
     </div>
   );
 }
@@ -198,7 +208,7 @@ export function ProfileForm() {
   } = useProfileForm();
 
   if (isLoading) {
-    return <ScreenLoader />;
+    return <DashboardSkeleton />;
   }
 
   return (
@@ -400,38 +410,156 @@ export function ProfileForm() {
             />
 
             <div className="space-y-4">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div className="space-y-1">
+                  <h4 className="flex items-center gap-2 text-sm font-medium">
+                    <MapPin className="h-4 w-4 text-muted-foreground" />{' '}
+                    Location
+                  </h4>
+                  <p className="text-sm text-muted-foreground">
+                    Share where you&apos;re based. Leave any field blank to keep
+                    it hidden.
+                  </p>
+                </div>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="gap-1 text-muted-foreground hover:text-foreground"
+                  onClick={() =>
+                    form.resetField('location', {
+                      defaultValue: {
+                        address: '',
+                        city: '',
+                        state: '',
+                        country: '',
+                        zipCode: '',
+                      },
+                      keepDirty: false,
+                      keepTouched: false,
+                    })
+                  }
+                >
+                  <RotateCcw className="h-3.5 w-3.5" />
+                  Clear fields
+                </Button>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-2">
+                <FormField
+                  control={form.control}
+                  name="location.address"
+                  render={({ field }) => (
+                    <FormItem className="md:col-span-2">
+                      <FormLabel>Street address</FormLabel>
+                      <FormControl>
+                        <Input placeholder="123 Main Street" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="location.city"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>City</FormLabel>
+                      <FormControl>
+                        <Input placeholder="San Francisco" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="location.state"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>State / Region</FormLabel>
+                      <FormControl>
+                        <Input placeholder="California" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="location.zipCode"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>ZIP / Postal code</FormLabel>
+                      <FormControl>
+                        <Input placeholder="94103" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="location.country"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Country</FormLabel>
+                      <FormControl>
+                        <Input placeholder="United States" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-4">
               <div>
                 <FormLabel>Social Accounts</FormLabel>
                 <FormDescription>
                   Add links to your website, blog, or social media profiles.
                 </FormDescription>
               </div>
+              {fields.length === 0 && (
+                <p className="text-sm text-muted-foreground">
+                  You haven&apos;t added any accounts yet.
+                </p>
+              )}
               {fields.map((field, index) => (
-                <div key={field.id} className="flex gap-2">
-                  <div className="flex-1">
-                    <SocialInput
-                      provider={
-                        form.watch(`socialAccounts.${index}.provider`) ||
-                        'website'
-                      }
-                      url={form.watch(`socialAccounts.${index}.url`) || ''}
-                      onProviderChange={provider => {
-                        form.setValue(
-                          `socialAccounts.${index}.provider`,
-                          provider
-                        );
-                      }}
-                      onUrlChange={url => {
-                        form.setValue(`socialAccounts.${index}.url`, url);
-                      }}
-                    />
-                  </div>
+                <div
+                  key={field.id}
+                  className="flex flex-col gap-2 sm:flex-row sm:items-center"
+                >
+                  <SocialInput
+                    provider={
+                      form.watch(`socialAccounts.${index}.provider`) ||
+                      'website'
+                    }
+                    url={form.watch(`socialAccounts.${index}.url`) || ''}
+                    onProviderChange={provider => {
+                      form.setValue(
+                        `socialAccounts.${index}.provider`,
+                        provider,
+                        {
+                          shouldDirty: true,
+                          shouldTouch: true,
+                        }
+                      );
+                    }}
+                    onUrlChange={url => {
+                      form.setValue(`socialAccounts.${index}.url`, url, {
+                        shouldDirty: true,
+                        shouldTouch: true,
+                      });
+                    }}
+                  />
                   <Button
                     type="button"
                     variant="destructive"
                     size="icon"
                     onClick={() => remove(index)}
-                    className="shrink-0"
+                    className="h-9 w-9 self-start sm:self-auto"
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
@@ -446,8 +574,13 @@ export function ProfileForm() {
               </Button>
             </div>
 
-            <Button type="submit" disabled={isSubmitDisabled}>
-              {isUpdating ? 'Updating...' : 'Update profile'}
+            <Button
+              type="submit"
+              disabled={isSubmitDisabled}
+              loading={isUpdating}
+              loadingText="Updating"
+            >
+              Update Profile
             </Button>
           </form>
         </Form>
