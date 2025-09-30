@@ -7,13 +7,14 @@ import {
 } from '@/components/ui/announcement-tag';
 import { Button } from '@/components/ui/button';
 import { ContainerTextFlip } from '@/components/ui/text-flip';
+import { useDownload } from '@/hooks/download';
 import { ArrowUpRight, ArrowUpRightIcon } from 'lucide-react';
 import Image from 'next/image';
-import Link from 'next/link';
 import Reveal, { RevealY } from './reveal';
 
 const words = ['15x faster', '10x secure', '10x safer', 'seamless'];
 export default function Hero() {
+  const downloadMutation = useDownload();
   return (
     <section className="overflow-hidden pt-20 pb-32 sm:pt-32 sm:pb-40 lg:pt-40 lg:pb-48">
       {/* Main Content Container */}
@@ -69,15 +70,16 @@ export default function Hero() {
 
               {/* CTA Button */}
               <div>
-                <Button size="lg" asChild className="text-base px-8 py-3">
-                  <Link
-                    href="/create-account"
-                    aria-label="Get started free"
-                    className="inline-flex items-center gap-2"
-                  >
-                    Create First SaaS App
-                    <ArrowUpRight className="h-5 w-5" aria-hidden="true" />
-                  </Link>
+                <Button
+                  size="lg"
+                  className="text-base px-8 py-3"
+                  onClick={() => downloadMutation.mutate()}
+                  disabled={downloadMutation.isPending}
+                  loading={downloadMutation.isPending}
+                  loadingText="Preparing Download"
+                >
+                  Create First SaaS App
+                  <ArrowUpRight className="h-5 w-5" aria-hidden="true" />
                 </Button>
               </div>
             </div>
