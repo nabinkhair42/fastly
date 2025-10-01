@@ -29,7 +29,7 @@
     "@tanstack/react-query": "^5.90.2",
     "@types/archiver": "^6.0.3",
     "archiver": "^7.0.1",
-    "axios": "1.12.2",
+    "axios": "1.12.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "extract-zip": "^2.0.1",
