@@ -1,34 +1,47 @@
-import { downloadService } from '@/services/useDownload';
-import { useMutation } from '@tanstack/react-query';
+import {
+  downloadSaaSStarter,
+  fetchStats,
+  StatsData,
+} from '@/services/useDownload';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 
+type ApiError = Error & {
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
+};
+
+const extractErrorMessage = (error: ApiError, fallback: string) => {
+  return error.response?.data?.message ?? fallback;
+};
+
 export const useDownload = () => {
-  return useMutation({
+  return useMutation<void, ApiError>({
     mutationFn: async () => {
-      const blob = await downloadService.downloadSaaSStarter();
-
-      // Create download link
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = 'my-saas-app.zip';
-
-      // Trigger download
-      document.body.appendChild(link);
-      link.click();
-
-      // Cleanup
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-
-      return blob;
-    },
-    onSuccess: () => {
-      toast.success('Download started successfully!');
+      return toast.promise(downloadSaaSStarter(), {
+        loading: 'Preparing your download',
+        success: 'Download started successfully!',
+        error: (error: ApiError) =>
+          extractErrorMessage(error, 'Failed to download. Please try again.'),
+      });
     },
     onError: error => {
       console.error('Download failed:', error);
-      toast.error('Failed to download. Please try again.');
     },
+  });
+};
+
+export const useFetchStats = () => {
+  return useQuery<StatsData, ApiError>({
+    queryKey: ['stats'],
+    queryFn: async () => {
+      const response = await fetchStats();
+      return response.data;
+    },
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
   });
 };

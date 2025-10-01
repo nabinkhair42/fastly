@@ -7,14 +7,16 @@ import {
 } from '@/components/ui/announcement-tag';
 import { Button } from '@/components/ui/button';
 import { ContainerTextFlip } from '@/components/ui/text-flip';
-import { useDownload } from '@/hooks/download';
+import { useDownload, useFetchStats } from '@/hooks/download';
 import { ArrowUpRightIcon, Download } from 'lucide-react';
 import Image from 'next/image';
 import Reveal, { RevealY } from './reveal';
 
 const words = ['15x faster', '10x secure', '10x safer', 'seamless'];
 export default function Hero() {
-  const downloadMutation = useDownload();
+  const { mutate: download, isPending } = useDownload();
+  const { data: stats } = useFetchStats();
+
   return (
     <section className="overflow-hidden pt-20 pb-32 sm:pt-32 sm:pb-40 lg:pt-40 lg:pb-48">
       {/* Main Content Container */}
@@ -69,18 +71,23 @@ export default function Hero() {
               </p>
 
               {/* CTA Button */}
-              <div>
+              <div className="space-y-2">
                 <Button
                   size="lg"
                   className="text-base px-8 py-3"
-                  onClick={() => downloadMutation.mutate()}
-                  disabled={downloadMutation.isPending}
-                  loading={downloadMutation.isPending}
+                  onClick={() => download()}
+                  disabled={isPending}
+                  loading={isPending}
                   loadingText="Preparing Download"
                 >
                   Create First SaaS App
                   <Download className="h-5 w-5" aria-hidden="true" />
                 </Button>
+                {stats && (
+                  <p className="text-sm text-muted-foreground">
+                    Used by {stats.totalDownloads.toLocaleString()}+ developers
+                  </p>
+                )}
               </div>
             </div>
           </div>
