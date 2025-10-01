@@ -2,6 +2,7 @@ import { generateTokenPair } from '@/helpers/jwtToken';
 import { githubOAuth } from '@/lib/apis/oAuth';
 import { createUserSession } from '@/lib/auth/sessionTracker';
 import dbConnect from '@/lib/config/dbConnect';
+import { sendWelcomeEmail } from '@/mail-templates/emailService';
 import { UserAuthModel, UserModel } from '@/models/users';
 import { AuthMethod } from '@/types/user';
 import { NextRequest, NextResponse } from 'next/server';
@@ -95,8 +96,6 @@ export async function GET(request: NextRequest) {
         Accept: 'application/vnd.github.v3+json',
       },
     });
-
-    console.log('userResponse from github', userResponse);
 
     if (!userResponse.ok) {
       console.error(
@@ -206,6 +205,10 @@ export async function GET(request: NextRequest) {
     redirectUrl.searchParams.set('lastName', userAuth.lastName || '');
     redirectUrl.searchParams.set('username', userProfile?.username || '');
 
+    // Send welcome email if new user
+    if (userAuth && userAuth.isVerified && userProfile) {
+      await sendWelcomeEmail(userAuth.email, userAuth.firstName || '');
+    }
     return NextResponse.redirect(redirectUrl.toString());
   } catch (error) {
     console.error('GitHub OAuth error:', error);

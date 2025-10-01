@@ -188,7 +188,7 @@ export function EmailVerificationForm() {
           </p>
         </div>
       </CardContent>
-      <CardFooter className="flex justify-center  bg-muted rounded-b-xl">
+      <CardFooter className="flex items-center justify-center">
         <div className="text-center text-sm">
           <Button
             variant="link"

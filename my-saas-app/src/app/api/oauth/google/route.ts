@@ -2,6 +2,7 @@ import { generateTokenPair } from '@/helpers/jwtToken';
 import { googleOAuth } from '@/lib/apis/oAuth';
 import { createUserSession } from '@/lib/auth/sessionTracker';
 import dbConnect from '@/lib/config/dbConnect';
+import { sendWelcomeEmail } from '@/mail-templates/emailService';
 import { UserAuthModel, UserModel } from '@/models/users';
 import { AuthMethod } from '@/types/user';
 import { NextRequest, NextResponse } from 'next/server';
@@ -95,8 +96,6 @@ export async function GET(request: NextRequest) {
       `https://www.googleapis.com/oauth2/v2/userinfo?access_token=${tokenData.access_token}`
     );
 
-    console.log('userResponse from google', userResponse);
-
     if (!userResponse.ok) {
       console.error(
         'Google user data fetch failed:',
@@ -108,7 +107,6 @@ export async function GET(request: NextRequest) {
     }
 
     const googleUser: GoogleUser = await userResponse.json();
-    console.log('Google user data:', googleUser);
 
     if (!googleUser.verified_email) {
       return NextResponse.redirect(
@@ -138,13 +136,6 @@ export async function GET(request: NextRequest) {
         googleUser.name?.split(' ').slice(1).join(' ') ||
         '';
 
-      console.log('Creating new user with:', {
-        firstName,
-        lastName,
-        email: googleUser.email,
-        googleUserData: googleUser,
-      });
-
       try {
         // Create auth user
         userAuth = await UserAuthModel.create({
@@ -165,8 +156,6 @@ export async function GET(request: NextRequest) {
           username: googleUser.email.split('@')[0], // Use email prefix as username
           avatar: googleUser.picture,
         });
-
-        console.log('User created successfully:', userAuth._id);
       } catch (dbError) {
         console.error('Database error creating user:', dbError);
         throw dbError;
@@ -204,6 +193,11 @@ export async function GET(request: NextRequest) {
     redirectUrl.searchParams.set('firstName', userAuth.firstName || '');
     redirectUrl.searchParams.set('lastName', userAuth.lastName || '');
     redirectUrl.searchParams.set('username', userProfile?.username || '');
+
+    // Send welcome email if new user
+    if (userAuth && userAuth.isVerified && userProfile) {
+      await sendWelcomeEmail(userAuth.email, userAuth.firstName || '');
+    }
 
     return NextResponse.redirect(redirectUrl.toString());
   } catch (error) {
