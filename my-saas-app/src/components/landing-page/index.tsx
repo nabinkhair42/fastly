@@ -30,17 +30,16 @@ export default function LandingPage() {
         <div className="flex flex-row gap-4">
           <Button size="lg" asChild className="rounded-full">
             <Link
-              href="https://github.com/nabinkhair42/fastly"
-              target="_blank"
+              href="/create-account"
               className="inline-flex items-center gap-2"
             >
-              Clone Repository
+              Create Account
               <ArrowUpRight className="h-4 w-4" />
             </Link>
           </Button>
           <Button size="lg" variant="outline" asChild className="rounded-full">
             <Link
-              href="https://starter.nabinkhair.com.np/docs"
+              href="https://fastly.nabinkhair.com.np/docs"
               target="_blank"
               className="inline-flex items-center gap-2"
             >
