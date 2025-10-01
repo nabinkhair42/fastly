@@ -34,7 +34,9 @@ export default function SiteHeader() {
             <Button
               size="sm"
               variant="outline"
-              onClick={() => router.push('/create-account')}
+              onClick={() =>
+                router.push('https://create-fastly-app.nabinkhair.com.np')
+              }
             >
               Demo App
               <ArrowUpRight />

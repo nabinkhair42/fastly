@@ -1,6 +1,6 @@
 import ChangelogPage from '@/components/changelog';
-import SiteHeader from '@/components/marketing/site-header';
-import { Footer } from 'react-day-picker';
+import Footer from '@/components/marketing/footer';
+import SiteHeader from '@/components/marketing/navbar';
 
 const page = () => {
   return (
@@ -9,7 +9,7 @@ const page = () => {
       <main>
         <ChangelogPage />
       </main>
-      <Footer />{' '}
+      <Footer />
     </>
   );
 };

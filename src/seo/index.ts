@@ -37,19 +37,7 @@ export const siteConfig = {
 
 export function generateSitemap() {
   const baseUrl = siteConfig.url;
-  const routes = [
-    '', // Homepage
-    '/log-in',
-    '/create-account',
-    '/forgot-password',
-    '/reset-password',
-    '/email-verification',
-    '/dashboard',
-    '/settings',
-    '/settings/account',
-    '/settings/edit-profile',
-    '/settings/change-password',
-  ];
+  const routes = ['/', '/changelog', '/docs'];
 
   return routes.map(route => ({
     url: `${baseUrl}${route}`,
