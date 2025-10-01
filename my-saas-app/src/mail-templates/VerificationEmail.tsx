@@ -5,7 +5,6 @@ import {
   Head,
   Html,
   Img,
-  Link,
   Row,
   Section,
   Text,
@@ -32,10 +31,10 @@ const VerificationEmail = ({
         >
           <Section style={{ textAlign: 'center', marginBottom: '20px' }}>
             <Img
-              src="https://starter.nabinkhair.com.np/icon.png"
+              src="https://fastly.nabinkhair.com.np/icon.png"
               alt="Fastly"
               width="150"
-              height="50"
+              height="150"
               style={{ maxWidth: '100%' }}
             />
           </Section>
@@ -66,9 +65,9 @@ const VerificationEmail = ({
                   style={{
                     fontSize: '32px',
                     fontWeight: 'bold',
-                    color: '#2d3e50',
+                    color: '#fff',
                     letterSpacing: '4px',
-                    backgroundColor: '#f5f5f5',
+                    backgroundColor: '#000',
                     padding: '20px',
                     borderRadius: '8px',
                     display: 'inline-block',
@@ -96,33 +95,6 @@ const VerificationEmail = ({
               }}
             >
               Didn&apos;t create an account? You can safely ignore this email.
-            </Text>
-            <Text
-              style={{
-                fontSize: '14px',
-                color: '#777',
-                marginTop: '10px',
-                textAlign: 'center',
-              }}
-            >
-              Having trouble? Contact our support team at{' '}
-              <Link
-                href="mailto:support@fastly.com"
-                style={{ color: '#4CAF50' }}
-              >
-                support@fastly.com
-              </Link>
-            </Text>
-
-            <Text
-              style={{
-                fontSize: '12px',
-                color: '#777',
-                marginTop: '20px',
-                textAlign: 'center',
-              }}
-            >
-              Fastly Team
             </Text>
           </Section>
         </Container>

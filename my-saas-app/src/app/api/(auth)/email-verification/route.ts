@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
     });
 
     // send welcome email
-    await sendWelcomeEmail(userAuth.email, tokens.accessToken);
+    await sendWelcomeEmail(userAuth.email, userAuth.firstName);
 
     return sendResponse('Email verified successfully', 200, {
       accessToken: tokens.accessToken,
