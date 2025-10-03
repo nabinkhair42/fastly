@@ -11,15 +11,14 @@ export default function IntegrationsSection() {
   return (
     <section>
       <div className="bg-muted dark:bg-background py-24">
-        <div className="mx-auto flex flex-col md:grid max-w-5xl px-4 lg:px-0 md:grid-cols-2 md:gap-12">
+        <div className="mx-auto flex flex-col md:grid max-w-5xl px-4 xl:px-0 md:grid-cols-2 md:gap-12">
           <div className="order-last mt-6 flex flex-col gap-12 md:order-first">
             <div className="space-y-3 text-center md:text-left">
               <h2 className="text-balance text-3xl font-semibold md:text-4xl lg:text-5xl">
                 Built on top of your favorite Tech Stack
               </h2>
               <p className="text-muted-foreground">
-                Designed using modern and most popular tech stacks among
-                developers.
+                Designed using modern and most popular tech stacks among developers.
               </p>
             </div>
             <div className="mt-auto grid grid-cols-[auto_1fr] gap-3">
@@ -98,9 +97,7 @@ const Integration = ({
       <div className="flex size-fit items-center justify-center">{icon}</div>
       <div className="space-y-1">
         <h3 className="text-sm font-medium">{name}</h3>
-        <p className="text-muted-foreground line-clamp-1 text-sm md:line-clamp-2">
-          {description}
-        </p>
+        <p className="text-muted-foreground line-clamp-1 text-sm md:line-clamp-2">{description}</p>
       </div>
     </div>
   );

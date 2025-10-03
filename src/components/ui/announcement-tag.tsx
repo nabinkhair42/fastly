@@ -22,10 +22,7 @@ export const Announcement = ({
   />
 );
 export type AnnouncementTagProps = HTMLAttributes<HTMLDivElement>;
-export const AnnouncementTag = ({
-  className,
-  ...props
-}: AnnouncementTagProps) => (
+export const AnnouncementTag = ({ className, ...props }: AnnouncementTagProps) => (
   <div
     className={cn(
       '-ml-2.5 shrink-0 truncate rounded-full bg-foreground/5 px-2.5 py-1 text-xs',
@@ -36,12 +33,6 @@ export const AnnouncementTag = ({
   />
 );
 export type AnnouncementTitleProps = HTMLAttributes<HTMLDivElement>;
-export const AnnouncementTitle = ({
-  className,
-  ...props
-}: AnnouncementTitleProps) => (
-  <div
-    className={cn('flex items-center gap-1 truncate py-1', className)}
-    {...props}
-  />
+export const AnnouncementTitle = ({ className, ...props }: AnnouncementTitleProps) => (
+  <div className={cn('flex items-center gap-1 truncate py-1', className)} {...props} />
 );

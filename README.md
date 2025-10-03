@@ -20,14 +20,47 @@ Fastly is a comprehensive SaaS foundation built with Next.js, TypeScript, and mo
 - Release communication pipeline featuring a tracing-beam changelog, release badges, and a JSON-driven data source for new announcements.
 - File upload workflow powered by UploadThing alongside client-side image cropping utilities.
 
-## Architecture
+## Project Structure
 
-- **Application shell** – App Router structure under `src/app` with dedicated segments for marketing, authentication, and protected routes.
-- **Component system** – shadcn/ui primitives styled with Tailwind CSS, supplemented by custom marketing and dashboard widgets.
-- **State and data** – TanStack Query drives server interactions, with Axios clients and domain services in `src/services`.
-- **Persistence** – MongoDB models in `src/models` handle users and sessions, aided by JWT helpers in `src/helpers`.
-- **Validation and security** – Zod schemas encapsulate request validation, while middleware enforces authentication boundaries.
-- **Email delivery** – React Email templates and Nodemailer configuration in `mail-templates` support transactional messaging.
+This is a monorepo managed with pnpm workspaces:
+
+- **Root (`/`)**: Marketing website with landing pages, docs, changelog, etc.
+- **`main-app/`**: Starter kit SaaS application with authentication, dashboard, etc.
+
+## Getting Started
+
+1. Install dependencies:
+
+   ```bash
+   pnpm install
+   ```
+
+2. Run the marketing site (port 4000):
+
+   ```bash
+   pnpm dev:marketing
+   ```
+
+3. Run the starter kit app (port 3000):
+
+   ```bash
+   pnpm dev:app
+   ```
+
+4. Run both simultaneously:
+   ```bash
+   pnpm dev:all
+   ```
+
+## Available Scripts
+
+- `pnpm dev:marketing` - Start marketing site in development
+- `pnpm dev:app` - Start starter kit app in development
+- `pnpm dev:all` - Start both apps concurrently
+- `pnpm build:marketing` - Build marketing site for production
+- `pnpm build:app` - Build starter kit app for production
+- `pnpm lint:all` - Lint all workspaces
+- `pnpm format:all` - Format code in all workspaces
 
 ## Technology Stack
 
@@ -40,7 +73,7 @@ Fastly is a comprehensive SaaS foundation built with Next.js, TypeScript, and mo
 
 ## Reference Links
 
-- Website: [`Live App`](https://starter.nabinkhair.com.np)
+- Website: [`Live App`](https://fastly.nabinkhair.com.np)
 - Repository: [`GitHub`](https://github.com/nabinkhair42/fastly)
 - Maintainer: [Nabin Khair](https://nabinkhair.com.np)
 

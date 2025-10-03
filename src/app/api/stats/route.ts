@@ -1,4 +1,3 @@
-// api to get stats data
 import dbConnect from '@/lib/dbConnect';
 import AppStats from '@/models/app-stats';
 import { NextResponse } from 'next/server';
@@ -20,11 +19,7 @@ export const GET = async () => {
 
     const stats: StatsResponse = {
       totalDownloads: latestStats?.totalDownloads ?? 0,
-      lastUpdated: (
-        latestStats?.lastUpdated ??
-        latestStats?.updatedAt ??
-        new Date()
-      ).toISOString(),
+      lastUpdated: (latestStats?.lastUpdated ?? latestStats?.updatedAt ?? new Date()).toISOString(),
     };
 
     return NextResponse.json({ data: stats });

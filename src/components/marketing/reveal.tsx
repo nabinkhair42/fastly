@@ -10,12 +10,7 @@ type RevealProps = PropsWithChildren<{
   duration?: number;
 }>;
 
-export default function Reveal({
-  children,
-  delay = 0.05,
-  y = 16,
-  className,
-}: RevealProps) {
+export default function Reveal({ children, delay = 0.05, y = 16, className }: RevealProps) {
   const prefersReducedMotion = useReducedMotion();
   return (
     <motion.div

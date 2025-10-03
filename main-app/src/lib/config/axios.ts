@@ -1,0 +1,149 @@
+import axios, { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
+
+// Create axios instance
+const api = axios.create({
+  baseURL: '/api',
+  timeout: 10000,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// Token management utilities
+export const tokenManager = {
+  getAccessToken: () => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('accessToken');
+    }
+    return null;
+  },
+
+  getRefreshToken: () => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('refreshToken');
+    }
+    return null;
+  },
+
+  getSessionId: () => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('sessionId');
+    }
+    return null;
+  },
+
+  setTokens: (accessToken: string, refreshToken: string, sessionId?: string) => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('accessToken', accessToken);
+      localStorage.setItem('refreshToken', refreshToken);
+      if (sessionId) {
+        localStorage.setItem('sessionId', sessionId);
+      }
+    }
+  },
+
+  clearTokens: () => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('user');
+      localStorage.removeItem('sessionId');
+    }
+  },
+};
+
+// Request interceptor to add auth token
+api.interceptors.request.use(
+  (config: InternalAxiosRequestConfig) => {
+    const token = tokenManager.getAccessToken();
+    if (token && config.headers) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    const sessionId = tokenManager.getSessionId();
+    if (sessionId && config.headers) {
+      config.headers['X-Session-Id'] = sessionId;
+    }
+    return config;
+  },
+  (error: AxiosError) => Promise.reject(error)
+);
+
+// Response interceptor to handle token refresh
+api.interceptors.response.use(
+  (response: AxiosResponse) => response,
+  async (error: AxiosError) => {
+    const originalRequest = error.config as InternalAxiosRequestConfig & {
+      _retry?: boolean;
+    };
+
+    const responseStatus = error.response?.status;
+    const serverMessage = (error.response?.data as { message?: string } | undefined)?.message;
+
+    if (responseStatus === 401) {
+      const normalizedMessage = serverMessage?.toLowerCase() ?? '';
+      if (
+        normalizedMessage.includes('session revoked') ||
+        normalizedMessage.includes('session context missing')
+      ) {
+        tokenManager.clearTokens();
+        window.location.href = '/log-in';
+        return Promise.reject(error);
+      }
+    }
+
+    // Skip 401 handling for authentication endpoints
+    const isAuthEndpoint =
+      originalRequest.url?.includes('/log-in') ||
+      originalRequest.url?.includes('/create-account') ||
+      originalRequest.url?.includes('/email-verification') ||
+      originalRequest.url?.includes('/forgot-password') ||
+      originalRequest.url?.includes('/reset-password');
+
+    if (responseStatus === 401 && !originalRequest._retry && !isAuthEndpoint) {
+      originalRequest._retry = true;
+
+      const refreshToken = tokenManager.getRefreshToken();
+      if (refreshToken) {
+        try {
+          const sessionId = tokenManager.getSessionId();
+          const response = await axios.post(
+            '/api/auth/refresh-token',
+            {
+              refreshToken,
+            },
+            {
+              headers: sessionId
+                ? {
+                    'X-Session-Id': sessionId,
+                  }
+                : undefined,
+            }
+          );
+
+          const { accessToken, refreshToken: newRefreshToken } = response.data.data;
+          const existingSessionId = tokenManager.getSessionId();
+          tokenManager.setTokens(accessToken, newRefreshToken, existingSessionId ?? undefined);
+
+          // Retry original request with new token
+          if (originalRequest.headers) {
+            originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+          }
+          return api(originalRequest);
+        } catch (refreshError) {
+          // Refresh failed, redirect to login
+          tokenManager.clearTokens();
+          window.location.href = '/log-in';
+          return Promise.reject(refreshError);
+        }
+      } else {
+        // No refresh token, redirect to login
+        tokenManager.clearTokens();
+        window.location.href = '/log-in';
+      }
+    }
+
+    return Promise.reject(error);
+  }
+);
+
+export default api;

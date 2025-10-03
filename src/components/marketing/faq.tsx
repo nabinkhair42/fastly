@@ -37,14 +37,12 @@ const faqs = [
 export default function FAQ() {
   return (
     <section aria-labelledby="faq-heading" className="py-16 sm:py-24">
-      <div className="mx-auto max-w-5xl px-4 lg:px-0">
+      <div className="mx-auto max-w-5xl px-4 xl:px-0">
         <div className="text-center">
           <h2 className="text-balance text-4xl font-semibold lg:text-5xl">
             Frequently Asked Questions
           </h2>
-          <p className="mt-4">
-            Here are some common questions about the product.
-          </p>
+          <p className="mt-4">Here are some common questions about the product.</p>
         </div>
         <Accordion
           type="single"

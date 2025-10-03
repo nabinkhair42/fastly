@@ -27,9 +27,7 @@ export function generatePageMetadata({
     title: metaTitle,
     description: metaDescription,
     keywords: metaKeywords,
-    robots: noIndex
-      ? { index: false, follow: false }
-      : { index: true, follow: true },
+    robots: noIndex ? { index: false, follow: false } : { index: true, follow: true },
     alternates: canonical ? { canonical } : undefined,
     openGraph: {
       title: metaTitle,
@@ -112,9 +110,7 @@ export function generateWebApplicationStructuredData() {
   };
 }
 
-export function generateBreadcrumbStructuredData(
-  items: Array<{ name: string; url: string }>
-) {
+export function generateBreadcrumbStructuredData(items: Array<{ name: string; url: string }>) {
   return {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',

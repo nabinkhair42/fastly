@@ -1,5 +1,8 @@
+packages:
+  - main-app
+
 onlyBuiltDependencies:
-  - '@tailwindcss/oxide'
+  - "@tailwindcss/oxide"
   - bcrypt
   - msgpackr-extract
   - sharp

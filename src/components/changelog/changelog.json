@@ -1,5 +1,39 @@
 [
   {
+    "version": "v1.2.0",
+    "date": "October 3, 2025",
+    "title": "Monorepo Architecture and Developer Tooling Overhaul",
+    "description": "Transformed the project into a production-ready monorepo with modern tooling, streamlined development workflows, and comprehensive code quality automation.",
+    "type": "version",
+    "changes": [
+      {
+        "type": "new",
+        "description": "Established pnpm workspaces monorepo structure separating marketing site and SaaS starter kit applications."
+      },
+      {
+        "type": "improved",
+        "description": "Migrated from deprecated next lint to modern ESLint CLI with comprehensive configuration and build directory exclusions."
+      },
+      {
+        "type": "improved",
+        "description": "Enhanced Prettier configuration with file-type specific formatting rules and better integration with ESLint."
+      },
+      {
+        "type": "new",
+        "description": "Implemented cross-workspace scripts for linting, formatting, and development workflows (dev:all, lint:all, format:all)."
+      },
+      {
+        "type": "fixed",
+        "description": "Resolved 26,000+ linting issues by properly excluding build artifacts and generated files from ESLint scanning."
+      },
+      {
+        "type": "improved",
+        "description": "Streamlined development experience with concurrent dev servers and unified workspace management."
+      }
+    ]
+  },
+
+  {
     "version": "v1.1.0",
     "date": "September 30, 2025",
     "title": "UI/UX Enhancements and Profile Features",

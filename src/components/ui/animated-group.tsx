@@ -40,10 +40,7 @@ const defaultItemVariants: Variants = {
   visible: { opacity: 1 },
 };
 
-const presetVariants: Record<
-  PresetType,
-  { container: Variants; item: Variants }
-> = {
+const presetVariants: Record<PresetType, { container: Variants; item: Variants }> = {
   fade: {
     container: defaultContainerVariants,
     item: {
@@ -136,12 +133,7 @@ const presetVariants: Record<
   },
 };
 
-function AnimatedGroup({
-  children,
-  className,
-  variants,
-  preset,
-}: AnimatedGroupProps) {
+function AnimatedGroup({ children, className, variants, preset }: AnimatedGroupProps) {
   const selectedVariants = preset
     ? presetVariants[preset]
     : { container: defaultContainerVariants, item: defaultItemVariants };
