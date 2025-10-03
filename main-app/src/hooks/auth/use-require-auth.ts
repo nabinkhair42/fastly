@@ -1,6 +1,6 @@
 'use client';
 
-import { useSession } from '@/hooks/auth/useSession';
+import { useSession } from '@/hooks/auth/use-session';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 

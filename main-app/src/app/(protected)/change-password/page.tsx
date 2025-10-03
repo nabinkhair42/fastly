@@ -2,7 +2,7 @@
 
 import DashboardSkeleton from '@/app/(protected)/components/dashboard-skeleton';
 import ChangePasswordForm from '@/app/(protected)/components/forms/change-password-form';
-import { useUserDetails } from '@/hooks/users/useUserMutations';
+import { useUserDetails } from '@/hooks/users/use-user-mutations';
 import { AuthMethod } from '@/types/user';
 
 const METHOD_LABELS: Record<AuthMethod, string> = {

@@ -1,6 +1,7 @@
-import { verifyPassword } from '@/helpers/hashPassword';
-import { sendResponse } from '@/lib/apis/sendResponse';
-import { requireAuth } from '@/lib/auth/authMiddleware';
+import { verifyPassword } from '@/helpers/hash-password';
+import { sendResponse } from '@/lib/apis/send-response';
+import { requireAuth } from '@/lib/auth/auth-middleware';
+import { UserSessionModel } from '@/models/user-sessions';
 import { UserAuthModel, UserModel } from '@/models/users';
 import { deleteUserSchema } from '@/zod/usersUpdate';
 import { NextRequest } from 'next/server';
@@ -47,10 +48,13 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Delete user profile (if exists)
-    await UserModel.deleteOne({ authUser: userAuth._id });
+    await UserModel.deleteOne({ userAuth: userAuth._id });
 
     // Delete user authentication record
     await UserAuthModel.findByIdAndDelete(userAuth._id);
+
+    // Delete User Sessions (if exists)
+    await UserSessionModel.deleteMany({ userAuth: userAuth._id });
 
     return sendResponse('User account deleted successfully', 200);
   } catch (error: unknown) {

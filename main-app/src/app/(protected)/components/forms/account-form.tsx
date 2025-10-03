@@ -29,8 +29,8 @@ import { ActiveSessions } from '@/app/(protected)/components/active-sessions';
 import DashboardSkeleton from '@/app/(protected)/components/dashboard-skeleton';
 import { DeleteUser } from '@/app/(protected)/components/delete-user';
 import { Separator } from '@/components/ui/separator';
-import { useUpdateUserDetails, useUserDetails } from '@/hooks/users/useUserMutations';
-import { useFont } from '@/providers/RootProvider';
+import { useUpdateUserDetails, useUserDetails } from '@/hooks/users/use-user-mutations';
+import { useFont } from '@/providers/root-provider';
 import { accountPreferencesSchema } from '@/zod/usersUpdate';
 
 type AccountFormValues = z.infer<typeof accountPreferencesSchema>;

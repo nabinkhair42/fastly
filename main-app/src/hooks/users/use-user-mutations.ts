@@ -1,7 +1,7 @@
 'use client';
 
-import { useAuth } from '@/providers/AuthProvider';
-import { userService } from '@/services/userService';
+import { useAuth } from '@/providers/auth-provider';
+import { userService } from '@/services/user-service';
 import {
   ChangePasswordRequest,
   ChangeUsernameRequest,

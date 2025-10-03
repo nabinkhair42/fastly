@@ -10,7 +10,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { useAuthMethod } from '@/hooks/users/useUserMutations';
+import { useAuthMethod } from '@/hooks/users/use-user-mutations';
 import { usePathname, useRouter } from 'next/navigation';
 import { GiCube } from 'react-icons/gi';
 

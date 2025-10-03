@@ -1,6 +1,6 @@
 'use client';
 
-import { OAuthButtons } from '@/app/(auth)/components/auth-buttons';
+import { OAuthButtons } from '@/app/(auth)/components/oauth-buttons';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -21,11 +21,11 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
-import { useLogin } from '@/hooks/auth/useAuthMutations';
-import { useLastUsedProvider } from '@/hooks/auth/useLastUsedProvider';
-import { useSafeRedirect } from '@/hooks/auth/useSafeRedirect';
-import { useSession } from '@/hooks/auth/useSession';
-import { handleOAuthError } from '@/lib/auth/oauthErrorHandler';
+import { useLogin } from '@/hooks/auth/use-auth-mutations';
+import { useLastUsedProvider } from '@/hooks/auth/use-last-used-provider';
+import { useSafeRedirect } from '@/hooks/auth/use-safe-redirect';
+import { useSession } from '@/hooks/auth/use-session';
+import { handleOAuthError } from '@/lib/auth/oauth-error-handler';
 import { AuthMethod } from '@/types/user';
 import { loginSchema } from '@/zod/authValidation';
 import { zodResolver } from '@hookform/resolvers/zod';

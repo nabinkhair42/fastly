@@ -1,7 +1,7 @@
 import { AuthMethod, type User, type UserAuth } from '@/types/user';
 import mongoose from 'mongoose';
 
-const authUserSchema = new mongoose.Schema({
+const userAuthSchema = new mongoose.Schema({
   firstName: { type: String, default: null },
   lastName: { type: String, default: null },
   email: { type: String, required: true, unique: true },
@@ -17,10 +17,10 @@ const authUserSchema = new mongoose.Schema({
 });
 
 export const UserAuthModel =
-  mongoose.models.UserAuth || mongoose.model<UserAuth>('UserAuth', authUserSchema);
+  mongoose.models.UserAuth || mongoose.model<UserAuth>('UserAuth', userAuthSchema);
 
 const userSchema = new mongoose.Schema({
-  authUser: {
+  userAuth: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'UserAuth',
     required: true,

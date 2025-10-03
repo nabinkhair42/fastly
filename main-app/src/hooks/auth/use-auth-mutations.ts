@@ -1,8 +1,8 @@
 'use client';
 
-import { setLastUsedProviderCookie } from '@/hooks/auth/useLastUsedProvider';
-import { useAuth } from '@/providers/AuthProvider';
-import { authService } from '@/services/authService';
+import { setLastUsedProviderCookie } from '@/hooks/auth/use-last-used-provider';
+import { useAuth } from '@/providers/auth-provider';
+import { authService } from '@/services/auth-service';
 import {
   CreateAccountRequest,
   EmailVerificationRequest,

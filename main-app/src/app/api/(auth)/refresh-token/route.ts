@@ -1,7 +1,7 @@
-import { generateTokenPair, verifyRefreshToken } from '@/helpers/jwtToken';
-import { sendResponse } from '@/lib/apis/sendResponse';
-import { touchSession } from '@/lib/auth/sessionTracker';
-import dbConnect from '@/lib/config/dbConnect';
+import { generateTokenPair, verifyRefreshToken } from '@/helpers/jwt-token';
+import { sendResponse } from '@/lib/apis/send-response';
+import { touchSession } from '@/lib/auth/session-tracker';
+import dbConnect from '@/lib/config/db-connect';
 import { UserAuthModel } from '@/models/users';
 import { refreshTokenSchema } from '@/zod/authValidation';
 import { NextRequest } from 'next/server';

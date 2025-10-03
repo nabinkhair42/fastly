@@ -17,7 +17,7 @@ import {
   FormItem,
   FormMessage,
 } from '@/components/ui/form';
-import { useResendVerification, useVerifyEmail } from '@/hooks/auth/useAuthMutations';
+import { useResendVerification, useVerifyEmail } from '@/hooks/auth/use-auth-mutations';
 import { verifyEmailSchema } from '@/zod/authValidation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ChevronLeft, Mail, RotateCcw } from 'lucide-react';

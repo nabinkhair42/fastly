@@ -11,8 +11,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { ImageCrop, ImageCropContent, useImageCrop } from '@/components/ui/image-crop';
-import { useAvatarUpload } from '@/hooks/users/useAvatarUpload';
-import { useUserDetails } from '@/hooks/users/useUserMutations';
+import { useAvatarUpload } from '@/hooks/users/use-avatar-upload';
+import { useUserDetails } from '@/hooks/users/use-user-mutations';
 import { Edit, ImagePlay, Trash2, Upload, X } from 'lucide-react';
 import { useRef, useState } from 'react';
 

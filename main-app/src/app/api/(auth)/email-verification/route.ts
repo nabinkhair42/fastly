@@ -1,8 +1,8 @@
-import { generateTokenPair } from '@/helpers/jwtToken';
-import { sendResponse } from '@/lib/apis/sendResponse';
-import { createUserSession } from '@/lib/auth/sessionTracker';
-import dbConnect from '@/lib/config/dbConnect';
-import { sendWelcomeEmail } from '@/mail-templates/emailService';
+import { generateTokenPair } from '@/helpers/jwt-token';
+import { sendResponse } from '@/lib/apis/send-response';
+import { createUserSession } from '@/lib/auth/session-tracker';
+import dbConnect from '@/lib/config/db-connect';
+import { sendWelcomeEmail } from '@/mail-templates/email-service';
 import { UserAuthModel, UserModel } from '@/models/users';
 import { verifyEmailSchema } from '@/zod/authValidation';
 import { NextRequest } from 'next/server';
@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
 
     // create user with data from userAuth
     await UserModel.create({
-      authUser: userAuth._id,
+      userAuth: userAuth._id,
       firstName: userAuth.firstName,
       lastName: userAuth.lastName,
       email: userAuth.email,

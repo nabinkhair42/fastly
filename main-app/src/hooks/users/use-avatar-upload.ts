@@ -1,6 +1,6 @@
-import { useUserDetails } from '@/hooks/users/useUserMutations';
-import { useUploadThing } from '@/lib/apis/uploadthing/uploadThing';
-import { userService } from '@/services/userService';
+import { useUserDetails } from '@/hooks/users/use-user-mutations';
+import { useUploadThing } from '@/lib/apis/uploadthing/upload-thing';
+import { userService } from '@/services/user-service';
 import { useCallback } from 'react';
 import toast from 'react-hot-toast';
 

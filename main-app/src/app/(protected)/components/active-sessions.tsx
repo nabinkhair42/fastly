@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { CardContent } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useRevokeSession, useUserSessions } from '@/hooks/users/useUserMutations';
+import { useRevokeSession, useUserSessions } from '@/hooks/users/use-user-mutations';
 import { cn } from '@/lib/utils';
 import { AuthMethod, UserSession } from '@/types/user';
 import { formatDistanceToNow } from 'date-fns';

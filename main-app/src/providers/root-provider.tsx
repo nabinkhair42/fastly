@@ -1,12 +1,12 @@
 'use client';
 
-import { ThemeProvider } from '@/components/theme-provider';
-import { useUserDetails } from '@/hooks/users/useUserMutations';
+import { ThemeProvider } from '@/providers/theme-provider';
+import { useUserDetails } from '@/hooks/users/use-user-mutations';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useTheme } from 'next-themes';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { Toaster } from 'react-hot-toast';
-import AuthProvider, { useAuth } from './AuthProvider';
+import AuthProvider, { useAuth } from './auth-provider';
 
 // Simple font context
 type FontContextType = {

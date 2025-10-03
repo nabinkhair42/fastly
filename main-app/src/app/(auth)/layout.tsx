@@ -3,8 +3,8 @@
 import { Suspense } from 'react';
 
 import ScreenLoader from '@/components/screen-loader';
-import { useRedirectIfAuthenticated } from '@/hooks/auth/useRequireAuth';
-import { useSafeRedirect } from '@/hooks/auth/useSafeRedirect';
+import { useRedirectIfAuthenticated } from '@/hooks/auth/use-require-auth';
+import { useSafeRedirect } from '@/hooks/auth/use-safe-redirect';
 import { usePathname } from 'next/navigation';
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {

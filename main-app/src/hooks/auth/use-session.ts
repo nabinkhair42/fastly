@@ -1,6 +1,6 @@
 'use client';
 
-import { useAuth } from '@/providers/AuthProvider';
+import { useAuth } from '@/providers/auth-provider';
 import { AuthenticatedUser } from '@/types/user';
 
 /**

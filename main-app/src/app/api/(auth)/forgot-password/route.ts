@@ -1,7 +1,7 @@
-import { generateOtp, generateOtpExpiration } from '@/helpers/generateOtp';
-import { sendResponse } from '@/lib/apis/sendResponse';
-import dbConnect from '@/lib/config/dbConnect';
-import { sendForgotPasswordEmail } from '@/mail-templates/emailService';
+import { generateOtp, generateOtpExpiration } from '@/helpers/generate-otp';
+import { sendResponse } from '@/lib/apis/send-response';
+import dbConnect from '@/lib/config/db-connect';
+import { sendForgotPasswordEmail } from '@/mail-templates/email-service';
 import { UserAuthModel } from '@/models/users';
 import { AuthMethod } from '@/types/user';
 import { forgotPasswordSchema } from '@/zod/authValidation';

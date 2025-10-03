@@ -24,7 +24,7 @@ import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Textarea } from '@/components/ui/textarea';
-import { useProfileForm } from '@/hooks/users/useProfileForm';
+import { useProfileForm } from '@/hooks/users/use-profile-form';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import {

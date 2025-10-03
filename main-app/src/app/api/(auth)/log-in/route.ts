@@ -1,8 +1,8 @@
-import { verifyPassword } from '@/helpers/hashPassword';
-import { generateTokenPair } from '@/helpers/jwtToken';
-import { sendResponse } from '@/lib/apis/sendResponse';
-import { createUserSession } from '@/lib/auth/sessionTracker';
-import dbConnect from '@/lib/config/dbConnect';
+import { verifyPassword } from '@/helpers/hash-password';
+import { generateTokenPair } from '@/helpers/jwt-token';
+import { sendResponse } from '@/lib/apis/send-response';
+import { createUserSession } from '@/lib/auth/session-tracker';
+import dbConnect from '@/lib/config/db-connect';
 import { UserAuthModel } from '@/models/users';
 import { loginSchema } from '@/zod/authValidation';
 import { NextRequest } from 'next/server';

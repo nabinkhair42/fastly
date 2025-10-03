@@ -3,13 +3,13 @@ import { useEffect, useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import { useDebounce } from '@/hooks/ui/useDebounce';
+import { useDebounce } from '@/hooks/ui/use-debounce';
 import {
   useChangeUsername,
   useUpdateUserDetails,
   useUserDetails,
-} from '@/hooks/users/useUserMutations';
-import { userService } from '@/services/userService';
+} from '@/hooks/users/use-user-mutations';
+import { userService } from '@/services/user-service';
 import { UpdateUserDetailsRequest } from '@/types/api';
 import { profileFormInputSchema } from '@/zod/usersUpdate';
 import toast from 'react-hot-toast';

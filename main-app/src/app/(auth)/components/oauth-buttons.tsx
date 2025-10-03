@@ -1,11 +1,11 @@
 'use client';
 
 import { Badge } from '@/components/ui/badge';
-import { useLastUsedProvider } from '@/hooks/auth/useLastUsedProvider';
-import { useSafeRedirect } from '@/hooks/auth/useSafeRedirect';
+import { useLastUsedProvider } from '@/hooks/auth/use-last-used-provider';
+import { useSafeRedirect } from '@/hooks/auth/use-safe-redirect';
 
 import { Button } from '@/components/ui/button';
-import { GithubOAuthClickFunction, GoogleOAuthClickFunction } from '@/lib/apis/oAuth';
+import { GithubOAuthClickFunction, GoogleOAuthClickFunction } from '@/lib/apis/oauth';
 import { AuthMethod } from '@/types/user';
 import { useState } from 'react';
 import { FaGithub, FaGoogle } from 'react-icons/fa6';

@@ -3,7 +3,7 @@
 import { Announcement, AnnouncementTag, AnnouncementTitle } from '@/components/ui/announcement-tag';
 import { Button } from '@/components/ui/button';
 import { ContainerTextFlip } from '@/components/ui/text-flip';
-import { useDownload, useFetchStats } from '@/hooks/download';
+import { useDownload, useFetchStats } from '@/hooks/use-download';
 import { ArrowUpRightIcon, Download } from 'lucide-react';
 import Image from 'next/image';
 import Reveal, { RevealY } from './reveal';

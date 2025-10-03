@@ -1,8 +1,8 @@
-import { generateTokenPair } from '@/helpers/jwtToken';
-import { githubOAuth } from '@/lib/apis/oAuth';
-import { createUserSession } from '@/lib/auth/sessionTracker';
-import dbConnect from '@/lib/config/dbConnect';
-import { sendWelcomeEmail } from '@/mail-templates/emailService';
+import { generateTokenPair } from '@/helpers/jwt-token';
+import { githubOAuth } from '@/lib/apis/oauth';
+import { createUserSession } from '@/lib/auth/session-tracker';
+import dbConnect from '@/lib/config/db-connect';
+import { sendWelcomeEmail } from '@/mail-templates/email-service';
 import { UserAuthModel, UserModel } from '@/models/users';
 import { AuthMethod } from '@/types/user';
 import { NextRequest, NextResponse } from 'next/server';
@@ -150,7 +150,7 @@ export async function GET(request: NextRequest) {
 
       // Create user profile
       await UserModel.create({
-        authUser: userAuth._id,
+        userAuth: userAuth._id,
         firstName: firstName || '',
         lastName: lastName || '',
         email: primaryEmail,
@@ -160,7 +160,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get user profile data
-    const userProfile = await UserModel.findOne({ authUser: userAuth._id });
+    const userProfile = await UserModel.findOne({ userAuth: userAuth._id });
 
     // Generate JWT tokens
     const tokens = generateTokenPair(userAuth._id.toString(), userAuth.email);

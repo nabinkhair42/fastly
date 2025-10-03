@@ -1,8 +1,8 @@
-import { sendResponse } from '@/lib/apis/sendResponse';
-import { requireAuth } from '@/lib/auth/authMiddleware';
-import { markSessionRevoked } from '@/lib/auth/sessionTracker';
-import dbConnect from '@/lib/config/dbConnect';
-import { UserSessionModel } from '@/models/userSessions';
+import { sendResponse } from '@/lib/apis/send-response';
+import { requireAuth } from '@/lib/auth/auth-middleware';
+import { markSessionRevoked } from '@/lib/auth/session-tracker';
+import dbConnect from '@/lib/config/db-connect';
+import { UserSessionModel } from '@/models/user-sessions';
 import { NextRequest } from 'next/server';
 import { z } from 'zod';
 

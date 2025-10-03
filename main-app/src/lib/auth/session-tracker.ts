@@ -1,4 +1,4 @@
-import { UserSessionModel } from '@/models/userSessions';
+import { UserSessionModel } from '@/models/user-sessions';
 import { AuthMethod } from '@/types/user';
 import { NextRequest } from 'next/server';
 import crypto from 'node:crypto';
