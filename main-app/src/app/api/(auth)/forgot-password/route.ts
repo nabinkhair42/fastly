@@ -1,4 +1,4 @@
-import { generateOtp, generateOtpExpiration } from '@/helpers/generateOtp';
+import { generateOtp, generateOtpExpiration } from '@/helpers/generate-otp';
 import { sendResponse } from '@/lib/apis/send-response';
 import dbConnect from '@/lib/config/db-connect';
 import { sendForgotPasswordEmail } from '@/mail-templates/email-service';

@@ -1,4 +1,4 @@
-import { generateTokenPair, verifyRefreshToken } from '@/helpers/jwtToken';
+import { generateTokenPair, verifyRefreshToken } from '@/helpers/jwt-token';
 import { sendResponse } from '@/lib/apis/send-response';
 import { touchSession } from '@/lib/auth/session-tracker';
 import dbConnect from '@/lib/config/db-connect';

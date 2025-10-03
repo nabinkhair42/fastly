@@ -1,5 +1,5 @@
-import { generateOtp } from '@/helpers/generateOtp';
-import { hashPassword } from '@/helpers/hashPassword';
+import { generateOtp } from '@/helpers/generate-otp';
+import { hashPassword } from '@/helpers/hash-password';
 import { sendResponse } from '@/lib/apis/send-response';
 import dbConnect from '@/lib/config/db-connect';
 import { sendVerificationEmail } from '@/mail-templates/email-service';

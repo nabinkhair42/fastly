@@ -1,4 +1,4 @@
-import { hashPassword } from '@/helpers/hashPassword';
+import { hashPassword } from '@/helpers/hash-password';
 import { sendResponse } from '@/lib/apis/send-response';
 import dbConnect from '@/lib/config/db-connect';
 import { UserAuthModel } from '@/models/users';

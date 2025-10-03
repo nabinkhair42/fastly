@@ -1,4 +1,4 @@
-import { hashPassword, verifyPassword } from '@/helpers/hashPassword';
+import { hashPassword, verifyPassword } from '@/helpers/hash-password';
 import { sendResponse } from '@/lib/apis/send-response';
 import { requireAuth } from '@/lib/auth/auth-middleware';
 import dbConnect from '@/lib/config/db-connect';

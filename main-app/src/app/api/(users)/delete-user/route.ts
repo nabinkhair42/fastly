@@ -1,4 +1,4 @@
-import { verifyPassword } from '@/helpers/hashPassword';
+import { verifyPassword } from '@/helpers/hash-password';
 import { sendResponse } from '@/lib/apis/send-response';
 import { requireAuth } from '@/lib/auth/auth-middleware';
 import { UserSessionModel } from '@/models/user-sessions';

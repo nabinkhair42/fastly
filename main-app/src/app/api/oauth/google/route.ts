@@ -1,4 +1,4 @@
-import { generateTokenPair } from '@/helpers/jwtToken';
+import { generateTokenPair } from '@/helpers/jwt-token';
 import { googleOAuth } from '@/lib/apis/oauth';
 import { createUserSession } from '@/lib/auth/session-tracker';
 import dbConnect from '@/lib/config/db-connect';

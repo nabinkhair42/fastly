@@ -1,5 +1,5 @@
-import { verifyPassword } from '@/helpers/hashPassword';
-import { generateTokenPair } from '@/helpers/jwtToken';
+import { verifyPassword } from '@/helpers/hash-password';
+import { generateTokenPair } from '@/helpers/jwt-token';
 import { sendResponse } from '@/lib/apis/send-response';
 import { createUserSession } from '@/lib/auth/session-tracker';
 import dbConnect from '@/lib/config/db-connect';
