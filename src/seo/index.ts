@@ -1,8 +1,7 @@
 // Replace the content of this file with your site's metadata
 export const siteConfig = {
   name: 'Fastly',
-  description:
-    'A starter template for SaaS applications built with Next.js and Tailwind CSS.',
+  description: 'A starter template for SaaS applications built with Next.js and Tailwind CSS.',
   url: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
   image: '/og-image.webp',
   logo: '/icon.png',
@@ -30,8 +29,7 @@ export const siteConfig = {
     site: '@khairnabin',
     creator: '@khairnabin',
     image: '/og-image.webp',
-    description:
-      'A starter template for SaaS applications built with Next.js and Tailwind CSS.',
+    description: 'A starter template for SaaS applications built with Next.js and Tailwind CSS.',
   },
 };
 

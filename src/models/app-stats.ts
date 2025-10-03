@@ -10,7 +10,6 @@ const AppStatsSchema = new mongoose.Schema(
   }
 );
 
-const AppStats =
-  mongoose.models.AppStats || mongoose.model('AppStats', AppStatsSchema);
+const AppStats = mongoose.models.AppStats || mongoose.model('AppStats', AppStatsSchema);
 
 export default AppStats;

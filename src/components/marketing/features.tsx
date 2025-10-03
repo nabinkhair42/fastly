@@ -1,10 +1,5 @@
 import { ReactNode } from 'react';
-import {
-  FaCloudUploadAlt,
-  FaCodeBranch,
-  FaUserCircle,
-  FaUserShield,
-} from 'react-icons/fa';
+import { FaCloudUploadAlt, FaCodeBranch, FaUserCircle, FaUserShield } from 'react-icons/fa';
 import { SiJsonwebtokens, SiTypescript } from 'react-icons/si';
 
 type feature = {
@@ -28,14 +23,12 @@ const features: feature[] = [
   },
   {
     title: 'Seamless Uploads',
-    description:
-      'Client-side image cropping with server cleanup for hassle-free avatar uploads.',
+    description: 'Client-side image cropping with server cleanup for hassle-free avatar uploads.',
     Icon: FaCloudUploadAlt,
   },
   {
     title: 'Robust APIs',
-    description:
-      'Zod-validated endpoints and consistent response helpers built for production.',
+    description: 'Zod-validated endpoints and consistent response helpers built for production.',
     Icon: FaCodeBranch,
   },
   {
@@ -45,8 +38,7 @@ const features: feature[] = [
   },
   {
     title: 'JWT Security',
-    description:
-      'Access and refresh tokens with automatic rotation and protected routes.',
+    description: 'Access and refresh tokens with automatic rotation and protected routes.',
     Icon: SiJsonwebtokens,
   },
 ];
@@ -56,12 +48,9 @@ export default function FeatureGrid() {
     <section className="py-16 md:py-32">
       <div className="mx-auto max-w-5xl px-4 lg:px-0 space-y-8 md:space-y-16">
         <div className="text-center">
-          <h2 className="text-balance text-4xl font-semibold lg:text-5xl">
-            Existing Features
-          </h2>
+          <h2 className="text-balance text-4xl font-semibold lg:text-5xl">Existing Features</h2>
           <p className="mt-4">
-            All of the essential features you need to build your SaaS product
-            faster.
+            All of the essential features you need to build your SaaS product faster.
           </p>
         </div>
         <div className="relative mx-auto grid divide-x divide-y border *:p-12 sm:grid-cols-2 lg:grid-cols-3">
@@ -76,9 +65,7 @@ export default function FeatureGrid() {
               </div>
 
               <div>
-                <p className="text-sm text-center text-muted-foreground">
-                  {feature.description}
-                </p>
+                <p className="text-sm text-center text-muted-foreground">{feature.description}</p>
               </div>
             </div>
           ))}

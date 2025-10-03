@@ -1,4 +1,3 @@
-// app/api/download/route.ts
 import dbConnect from '@/lib/dbConnect';
 import AppStats from '@/models/app-stats';
 import { NextResponse } from 'next/server';
