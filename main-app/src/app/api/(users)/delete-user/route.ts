@@ -53,7 +53,7 @@ export async function DELETE(request: NextRequest) {
     // Delete user authentication record
     await UserAuthModel.findByIdAndDelete(userAuth._id);
 
-    // Delete User Sessions(if exists)
+    // Delete User Sessions (if exists)
     await UserSessionModel.deleteMany({ userAuth: userAuth._id });
 
     return sendResponse('User account deleted successfully', 200);
