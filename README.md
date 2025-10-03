@@ -40,7 +40,7 @@ Fastly is a comprehensive SaaS foundation built with Next.js, TypeScript, and mo
 
 ## Reference Links
 
-- Website: [`Live App`](https://starter.nabinkhair.com.np)
+- Website: [`Live App`](https://fastly.nabinkhair.com.np)
 - Repository: [`GitHub`](https://github.com/nabinkhair42/fastly)
 - Maintainer: [Nabin Khair](https://nabinkhair.com.np)
 
