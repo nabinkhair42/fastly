@@ -15,9 +15,9 @@ node-linker=hoisted
 EOL
 fi
 
-# Install dependencies using pnpm
+# Install dependencies using pnpm (skip workspace features)
 echo "Installing dependencies..."
-pnpm install
+pnpm install --ignore-workspace
 
 # Build the Next.js application
 echo "Building application..."
