@@ -1,6 +1,6 @@
 'use client';
 
-import { OAuthButtons } from '@/app/(auth)/components/auth-buttons';
+import { OAuthButtons } from '@/app/(auth)/components/oauth-buttons';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
