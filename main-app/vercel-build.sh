@@ -12,6 +12,7 @@ if [ ! -f .npmrc ]; then
 shamefully-hoist=true
 strict-peer-dependencies=false
 node-linker=hoisted
+public-hoist-pattern[]=*
 EOL
 fi
 
