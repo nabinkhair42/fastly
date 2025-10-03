@@ -1,4 +1,4 @@
-import { downloadSaaSStarter, fetchStats, StatsData } from '@/services/useDownload';
+import { downloadSaaSStarter, fetchStats, StatsData } from '@/services/download';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 

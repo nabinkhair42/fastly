@@ -76,6 +76,7 @@ This is a monorepo managed with pnpm workspaces:
 - Website: [`Live App`](https://fastly.nabinkhair.com.np)
 - Repository: [`GitHub`](https://github.com/nabinkhair42/fastly)
 - Maintainer: [Nabin Khair](https://nabinkhair.com.np)
+- Changelog: [`Changelog History`](https://fastly.nabinkhair.com.np/changelog)
 
 ---
 
