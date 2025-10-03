@@ -27,6 +27,9 @@
     ["cx\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"]
   ],
   "cSpell.words": [
-    "Fastly"
+    "clientside",
+    "Fastly",
+    "uploadthing",
+    "utapi"
   ]
 } 
