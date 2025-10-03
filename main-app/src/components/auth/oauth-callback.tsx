@@ -1,8 +1,8 @@
 'use client';
 
-import { setLastUsedProviderCookie } from '@/hooks/auth/useLastUsedProvider';
-import { sanitizeRedirect } from '@/hooks/auth/useSafeRedirect';
-import { useAuth } from '@/providers/AuthProvider';
+import { setLastUsedProviderCookie } from '@/hooks/auth/use-last-used-provider';
+import { sanitizeRedirect } from '@/hooks/auth/use-safe-redirect';
+import { useAuth } from '@/providers/auth-provider';
 import { AuthMethod } from '@/types/user';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useRef } from 'react';

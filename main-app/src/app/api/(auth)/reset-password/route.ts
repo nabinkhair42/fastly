@@ -1,6 +1,6 @@
 import { hashPassword } from '@/helpers/hashPassword';
-import { sendResponse } from '@/lib/apis/sendResponse';
-import dbConnect from '@/lib/config/dbConnect';
+import { sendResponse } from '@/lib/apis/send-response';
+import dbConnect from '@/lib/config/db-connect';
 import { UserAuthModel } from '@/models/users';
 import { resetPasswordRequestSchema } from '@/zod/authValidation';
 import { NextRequest } from 'next/server';

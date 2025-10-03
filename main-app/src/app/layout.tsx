@@ -1,4 +1,4 @@
-import RootProvider from '@/providers/RootProvider';
+import RootProvider from '@/providers/root-provider';
 import { metadata } from '@/seo/metadata';
 import { Viewport } from 'next';
 import { Noto_Sans } from 'next/font/google';

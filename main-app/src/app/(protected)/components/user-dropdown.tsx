@@ -9,8 +9,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useLogout } from '@/hooks/auth/useAuthMutations';
-import { useUserDetails } from '@/hooks/users/useUserMutations';
+import { useLogout } from '@/hooks/auth/use-auth-mutations';
+import { useUserDetails } from '@/hooks/users/use-user-mutations';
 import { ChevronRight, LogOut, LucideIcon, Settings, User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';

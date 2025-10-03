@@ -2,9 +2,9 @@
 import { render } from '@react-email/render';
 import nodemailer from 'nodemailer';
 
-import ForgotPasswordEmail from './ForgotPasswordEmail';
-import VerificationEmail from './VerificationEmail';
-import WelcomeEmail from './WelcomeMessage';
+import ForgotPasswordEmail from './forgot-password-email';
+import VerificationEmail from './verification-email';
+import WelcomeEmail from './welcome-message';
 
 const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_SERVER_HOST,

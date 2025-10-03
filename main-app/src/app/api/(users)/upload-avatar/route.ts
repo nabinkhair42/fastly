@@ -1,7 +1,7 @@
-import { sendResponse } from '@/lib/apis/sendResponse';
+import { sendResponse } from '@/lib/apis/send-response';
 import { utapi } from '@/lib/apis/uploadthing/core';
-import { requireAuth } from '@/lib/auth/authMiddleware';
-import dbConnect from '@/lib/config/dbConnect';
+import { requireAuth } from '@/lib/auth/auth-middleware';
+import dbConnect from '@/lib/config/db-connect';
 import { UserModel } from '@/models/users';
 import { NextRequest } from 'next/server';
 
@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Find user by authenticated user ID
-    const user = await UserModel.findOne({ authUser: authResult.user!.userId });
+    const user = await UserModel.findOne({ userAuth: authResult.user!.userId });
     if (!user) {
       return sendResponse('User profile not found', 404);
     }
@@ -45,7 +45,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Find user by authenticated user ID
-    const user = await UserModel.findOne({ authUser: authResult.user!.userId });
+    const user = await UserModel.findOne({ userAuth: authResult.user!.userId });
     if (!user) {
       return sendResponse('User profile not found', 404);
     }

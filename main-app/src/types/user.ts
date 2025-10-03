@@ -22,7 +22,7 @@ export interface UserLocation {
 
 export interface User {
   _id: string;
-  authUser: string;
+  userAuth: string;
   firstName: string;
   lastName: string;
   email: string;

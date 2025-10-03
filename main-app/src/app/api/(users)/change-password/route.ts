@@ -1,7 +1,7 @@
 import { hashPassword, verifyPassword } from '@/helpers/hashPassword';
-import { sendResponse } from '@/lib/apis/sendResponse';
-import { requireAuth } from '@/lib/auth/authMiddleware';
-import dbConnect from '@/lib/config/dbConnect';
+import { sendResponse } from '@/lib/apis/send-response';
+import { requireAuth } from '@/lib/auth/auth-middleware';
+import dbConnect from '@/lib/config/db-connect';
 import { UserAuthModel } from '@/models/users';
 import { changePasswordSchema, setPasswordSchema } from '@/zod/usersUpdate';
 import { NextRequest } from 'next/server';

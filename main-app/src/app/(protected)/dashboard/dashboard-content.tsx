@@ -4,7 +4,7 @@ import DashboardSkeleton from '@/app/(protected)/components/dashboard-skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { useUserDetails } from '@/hooks/users/useUserMutations';
+import { useUserDetails } from '@/hooks/users/use-user-mutations';
 import { ArrowUpRight, Calendar, Mail, MapPin, Palette, Type, User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import type { ReactNode } from 'react';

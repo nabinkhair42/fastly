@@ -20,7 +20,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
-import { useCreateAccount } from '@/hooks/auth/useAuthMutations';
+import { useCreateAccount } from '@/hooks/auth/use-auth-mutations';
 import { createAccountSchema } from '@/zod/authValidation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Eye, EyeOff, UserPlus } from 'lucide-react';

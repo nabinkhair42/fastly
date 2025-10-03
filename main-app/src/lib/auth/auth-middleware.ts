@@ -1,7 +1,7 @@
 import { authenticateToken } from '@/helpers/jwtToken';
-import { sendResponse } from '@/lib/apis/sendResponse';
-import { touchSession } from '@/lib/auth/sessionTracker';
-import dbConnect from '@/lib/config/dbConnect';
+import { sendResponse } from '@/lib/apis/send-response';
+import { touchSession } from '@/lib/auth/session-tracker';
+import dbConnect from '@/lib/config/db-connect';
 import { UserAuthModel } from '@/models/users';
 import type { AuthenticatedUser } from '@/types/user';
 import { NextRequest } from 'next/server';

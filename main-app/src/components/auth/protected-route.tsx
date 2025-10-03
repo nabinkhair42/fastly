@@ -1,6 +1,6 @@
 'use client';
 
-import { useSession } from '@/hooks/auth/useSession';
+import { useSession } from '@/hooks/auth/use-session';
 import { Loader } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo } from 'react';

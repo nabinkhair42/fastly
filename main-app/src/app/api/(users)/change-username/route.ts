@@ -1,6 +1,6 @@
-import { sendResponse } from '@/lib/apis/sendResponse';
-import { requireAuth } from '@/lib/auth/authMiddleware';
-import dbConnect from '@/lib/config/dbConnect';
+import { sendResponse } from '@/lib/apis/send-response';
+import { requireAuth } from '@/lib/auth/auth-middleware';
+import dbConnect from '@/lib/config/db-connect';
 import { UserModel } from '@/models/users';
 import { changeUsernameSchema, checkUsernameAvailabilitySchema } from '@/zod/usersUpdate';
 import { NextRequest } from 'next/server';
@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Find user by authenticated user ID
-    const user = await UserModel.findOne({ authUser: authResult.user!.userId });
+    const user = await UserModel.findOne({ userAuth: authResult.user!.userId });
     if (!user) {
       return sendResponse('User profile not found', 404);
     }

@@ -1,9 +1,9 @@
 // Main auth exports - import everything from here for convenience
 
 // Core authentication
-export { useSession } from '@/hooks/auth/useSession';
-export type { SessionData } from '@/hooks/auth/useSession';
-export { useAuth } from '@/providers/AuthProvider';
+export { useSession } from '@/hooks/auth/use-session';
+export type { SessionData } from '@/hooks/auth/use-session';
+export { useAuth } from '@/providers/auth-provider';
 
 // Route protection
 export { default as ProtectedRoute, withProtectedRoute } from '@/components/auth/protected-route';
@@ -11,7 +11,7 @@ export {
   useAuthGuard,
   useRedirectIfAuthenticated,
   useRequireAuth,
-} from '@/hooks/auth/useRequireAuth';
+} from '@/hooks/auth/use-require-auth';
 
 // Authentication mutations
 export {
@@ -22,7 +22,7 @@ export {
   useResendVerification,
   useResetPassword,
   useVerifyEmail,
-} from '@/hooks/auth/useAuthMutations';
+} from '@/hooks/auth/use-auth-mutations';
 
 // User management
 export {
@@ -32,11 +32,11 @@ export {
   userQueryKeys,
   useUpdateUserDetails,
   useUserDetails,
-} from '@/hooks/users/useUserMutations';
+} from '@/hooks/users/use-user-mutations';
 
 // Services (for direct API calls if needed)
-export { authService } from '@/services/authService';
-export { userService } from '@/services/userService';
+export { authService } from '@/services/auth-service';
+export { userService } from '@/services/user-service';
 
 // Types
 export type {
