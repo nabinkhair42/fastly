@@ -5,7 +5,6 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-  // Disable React strict mode for the upload-avatar component
   reactStrictMode: true,
 };
 

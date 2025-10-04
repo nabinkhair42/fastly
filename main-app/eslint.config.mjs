@@ -48,6 +48,7 @@ const config = [
       '**/.turbo/**',
       '**/.vercel/**',
       '**/public/**',
+      'next-env.d.ts',
     ],
   },
   ...eslintConfig,
