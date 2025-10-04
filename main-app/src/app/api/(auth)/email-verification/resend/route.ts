@@ -1,7 +1,7 @@
 import { generateOtp } from '@/helpers/generate-otp';
 import { sendResponse } from '@/lib/apis/send-response';
 import dbConnect from '@/lib/config/db-connect';
-import { sendVerificationEmail } from '@/mail-templates/email-service';
+import { sendVerificationEmail } from '@/mail-templates';
 import { UserAuthModel } from '@/models/users';
 import { resendVerificationEmailSchema } from '@/zod/authValidation';
 import { NextRequest } from 'next/server';

@@ -2,7 +2,7 @@ import { generateTokenPair } from '@/helpers/jwt-token';
 import { sendResponse } from '@/lib/apis/send-response';
 import { createUserSession } from '@/lib/auth/session-tracker';
 import dbConnect from '@/lib/config/db-connect';
-import { sendWelcomeEmail } from '@/mail-templates/email-service';
+import { sendWelcomeEmail } from '@/mail-templates';
 import { UserAuthModel, UserModel } from '@/models/users';
 import { verifyEmailSchema } from '@/zod/authValidation';
 import { NextRequest } from 'next/server';
