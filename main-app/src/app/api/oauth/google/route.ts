@@ -1,5 +1,5 @@
 import { generateTokenPair } from '@/helpers/jwt-token';
-import { googleOAuth } from '@/lib/apis/oauth';
+import { googleOAuth } from '@/lib/apis';
 import { createUserSession } from '@/lib/auth/session-tracker';
 import dbConnect from '@/lib/config/db-connect';
 import { sendWelcomeEmail } from '@/mail-templates/email-service';

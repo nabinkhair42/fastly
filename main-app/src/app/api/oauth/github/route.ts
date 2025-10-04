@@ -1,5 +1,5 @@
 import { generateTokenPair } from '@/helpers/jwt-token';
-import { githubOAuth } from '@/lib/apis/oauth';
+import { githubOAuth } from '@/lib/apis';
 import { createUserSession } from '@/lib/auth/session-tracker';
 import dbConnect from '@/lib/config/db-connect';
 import { sendWelcomeEmail } from '@/mail-templates/email-service';

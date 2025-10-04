@@ -5,10 +5,10 @@ import { useLastUsedProvider } from '@/hooks/auth/use-last-used-provider';
 import { useSafeRedirect } from '@/hooks/auth/use-safe-redirect';
 
 import { Button } from '@/components/ui/button';
-import { GithubOAuthClickFunction, GoogleOAuthClickFunction } from '@/lib/apis/oauth';
 import { AuthMethod } from '@/types/user';
 import { useState } from 'react';
 import { FaGithub, FaGoogle } from 'react-icons/fa6';
+import { GoogleOAuthClickFunction, GithubOAuthClickFunction } from '@/lib/apis';
 
 interface OAuthButtonProps {
   redirectTo: string;
