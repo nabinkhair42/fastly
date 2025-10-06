@@ -47,7 +47,7 @@
     "clsx": "^2.1.1",
     "extract-zip": "^2.0.1",
     "install": "^0.13.0",
-    "lucide-react": "^0.525.0",
+    "lucide-react": "^0.544.0",
     "mongoose": "^8.18.3",
     "motion": "^12.23.22",
     "next": "15.5.4",
