@@ -1,6 +1,6 @@
-import dbConnect from '@/lib/db-connect';
-import AppStats from '@/models/app-stats';
-import { NextResponse } from 'next/server';
+import dbConnect from "@/lib/db-connect";
+import AppStats from "@/models/app-stats";
+import { NextResponse } from "next/server";
 
 type StatsResponse = {
   totalDownloads: number;
@@ -19,17 +19,21 @@ export const GET = async () => {
 
     const stats: StatsResponse = {
       totalDownloads: latestStats?.totalDownloads ?? 0,
-      lastUpdated: (latestStats?.lastUpdated ?? latestStats?.updatedAt ?? new Date()).toISOString(),
+      lastUpdated: (
+        latestStats?.lastUpdated ??
+        latestStats?.updatedAt ??
+        new Date()
+      ).toISOString(),
     };
 
     return NextResponse.json({ data: stats });
   } catch (error) {
-    console.error('Failed to fetch stats', error);
+    console.error("Failed to fetch stats", error);
     return NextResponse.json(
       {
-        error: 'Unable to fetch stats right now.',
+        error: "Unable to fetch stats right now.",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 };

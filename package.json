@@ -13,10 +13,10 @@
     "build:app": "cd main-app && pnpm run build",
     "start:app": "cd main-app && pnpm run start",
     "prepare": "husky",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
+    "lint": "biome lint .",
+    "lint:fix": "biome lint . --fix",
+    "format": "biome format . --write",
+    "format:check": "biome format . --check",
     "lint:all": "pnpm run lint && cd main-app && pnpm run lint",
     "lint:fix:all": "pnpm run lint:fix && cd main-app && pnpm run lint:fix",
     "format:all": "pnpm run format && cd main-app && pnpm run format",
@@ -26,13 +26,8 @@
     "type-check": "tsc --noEmit"
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx}": [
-      "eslint --fix",
-      "prettier --write"
-    ],
-    "*.{json,css,md}": [
-      "prettier --write"
-    ]
+    "*.{js,jsx,ts,tsx}": ["biome lint --fix", "biome format --write"],
+    "*.{json,css,md}": ["biome format --write"]
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.12",
@@ -50,7 +45,7 @@
     "lucide-react": "^0.525.0",
     "mongoose": "^8.18.3",
     "motion": "^12.23.22",
-    "next": "15.5.4",
+    "next": "16.0.3",
     "next-themes": "^0.4.6",
     "node-fetch": "^3.3.2",
     "radix-ui": "^1.4.3",
@@ -61,21 +56,12 @@
     "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3.3.1",
+    "@biomejs/biome": "^1.9.4",
     "@tailwindcss/postcss": "^4.1.13",
     "@types/node": "^20.19.19",
     "@types/react": "^19.1.16",
     "@types/react-dom": "^19.1.9",
-    "@typescript-eslint/eslint-plugin": "^8.45.0",
-    "@typescript-eslint/parser": "^8.45.0",
     "concurrently": "^9.2.1",
-    "eslint": "^9.36.0",
-    "eslint-config-next": "15.3.5",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-import": "^2.32.0",
-    "eslint-plugin-prettier": "^5.5.4",
-    "eslint-plugin-react-hooks": "^6.1.0",
-    "eslint-plugin-unused-imports": "^4.2.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.3",
     "prettier": "^3.6.2",

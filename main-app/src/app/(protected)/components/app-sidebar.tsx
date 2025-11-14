@@ -1,4 +1,4 @@
-import { UserDropdown } from '@/app/(protected)/components/user-dropdown';
+import { UserDropdown } from "@/app/(protected)/components/user-dropdown";
 import {
   Sidebar,
   SidebarContent,
@@ -9,10 +9,10 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from '@/components/ui/sidebar';
-import { useAuthMethod } from '@/hooks/users/use-user-mutations';
-import { usePathname, useRouter } from 'next/navigation';
-import { GiCube } from 'react-icons/gi';
+} from "@/components/ui/sidebar";
+import { useAuthMethod } from "@/hooks/users/use-user-mutations";
+import { usePathname, useRouter } from "next/navigation";
+import { GiCube } from "react-icons/gi";
 
 export const AppSidebar = () => {
   const authMethod = useAuthMethod();
@@ -35,7 +35,7 @@ export const AppSidebar = () => {
         <SidebarGroup>
           <SidebarGroupLabel>Settings</SidebarGroupLabel>
           <SidebarMenu>
-            {sidebarNavItems.map(item => (
+            {sidebarNavItems.map((item) => (
               <SidebarMenuItem key={item.href}>
                 <SidebarMenuButton
                   isActive={item.href === pathname}
@@ -59,21 +59,21 @@ export const AppSidebar = () => {
 const getSidebarNavItems = (authMethod: string) => {
   return [
     {
-      title: 'Profile',
-      href: '/dashboard',
+      title: "Profile",
+      href: "/dashboard",
     },
     {
-      title: 'Edit Profile',
-      href: '/edit-profile',
+      title: "Edit Profile",
+      href: "/edit-profile",
     },
     {
-      title: 'Change Password',
-      href: '/change-password',
-      isDisabled: authMethod === 'email',
+      title: "Change Password",
+      href: "/change-password",
+      isDisabled: authMethod === "email",
     },
     {
-      title: 'Accounts',
-      href: '/account',
+      title: "Accounts",
+      href: "/account",
     },
   ];
 };

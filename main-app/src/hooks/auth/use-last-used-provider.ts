@@ -1,51 +1,39 @@
-// src/hooks/auth/useLastUsedProvider.ts
-'use client';
+"use client";
 
-import { AuthMethod } from '@/types/user';
-import { useCallback, useEffect, useState } from 'react';
+import {
+  getLastUsedProvider,
+  setLastUsedProviderCookie,
+} from "@/lib/utils/cookie-manager";
+import type { AuthMethod } from "@/types/user";
+import { useCallback, useEffect, useState } from "react";
 
-const LAST_USED_PROVIDER_KEY = 'lastUsedOAuthProvider';
-const COOKIE_MAX_AGE = 60 * 60 * 24 * 30; // 30 days
-
-// Helper function to set the last used provider cookie directly (for use in OAuth callbacks)
-export const setLastUsedProviderCookie = (provider: AuthMethod) => {
-  if (typeof window === 'undefined') return;
-
-  document.cookie = `${LAST_USED_PROVIDER_KEY}=${provider}; path=/; max-age=${COOKIE_MAX_AGE}; SameSite=Lax`;
-};
-
+/**
+ * Hook to manage last used OAuth provider
+ * Persists provider choice in cookies for better UX
+ */
 export const useLastUsedProvider = () => {
-  const [lastUsedProvider, setLastUsedProvider] = useState<AuthMethod | null>(null);
-
-  // Get last used provider from cookie
-  const getLastUsedProvider = useCallback((): AuthMethod | null => {
-    if (typeof window === 'undefined') return null;
-
-    const cookieValue = document.cookie
-      .split('; ')
-      .find(row => row.startsWith(`${LAST_USED_PROVIDER_KEY}=`))
-      ?.split('=')[1];
-
-    return (cookieValue as AuthMethod) || null;
-  }, []);
-
-  // Set last used provider in cookie
-  const setLastUsedProviderCookie = useCallback((provider: AuthMethod) => {
-    if (typeof window === 'undefined') return;
-
-    document.cookie = `${LAST_USED_PROVIDER_KEY}=${provider}; path=/; max-age=${COOKIE_MAX_AGE}; SameSite=Lax`;
-    setLastUsedProvider(provider);
-  }, []);
+  const [lastUsedProvider, setLastUsedProvider] = useState<AuthMethod | null>(
+    null,
+  );
 
   // Initialize on mount
   useEffect(() => {
     const stored = getLastUsedProvider();
     setLastUsedProvider(stored);
-  }, [getLastUsedProvider]);
+  }, []);
+
+  // Set provider and persist to cookie
+  const handleSetProvider = useCallback((provider: AuthMethod) => {
+    setLastUsedProviderCookie(provider);
+    setLastUsedProvider(provider);
+  }, []);
 
   return {
     lastUsedProvider,
-    setLastUsedProvider: setLastUsedProviderCookie,
+    setLastUsedProvider: handleSetProvider,
     isLastUsed: (provider: AuthMethod) => lastUsedProvider === provider,
   };
 };
+
+// Export utility for direct use in OAuth callbacks
+export { setLastUsedProviderCookie } from "@/lib/utils/cookie-manager";

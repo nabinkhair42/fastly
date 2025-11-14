@@ -33,7 +33,7 @@ import { Eye, EyeOff, Fingerprint } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
+import type { z } from 'zod';
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
@@ -51,7 +51,7 @@ export function LoginForm() {
 
   useEffect(() => {
     hasRedirectedRef.current = false;
-  }, [isAuthenticated, redirectTo]);
+  }, []);
 
   // Handle OAuth error messages
   useEffect(() => {

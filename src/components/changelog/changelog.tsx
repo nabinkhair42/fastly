@@ -1,11 +1,16 @@
-import { ChangelogBadge } from '@/components/changelog/changelog-badge';
-import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
-import { Bug, CalendarDays, Package, Sparkles, Zap } from 'lucide-react';
-import Image from 'next/image';
-import { GoDotFill } from 'react-icons/go';
+import { ChangelogBadge } from "@/components/changelog/changelog-badge";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
+import { Bug, CalendarDays, Package, Sparkles, Zap } from "lucide-react";
+import Image from "next/image";
+import { GoDotFill } from "react-icons/go";
 
-export type ChangelogEntryType = 'new' | 'improved' | 'fixed' | 'version' | 'outline';
+export type ChangelogEntryType =
+  | "new"
+  | "improved"
+  | "fixed"
+  | "version"
+  | "outline";
 
 export interface ChangelogEntry {
   version: string;
@@ -14,7 +19,7 @@ export interface ChangelogEntry {
   description: string;
   type: ChangelogEntryType;
   changes: {
-    type: 'new' | 'improved' | 'fixed';
+    type: "new" | "improved" | "fixed";
     description: string;
   }[];
   image?: string;
@@ -32,9 +37,9 @@ const changeTypeIcons = {
 };
 
 const changeTypeLabels = {
-  new: 'New',
-  improved: 'Improved',
-  fixed: 'Fixed',
+  new: "New",
+  improved: "Improved",
+  fixed: "Fixed",
 };
 
 const entryTypeIcons: Record<ChangelogEntryType, typeof Sparkles> = {
@@ -46,27 +51,30 @@ const entryTypeIcons: Record<ChangelogEntryType, typeof Sparkles> = {
 };
 
 const entryTypeLabels: Record<ChangelogEntryType, string> = {
-  new: 'Feature release',
-  improved: 'Enhancement',
-  fixed: 'Patch release',
-  version: 'Stable release',
-  outline: 'Announcement',
+  new: "Feature release",
+  improved: "Enhancement",
+  fixed: "Patch release",
+  version: "Stable release",
+  outline: "Announcement",
 };
 
 export function Changelog({ entries, className }: ChangelogProps) {
   return (
-    <div className={cn('w-full max-w-5xl mx-auto px-4 xl:px-0', className)}>
+    <div className={cn("w-full max-w-5xl mx-auto px-4 xl:px-0", className)}>
       {/* Header */}
       <section className="mb-16 space-y-3">
         <div className="space-y-2">
           <p className="text-xs text-muted-foreground">Release notes</p>
           <h1 className="text-4xl font-bold text-foreground"># Changelog</h1>
           <p className="text-muted-foreground">
-            Keep track of all the latest updates, improvements, and bug fixes to our platform.
+            Keep track of all the latest updates, improvements, and bug fixes to
+            our platform.
           </p>
         </div>
         <div className="flex  gap-3 text-muted-foreground">
-          <Badge variant={'outline'}>Updated {entries[0]?.date ?? 'recently'}</Badge>
+          <Badge variant={"outline"}>
+            Updated {entries[0]?.date ?? "recently"}
+          </Badge>
         </div>
       </section>
 
@@ -78,10 +86,10 @@ export function Changelog({ entries, className }: ChangelogProps) {
               if (!acc[change.type]) {
                 acc[change.type] = [];
               }
-              acc[change.type]!.push(change.description);
+              acc[change.type]?.push(change.description);
               return acc;
             },
-            {} as Record<ChangelogEntry['changes'][number]['type'], string[]>
+            {} as Record<ChangelogEntry["changes"][number]["type"], string[]>,
           );
 
           const EntryTypeIcon = entryTypeIcons[entry.type];
@@ -101,7 +109,10 @@ export function Changelog({ entries, className }: ChangelogProps) {
                         <EntryTypeIcon className="h-3.5 w-3.5" />
                         {entryTypeLabel}
                       </ChangelogBadge>
-                      <Badge variant="outline" className="rounded-full text-xs sm:text-sm">
+                      <Badge
+                        variant="outline"
+                        className="rounded-full text-xs sm:text-sm"
+                      >
                         {entry.version}
                       </Badge>
                     </div>
@@ -135,31 +146,43 @@ export function Changelog({ entries, className }: ChangelogProps) {
                   )}
 
                   <div className="space-y-6">
-                    {Object.entries(groupedChanges).map(([type, descriptions]) => {
-                      const Icon = changeTypeIcons[type as keyof typeof changeTypeIcons];
+                    {Object.entries(groupedChanges).map(
+                      ([type, descriptions]) => {
+                        const Icon =
+                          changeTypeIcons[type as keyof typeof changeTypeIcons];
 
-                      return (
-                        <section key={type} className="space-y-2">
-                          <div className="flex items-center gap-2 text-sm font-medium text-foreground">
-                            <ChangelogBadge
-                              variant={type as 'new' | 'improved' | 'fixed'}
-                              className="flex items-center gap-1 text-xs sm:text-sm"
-                            >
-                              <Icon className="h-3.5 w-3.5" />
-                              {changeTypeLabels[type as keyof typeof changeTypeLabels]}
-                            </ChangelogBadge>
-                          </div>
-                          <ul className="space-y-2 text-sm text-muted-foreground">
-                            {descriptions.map((description, idx) => (
-                              <li key={`${type}-${idx}`} className="flex gap-3 items-center">
-                                <GoDotFill />
-                                <span className="text-foreground">{description}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </section>
-                      );
-                    })}
+                        return (
+                          <section key={type} className="space-y-2">
+                            <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+                              <ChangelogBadge
+                                variant={type as "new" | "improved" | "fixed"}
+                                className="flex items-center gap-1 text-xs sm:text-sm"
+                              >
+                                <Icon className="h-3.5 w-3.5" />
+                                {
+                                  changeTypeLabels[
+                                    type as keyof typeof changeTypeLabels
+                                  ]
+                                }
+                              </ChangelogBadge>
+                            </div>
+                            <ul className="space-y-2 text-sm text-muted-foreground">
+                              {descriptions.map((description, idx) => (
+                                <li
+                                  key={`${type}-${idx}`}
+                                  className="flex gap-3 items-center"
+                                >
+                                  <GoDotFill />
+                                  <span className="text-foreground">
+                                    {description}
+                                  </span>
+                                </li>
+                              ))}
+                            </ul>
+                          </section>
+                        );
+                      },
+                    )}
                   </div>
                 </section>
               </div>

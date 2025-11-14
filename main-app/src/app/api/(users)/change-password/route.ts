@@ -1,83 +1,115 @@
-import { hashPassword, verifyPassword } from '@/helpers/hash-password';
-import { sendResponse } from '@/lib/apis/send-response';
-import { requireAuth } from '@/lib/auth/auth-middleware';
-import dbConnect from '@/lib/config/db-connect';
-import { UserAuthModel } from '@/models/users';
-import { changePasswordSchema, setPasswordSchema } from '@/zod/usersUpdate';
-import { NextRequest } from 'next/server';
+import crypto from "node:crypto";
+import { hashPassword, verifyPassword } from "@/helpers/hash-password";
+import { requireAuth } from "@/lib/auth/auth-middleware";
+import dbConnect from "@/lib/config/db-connect";
+import { handleApiError } from "@/lib/utils/error-handler";
+import { logApiError } from "@/lib/utils/logger";
+import {
+  sendAppError,
+  sendBadRequest,
+  sendNotFound,
+  sendSuccess,
+} from "@/lib/utils/response";
+import { validateAndSanitize } from "@/lib/utils/validators";
+import { UserAuthModel } from "@/models/users";
+import { changePasswordSchema, setPasswordSchema } from "@/zod/usersUpdate";
+import type { NextRequest } from "next/server";
 
+/**
+ * POST /api/(users)/change-password
+ * Change or set user password
+ * @param request - NextRequest with authorization header and password data in body
+ * @returns Password change confirmation
+ */
 export async function POST(request: NextRequest) {
-  await dbConnect();
+  const requestId = crypto.randomUUID();
 
   try {
-    const body = await request.json();
-    const { currentPassword, newPassword, confirmPassword } = body;
+    await dbConnect();
 
-    // Authenticate user
     const authResult = await requireAuth(request);
     if (!authResult.success) {
       return authResult.response;
     }
 
-    // Find user auth by authenticated user ID
-    const userAuth = await UserAuthModel.findById(authResult.user!.userId);
+    const body = await request.json();
+    const { currentPassword, newPassword, confirmPassword } = body;
+
+    // Find user auth
+    const userAuth = await UserAuthModel.findById(authResult.user?.userId);
     if (!userAuth) {
-      return sendResponse('User not found', 404);
+      return sendNotFound("User not found", requestId);
     }
 
+    // Determine validation schema based on existing password
     const hasExistingPassword = Boolean(userAuth.password);
-    const validationSchema = hasExistingPassword ? changePasswordSchema : setPasswordSchema;
+    const validationSchema = hasExistingPassword
+      ? changePasswordSchema
+      : setPasswordSchema;
 
-    const validationResult = validationSchema.safeParse({
-      currentPassword,
-      newPassword,
-      confirmPassword,
-    });
+    // Validate input
+    validateAndSanitize(
+      { currentPassword, newPassword, confirmPassword },
+      validationSchema,
+    );
 
-    if (!validationResult.success) {
-      return sendResponse(validationResult.error.message, 400);
-    }
-
-    // Check if new password and confirm password match
+    // Verify passwords match
     if (newPassword !== confirmPassword) {
-      return sendResponse('New password and confirm password do not match', 400);
+      return sendBadRequest("Passwords do not match", undefined, requestId);
     }
 
+    // If user has existing password, verify current password
     if (hasExistingPassword) {
       if (!currentPassword || !userAuth.password) {
-        return sendResponse('Current password is required', 400);
+        return sendBadRequest(
+          "Current password is required",
+          undefined,
+          requestId,
+        );
       }
 
-      const isCurrentPasswordValid = await verifyPassword(currentPassword, userAuth.password);
-
+      const isCurrentPasswordValid = await verifyPassword(
+        currentPassword,
+        userAuth.password,
+      );
       if (!isCurrentPasswordValid) {
-        return sendResponse('Current password is incorrect', 400);
+        return sendBadRequest(
+          "Current password is incorrect",
+          undefined,
+          requestId,
+        );
       }
 
-      const isSamePassword = await verifyPassword(newPassword, userAuth.password);
-
+      const isSamePassword = await verifyPassword(
+        newPassword,
+        userAuth.password,
+      );
       if (isSamePassword) {
-        return sendResponse('New password must be different from current password', 400);
+        return sendBadRequest(
+          "New password must be different from current password",
+          undefined,
+          requestId,
+        );
       }
     }
 
-    // Hash new password
+    // Hash and update password
     const hashedNewPassword = await hashPassword(newPassword);
-
-    // Update password
     userAuth.password = hashedNewPassword;
     userAuth.updatedAt = new Date();
     await userAuth.save();
 
-    return sendResponse('Password changed successfully', 200, {
-      message: hasExistingPassword
-        ? 'Your password has been updated successfully'
-        : 'Password added successfully. You can now sign in with email too.',
+    const message = hasExistingPassword
+      ? "Your password has been updated successfully"
+      : "Password added successfully. You can now sign in with email too.";
+
+    return sendSuccess("Password changed successfully", { message }, requestId);
+  } catch (error) {
+    logApiError("/api/change-password", error, { method: "POST" });
+    const appError = handleApiError(error, {
+      endpoint: "/api/change-password",
+      method: "POST",
     });
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      return sendResponse(error.message, 500, null, error);
-    }
-    return sendResponse('Unknown error occurred', 500, null, error);
+    return sendAppError(appError, requestId);
   }
 }

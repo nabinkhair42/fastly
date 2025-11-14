@@ -1,13 +1,30 @@
-import { sendResponse } from '@/lib/apis/send-response';
-import { utapi } from '@/lib/apis/uploadthing/core';
-import { requireAuth } from '@/lib/auth/auth-middleware';
-import dbConnect from '@/lib/config/db-connect';
-import { UserModel } from '@/models/users';
-import { NextRequest } from 'next/server';
+import crypto from "node:crypto";
+import { utapi } from "@/lib/apis/uploadthing/core";
+import { requireAuth } from "@/lib/auth/auth-middleware";
+import dbConnect from "@/lib/config/db-connect";
+import { handleApiError } from "@/lib/utils/error-handler";
+import { logApiError } from "@/lib/utils/logger";
+import {
+  sendAppError,
+  sendBadRequest,
+  sendNotFound,
+  sendSuccess,
+} from "@/lib/utils/response";
+import { UserModel } from "@/models/users";
+import type { NextRequest } from "next/server";
 
+/**
+ * POST /api/(users)/upload-avatar
+ * Update user avatar
+ * @param request - NextRequest with authorization header and avatar URL in body
+ * @returns Updated avatar confirmation
+ */
 export async function POST(request: NextRequest) {
-  await dbConnect();
+  const requestId = crypto.randomUUID();
+
   try {
+    await dbConnect();
+
     const authResult = await requireAuth(request);
     if (!authResult.success) {
       return authResult.response;
@@ -15,66 +32,86 @@ export async function POST(request: NextRequest) {
 
     const { avatar } = await request.json();
 
-    if (!avatar || typeof avatar !== 'string') {
-      return sendResponse('Avatar URL is required', 400);
+    if (!avatar || typeof avatar !== "string") {
+      return sendBadRequest("Avatar URL is required", undefined, requestId);
     }
 
     // Find user by authenticated user ID
-    const user = await UserModel.findOne({ userAuth: authResult.user!.userId });
+    const user = await UserModel.findOne({ userAuth: authResult.user?.userId });
     if (!user) {
-      return sendResponse('User profile not found', 404);
+      return sendNotFound("User profile not found", requestId);
     }
 
     // Update avatar
     user.avatar = avatar;
     await user.save();
 
-    return sendResponse('Avatar updated successfully', 200);
-  } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-    return sendResponse(errorMessage, 500, null, error);
+    return sendSuccess("Avatar updated successfully", { avatar }, requestId);
+  } catch (error) {
+    logApiError("/api/upload-avatar", error, { method: "POST" });
+    const appError = handleApiError(error, {
+      endpoint: "/api/upload-avatar",
+      method: "POST",
+    });
+    return sendAppError(appError, requestId);
   }
 }
 
+/**
+ * DELETE /api/(users)/upload-avatar
+ * Delete user avatar
+ * @param request - NextRequest with authorization header
+ * @returns Deletion confirmation
+ */
 export async function DELETE(request: NextRequest) {
-  await dbConnect();
+  const requestId = crypto.randomUUID();
+
   try {
+    await dbConnect();
+
     const authResult = await requireAuth(request);
     if (!authResult.success) {
       return authResult.response;
     }
 
     // Find user by authenticated user ID
-    const user = await UserModel.findOne({ userAuth: authResult.user!.userId });
+    const user = await UserModel.findOne({ userAuth: authResult.user?.userId });
     if (!user) {
-      return sendResponse('User profile not found', 404);
+      return sendNotFound("User profile not found", requestId);
     }
 
     // Check if user has an avatar to delete
     if (!user.avatar) {
-      return sendResponse('No avatar to delete', 400);
+      return sendBadRequest("No avatar to delete", undefined, requestId);
     }
 
     // Extract file key from the avatar URL
-    // UploadThing URLs typically contain the file key
-    const urlParts = user.avatar.split('/');
+    const urlParts = user.avatar.split("/");
     const fileName = urlParts[urlParts.length - 1];
 
     try {
       // Delete file from UploadThing
       await utapi.deleteFiles(fileName);
     } catch (deleteError) {
-      console.warn('Failed to delete file from UploadThing:', deleteError);
+      logApiError("/api/upload-avatar", deleteError, { method: "DELETE" });
       // Continue with database cleanup even if UploadThing deletion fails
     }
 
     // Delete avatar from database
-    user.avatar = '';
+    user.avatar = "";
     await user.save();
 
-    return sendResponse('Avatar deleted successfully', 200);
-  } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-    return sendResponse(errorMessage, 500, null, error);
+    return sendSuccess(
+      "Avatar deleted successfully",
+      { message: "Avatar removed" },
+      requestId,
+    );
+  } catch (error) {
+    logApiError("/api/upload-avatar", error, { method: "DELETE" });
+    const appError = handleApiError(error, {
+      endpoint: "/api/upload-avatar",
+      method: "DELETE",
+    });
+    return sendAppError(appError, requestId);
   }
 }

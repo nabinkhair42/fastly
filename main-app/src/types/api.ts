@@ -1,80 +1,70 @@
-import {
+import type {
   AuthenticatedUser,
   SocialAccountUrl,
   UserLocation,
   UserProfile,
-  UserSession,
-} from '@/types/user';
+} from "@/types/user";
 
-// Authentication API interfaces
-export interface LoginRequest {
-  email: string;
-  password: string;
-}
+// ============================================
+// Authentication API Types
+// ============================================
 
-export interface LoginResponse {
+export interface AuthResponse {
   success: boolean;
   message: string;
-  statusCode: number;
   data: {
     accessToken: string;
     refreshToken: string;
-    session?: SessionSummary;
+    session?: {
+      sessionId: string;
+      createdAt: string;
+      browser: string;
+      os: string;
+      device: string;
+      ipAddress: string;
+    };
     user: AuthenticatedUser;
   };
 }
 
-export interface CreateAccountRequest {
+// Request types (inline for single-field interfaces)
+export type LoginRequest = {
+  email: string;
+  password: string;
+};
+
+export type CreateAccountRequest = {
   firstName: string;
   lastName: string;
   email: string;
   password: string;
   confirmPassword: string;
-}
+};
 
-export interface EmailVerificationRequest {
+export type EmailVerificationRequest = {
   email: string;
   verificationCode: string;
-}
+};
 
-export interface ForgotPasswordRequest {
+export type ForgotPasswordRequest = {
   email: string;
-}
+};
 
-export interface ResetPasswordRequest {
+export type ResetPasswordRequest = {
   email: string;
   resetToken: string;
   password: string;
   confirmPassword: string;
-}
+};
 
-export interface RefreshTokenRequest {
+export type RefreshTokenRequest = {
   refreshToken: string;
-}
+};
 
-export interface SessionSummary {
-  sessionId: string;
-  createdAt: string;
-  browser: string;
-  os: string;
-  device: string;
-  ipAddress: string;
-}
+// ============================================
+// User Management API Types
+// ============================================
 
-export interface AuthResponse {
-  message: string;
-  data?: {
-    accessToken: string;
-    refreshToken: string;
-    user: {
-      id: string;
-      email: string;
-      isVerified: boolean;
-    };
-  };
-}
-
-// User Management API interfaces
 export interface UpdateUserDetailsRequest {
   firstName?: string;
   lastName?: string;
@@ -88,41 +78,61 @@ export interface UpdateUserDetailsRequest {
   location?: Partial<UserLocation> | null;
 }
 
-export interface ChangeUsernameRequest {
+export type ChangeUsernameRequest = {
   username: string;
-}
+};
 
-export interface ChangePasswordRequest {
+export type ChangePasswordRequest = {
   currentPassword?: string;
   newPassword: string;
   confirmPassword: string;
-}
+};
 
-export interface DeleteUserRequest {
+export type DeleteUserRequest = {
   password?: string;
-}
+};
 
-export interface UserDetailsResponse {
+export type RevokeSessionRequest = {
+  sessionId: string;
+};
+
+// ============================================
+// Response Types
+// ============================================
+
+export type UserDetailsResponse = {
   message: string;
   data: {
     user: UserProfile;
   };
-}
+};
 
-export interface UserSessionsResponse {
-  message: string;
-  data: {
-    sessions: UserSession[];
-  };
-}
-
-export interface RevokeSessionRequest {
-  sessionId: string;
-}
-
-export interface AvatarUploadResponse {
+export type AvatarUploadResponse = {
   message: string;
   data?: {
     avatar: string;
   };
-}
+};
+
+export type SessionData = {
+  _id: string;
+  sessionId: string;
+  authMethod: string;
+  userAgent: string;
+  browser: string;
+  os: string;
+  device: string;
+  ipAddress: string;
+  location: string | null;
+  createdAt: string;
+  lastActiveAt: string;
+  revokedAt: string | null;
+};
+
+export type SessionsResponse = {
+  success: boolean;
+  message: string;
+  data: {
+    sessions: SessionData[];
+  };
+};

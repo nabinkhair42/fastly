@@ -9,6 +9,32 @@ import {
 import { useEffect, useState } from 'react';
 import { Button } from './button';
 import { Input } from './input';
+
+// Helper function to parse bold text without dangerouslySetInnerHTML
+function parseDescription(text: string) {
+  const parts: (string | React.ReactNode)[] = [];
+  let lastIndex = 0;
+  const regex = /\*\*(.*?)\*\*/g;
+
+  let match = regex.exec(text);
+  while (match !== null) {
+    // Add text before the match
+    if (match.index > lastIndex) {
+      parts.push(text.substring(lastIndex, match.index));
+    }
+    // Add bold text
+    parts.push(<strong key={match.index}>{match[1]}</strong>);
+    lastIndex = regex.lastIndex;
+    match = regex.exec(text);
+  }
+
+  // Add remaining text
+  if (lastIndex < text.length) {
+    parts.push(text.substring(lastIndex));
+  }
+
+  return parts.length > 0 ? parts : text;
+}
 interface ActionDialogProps {
   title: string;
   description: string;
@@ -61,15 +87,11 @@ export function ActionDialog({
   };
 
   return (
-    <Dialog open onOpenChange={onCancel}>
+    <Dialog open={true} onOpenChange={onCancel}>
       <DialogContent className="sm:max-w-md p-0">
         <DialogHeader className="space-y-3 pt-4 px-6">
           <DialogTitle>{title}</DialogTitle>
-          <DialogDescription
-            dangerouslySetInnerHTML={{
-              __html: description.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'),
-            }}
-          />
+          <DialogDescription>{parseDescription(description)}</DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-4">
           {type === 'rename' ? (
@@ -78,7 +100,7 @@ export function ActionDialog({
               onChange={e => setInputValue(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Enter new title..."
-              autoFocus
+              autoFocus={true}
             />
           ) : (
             children

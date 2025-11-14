@@ -1,4 +1,4 @@
-import ChangelogPage from '@/components/changelog';
+import ChangelogPage from "@/components/changelog";
 
 const page = () => {
   return <ChangelogPage />;

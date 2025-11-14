@@ -4,7 +4,7 @@ export function SiteFooter() {
       <div className="container-wrapper px-4 xl:px-6">
         <div className="flex h-16 items-center justify-between">
           <div className="text-muted-foreground w-full px-1 text-center text-xs leading-loose sm:text-sm">
-            Built by{' '}
+            Built by{" "}
             <a
               href="https://nabinkhair.com.com.np"
               target="_blank"
@@ -12,8 +12,8 @@ export function SiteFooter() {
               className="font-medium underline underline-offset-4"
             >
               nabinkhair
-            </a>{' '}
-            at{' '}
+            </a>{" "}
+            at{" "}
             <a
               href="https://github.com/codixra"
               target="_blank"
@@ -22,7 +22,7 @@ export function SiteFooter() {
             >
               Codixra
             </a>
-            . The source code is available on{' '}
+            . The source code is available on{" "}
             <a
               href="https://github.com/nabinkhair42/fastly"
               target="_blank"

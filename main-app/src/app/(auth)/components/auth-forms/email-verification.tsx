@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -8,7 +8,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
+} from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -16,51 +16,58 @@ import {
   FormField,
   FormItem,
   FormMessage,
-} from '@/components/ui/form';
-import { useResendVerification, useVerifyEmail } from '@/hooks/auth/use-auth-mutations';
-import { verifyEmailSchema } from '@/zod/authValidation';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { ChevronLeft, Mail, RotateCcw } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
+} from "@/components/ui/form";
+import {
+  useResendVerification,
+  useVerifyEmail,
+} from "@/hooks/auth/use-auth-mutations";
+import { verifyEmailSchema } from "@/zod/authValidation";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ChevronLeft, Mail, RotateCcw } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import type { z } from "zod";
 
-import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
-import { REGEXP_ONLY_DIGITS_AND_CHARS } from 'input-otp';
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
+import { REGEXP_ONLY_DIGITS_AND_CHARS } from "input-otp";
 
 type EmailVerificationFormData = z.infer<typeof verifyEmailSchema>;
 
 export function EmailVerificationForm() {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
   const [countdown, setCountdown] = useState(0);
   const router = useRouter();
 
   const verifyEmailMutation = useVerifyEmail(() => {
     // This callback runs after auth state is updated
     // Redirect to dashboard after successful verification
-    router.push('/dashboard');
+    router.push("/dashboard");
   });
   const resendVerificationMutation = useResendVerification();
 
   const form = useForm<EmailVerificationFormData>({
     resolver: zodResolver(verifyEmailSchema),
     defaultValues: {
-      email: '',
-      verificationCode: '',
+      email: "",
+      verificationCode: "",
     },
-    mode: 'onChange',
+    mode: "onChange",
   });
 
   useEffect(() => {
     // Get email from localStorage (set in create-account page)
-    const storedEmail = localStorage.getItem('verificationEmail');
+    const storedEmail = localStorage.getItem("verificationEmail");
     if (storedEmail) {
       setEmail(storedEmail);
-      form.setValue('email', storedEmail);
+      form.setValue("email", storedEmail);
     } else {
       // If no email stored, redirect to create-account
-      router.push('/create-account');
+      router.push("/create-account");
     }
   }, [form, router]);
 
@@ -76,7 +83,7 @@ export function EmailVerificationForm() {
     try {
       await verifyEmailMutation.mutateAsync(data);
       // Clear stored email
-      localStorage.removeItem('verificationEmail');
+      localStorage.removeItem("verificationEmail");
       // Redirect will be handled in the mutation's onSuccess callback
     } catch (error) {
       console.error(error);
@@ -84,7 +91,9 @@ export function EmailVerificationForm() {
   };
 
   const handleResendCode = async () => {
-    if (countdown > 0) return;
+    if (countdown > 0) {
+      return;
+    }
 
     try {
       await resendVerificationMutation.mutateAsync(email);
@@ -102,7 +111,8 @@ export function EmailVerificationForm() {
         </div>
         <CardTitle className="text-2xl font-bold">Verify Your Email</CardTitle>
         <CardDescription>
-          We&apos;ve sent a verification code to <span className="font-medium">{email}</span>
+          We&apos;ve sent a verification code to{" "}
+          <span className="font-medium">{email}</span>
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -122,7 +132,7 @@ export function EmailVerificationForm() {
                       pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
                       {...field}
                     >
-                      {' '}
+                      {" "}
                       <InputOTPGroup>
                         <InputOTPSlot index={0} />
                         <InputOTPSlot index={1} />
@@ -133,7 +143,9 @@ export function EmailVerificationForm() {
                       </InputOTPGroup>
                     </InputOTP>
                   </FormControl>
-                  <FormDescription>Enter the 6-digit code sent to your email</FormDescription>
+                  <FormDescription>
+                    Enter the 6-digit code sent to your email
+                  </FormDescription>
 
                   <FormMessage />
                 </FormItem>
@@ -154,7 +166,7 @@ export function EmailVerificationForm() {
 
         <div className="text-center mt-4">
           <p className="text-sm text-muted-foreground flex items-center justify-center">
-            Didn&apos;t receive the code?{' '}
+            Didn&apos;t receive the code?{" "}
             <Button
               variant="link"
               className="p-0 font-normal "
@@ -184,8 +196,8 @@ export function EmailVerificationForm() {
             variant="link"
             className="p-0 font-normal"
             onClick={() => {
-              localStorage.removeItem('verificationEmail');
-              router.push('/create-account');
+              localStorage.removeItem("verificationEmail");
+              router.push("/create-account");
             }}
           >
             <ChevronLeft className="h-4 w-4" />

@@ -1,8 +1,8 @@
-import { SiteFooter } from '@/components/site-footer';
-import { SiteHeader } from '@/components/site-header';
-import AppRootProvider from '@/providers/app-root-provider';
-import { metadata } from '@/seo/metadata';
-import './globals.css';
+import { SiteFooter } from "@/components/site-footer";
+import { SiteHeader } from "@/components/site-header";
+import AppRootProvider from "@/providers/app-root-provider";
+import { metadata } from "@/seo/metadata";
+import "./globals.css";
 export { metadata };
 
 export default function RootLayout({
@@ -11,7 +11,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning={true}>
       <body>
         <AppRootProvider>
           <SiteHeader />

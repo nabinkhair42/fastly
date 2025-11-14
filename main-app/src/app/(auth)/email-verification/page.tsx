@@ -1,12 +1,17 @@
-import { EmailVerificationForm } from '@/app/(auth)/components/auth-forms';
-import { generatePageMetadata } from '@/seo/seo';
+import { EmailVerificationForm } from "@/app/(auth)/components/auth-forms";
+import { generatePageMetadata } from "@/seo/seo";
 
 export const metadata = generatePageMetadata({
-  title: 'Verify Email',
+  title: "Verify Email",
   description:
-    'Verify your email address to complete your Fastly account setup and access all features.',
-  keywords: ['email verification', 'verify email', 'account verification', 'email confirmation'],
-  canonical: '/email-verification',
+    "Verify your email address to complete your Fastly account setup and access all features.",
+  keywords: [
+    "email verification",
+    "verify email",
+    "account verification",
+    "email confirmation",
+  ],
+  canonical: "/email-verification",
   noIndex: true, // Don't index verification pages
 });
 

@@ -1,14 +1,11 @@
-import type { NextConfig } from 'next';
+import type { NextConfig } from "next";
+import path from "path";
 
 const nextConfig: NextConfig = {
-  /* config options here */
-  eslint: {
-    // Warning: This allows production builds to successfully complete even if
-    // your project has ESLint errors.
-    ignoreDuringBuilds: true,
-  },
-  // Disable React strict mode for the upload-avatar component
   reactStrictMode: true,
+  turbopack: {
+    root: path.join(process.cwd(), ".."),
+  },
 };
 
 export default nextConfig;

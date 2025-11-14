@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useAuth } from '@/providers/auth-provider';
-import { AuthenticatedUser } from '@/types/user';
+import { useAuth } from "@/providers/auth-provider";
+import type { AuthenticatedUser } from "@/types/user";
 
 /**
  * Type definitions for session data
@@ -12,7 +12,7 @@ export interface SessionData {
   isLoading: boolean;
   isLoggedIn: boolean;
   isGuest: boolean;
-  status: 'loading' | 'authenticated' | 'unauthenticated';
+  status: "loading" | "authenticated" | "unauthenticated";
 }
 
 /**
@@ -29,6 +29,10 @@ export const useSession = (): SessionData => {
     // Helper computed properties
     isLoggedIn: isAuthenticated,
     isGuest: !isAuthenticated,
-    status: isLoading ? 'loading' : isAuthenticated ? 'authenticated' : 'unauthenticated',
+    status: isLoading
+      ? "loading"
+      : isAuthenticated
+        ? "authenticated"
+        : "unauthenticated",
   };
 };

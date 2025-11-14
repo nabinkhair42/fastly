@@ -1,11 +1,11 @@
 "use client';";
-import { DemoButton } from '@/components/buttons/demo-app';
-import { GitHubButton } from '@/components/buttons/github-repo';
-import { ModeSwitcher } from '@/components/buttons/mode-switcher';
-import { Separator } from '@/components/ui/separator';
-import { siteConfig } from '@/seo';
-import Link from 'next/link';
-import { GiCube } from 'react-icons/gi';
+import { DemoButton } from "@/components/buttons/demo-app";
+import { GitHubButton } from "@/components/buttons/github-repo";
+import { ModeSwitcher } from "@/components/buttons/mode-switcher";
+import { Separator } from "@/components/ui/separator";
+import { siteConfig } from "@/seo";
+import Link from "next/link";
+import { GiCube } from "react-icons/gi";
 
 export const AppIcon = () => (
   <Link href="/" className="flex items-center space-x-2">
@@ -16,12 +16,12 @@ export const AppIcon = () => (
 
 const NAV_LINKS = [
   {
-    label: 'Docs',
-    href: '/docs',
+    label: "Docs",
+    href: "/docs",
   },
   {
-    label: 'Changelog',
-    href: '/changelog',
+    label: "Changelog",
+    href: "/changelog",
   },
 ];
 
@@ -33,7 +33,7 @@ export function SiteHeader() {
           <AppIcon />
 
           <nav className="ml-0 hidden gap-6 sm:ml-6 sm:flex">
-            {NAV_LINKS.map(link => (
+            {NAV_LINKS.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
@@ -45,9 +45,15 @@ export function SiteHeader() {
           </nav>
           <div className="ml-auto flex items-center gap-2">
             <ModeSwitcher />
-            <Separator orientation="vertical" className="hidden h-4 sm:inline-flex" />
+            <Separator
+              orientation="vertical"
+              className="hidden h-4 sm:inline-flex"
+            />
             <DemoButton />
-            <Separator orientation="vertical" className="hidden h-4 sm:inline-flex" />
+            <Separator
+              orientation="vertical"
+              className="hidden h-4 sm:inline-flex"
+            />
             <GitHubButton />
           </div>
         </div>

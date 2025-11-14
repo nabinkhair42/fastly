@@ -1,36 +1,36 @@
-'use client';
+"use client";
 
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from '@/components/ui/accordion';
+} from "@/components/ui/accordion";
 
 const faqs = [
   {
-    q: 'What’s included?',
-    a: 'Auth (email + OAuth), profiles, uploads, emails, Zod APIs, JWT, MongoDB, and a polished UI.',
+    q: "What’s included?",
+    a: "Auth (email + OAuth), profiles, uploads, emails, Zod APIs, JWT, MongoDB, and a polished UI.",
   },
   {
-    q: 'Does it support OAuth?',
-    a: 'Yes—Google and GitHub are wired with an email/password flow and verification.',
+    q: "Does it support OAuth?",
+    a: "Yes—Google and GitHub are wired with an email/password flow and verification.",
   },
   {
-    q: 'How are tokens handled?',
-    a: 'Short‑lived access tokens with refresh rotation and route protection.',
+    q: "How are tokens handled?",
+    a: "Short‑lived access tokens with refresh rotation and route protection.",
   },
   {
-    q: 'Can I deploy to Vercel?',
-    a: 'Yes. The project is optimized for Vercel with environment variables and edge‑ready patterns.',
+    q: "Can I deploy to Vercel?",
+    a: "Yes. The project is optimized for Vercel with environment variables and edge‑ready patterns.",
   },
   {
-    q: 'Can I customize the UI?',
-    a: 'Absolutely. Tailwind + shadcn/ui + Radix components are easy to theme and extend.',
+    q: "Can I customize the UI?",
+    a: "Absolutely. Tailwind + shadcn/ui + Radix components are easy to theme and extend.",
   },
   {
-    q: 'Is there a database?',
-    a: 'MongoDB via Mongoose models for users and auth data.',
+    q: "Is there a database?",
+    a: "MongoDB via Mongoose models for users and auth data.",
   },
 ] as const;
 
@@ -42,11 +42,13 @@ export default function FAQ() {
           <h2 className="text-balance text-4xl font-semibold lg:text-5xl">
             Frequently Asked Questions
           </h2>
-          <p className="mt-4">Here are some common questions about the product.</p>
+          <p className="mt-4">
+            Here are some common questions about the product.
+          </p>
         </div>
         <Accordion
           type="single"
-          collapsible
+          collapsible={true}
           className="mt-6 [mask-image:linear-gradient(to_bottom,black_50%,transparent_100%)] pb-6"
         >
           {faqs.map((f, i) => (

@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { OAuthButtons } from '@/app/(auth)/components/oauth-buttons';
-import { Button } from '@/components/ui/button';
+import { OAuthButtons } from "@/app/(auth)/components/oauth-buttons";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -9,7 +9,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
+} from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -17,17 +17,17 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Separator } from '@/components/ui/separator';
-import { useCreateAccount } from '@/hooks/auth/use-auth-mutations';
-import { createAccountSchema } from '@/zod/authValidation';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Eye, EyeOff, UserPlus } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
+import { useCreateAccount } from "@/hooks/auth/use-auth-mutations";
+import { createAccountSchema } from "@/zod/authValidation";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Eye, EyeOff, UserPlus } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import type { z } from "zod";
 
 type CreateAccountFormData = z.infer<typeof createAccountSchema>;
 
@@ -40,19 +40,19 @@ export function CreateAccountForm() {
   const form = useForm<CreateAccountFormData>({
     resolver: zodResolver(createAccountSchema),
     defaultValues: {
-      firstName: '',
-      lastName: '',
-      email: '',
-      password: '',
-      confirmPassword: '',
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
     },
-    mode: 'onChange',
+    mode: "onChange",
   });
 
   const onSubmit = async (data: CreateAccountFormData) => {
     if (data.password !== data.confirmPassword) {
-      form.setError('confirmPassword', {
-        message: 'Passwords do not match',
+      form.setError("confirmPassword", {
+        message: "Passwords do not match",
       });
       return;
     }
@@ -60,11 +60,11 @@ export function CreateAccountForm() {
     try {
       await createAccountMutation.mutateAsync({
         ...data,
-        confirmPassword: data.confirmPassword || '',
+        confirmPassword: data.confirmPassword || "",
       });
       // Store email in localStorage for email verification page
-      localStorage.setItem('verificationEmail', data.email);
-      router.push('/email-verification');
+      localStorage.setItem("verificationEmail", data.email);
+      router.push("/email-verification");
     } catch (error) {
       console.error(error);
     }
@@ -77,7 +77,9 @@ export function CreateAccountForm() {
           <UserPlus className="h-6 w-6" />
         </div>
         <CardTitle className="text-2xl font-bold">Create Account</CardTitle>
-        <CardDescription>Enter your information to create a new account</CardDescription>
+        <CardDescription>
+          Enter your information to create a new account
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -118,7 +120,11 @@ export function CreateAccountForm() {
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input type="email" placeholder="Enter your email" {...field} />
+                    <Input
+                      type="email"
+                      placeholder="Enter your email"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -134,7 +140,7 @@ export function CreateAccountForm() {
                   <FormControl>
                     <div className="relative">
                       <Input
-                        type={showPassword ? 'text' : 'password'}
+                        type={showPassword ? "text" : "password"}
                         placeholder="Enter your password"
                         {...field}
                       />
@@ -167,7 +173,7 @@ export function CreateAccountForm() {
                   <FormControl>
                     <div className="relative">
                       <Input
-                        type={showConfirmPassword ? 'text' : 'password'}
+                        type={showConfirmPassword ? "text" : "password"}
                         placeholder="Confirm your password"
                         {...field}
                       />
@@ -176,7 +182,9 @@ export function CreateAccountForm() {
                         variant="ghost"
                         size="sm"
                         className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 p-0 hover:bg-transparent"
-                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        onClick={() =>
+                          setShowConfirmPassword(!showConfirmPassword)
+                        }
                       >
                         {showConfirmPassword ? (
                           <EyeOff className="h-4 w-4" />
@@ -212,8 +220,12 @@ export function CreateAccountForm() {
       </CardContent>
       <CardFooter className="flex items-center justify-center">
         <div className="text-center text-sm text-muted-foreground">
-          Already have an account?{' '}
-          <Button variant="link" className="p-0 font-normal" onClick={() => router.push('/log-in')}>
+          Already have an account?{" "}
+          <Button
+            variant="link"
+            className="p-0 font-normal"
+            onClick={() => router.push("/log-in")}
+          >
             Sign in
           </Button>
         </div>

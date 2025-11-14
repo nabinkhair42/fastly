@@ -1,15 +1,15 @@
-'use client';
+"use client";
 
-import DashboardSkeleton from '@/app/(protected)/components/dashboard-skeleton';
-import ChangePasswordForm from '@/app/(protected)/components/forms/change-password-form';
-import { useUserDetails } from '@/hooks/users/use-user-mutations';
-import { AuthMethod } from '@/types/user';
+import DashboardSkeleton from "@/app/(protected)/components/dashboard-skeleton";
+import ChangePasswordForm from "@/app/(protected)/components/forms/change-password-form";
+import { useUserDetails } from "@/hooks/users/use-user-mutations";
+import { AuthMethod } from "@/types/user";
 
 const METHOD_LABELS: Record<AuthMethod, string> = {
-  [AuthMethod.EMAIL]: 'Email',
-  [AuthMethod.GOOGLE]: 'Google',
-  [AuthMethod.FACEBOOK]: 'Facebook',
-  [AuthMethod.GITHUB]: 'GitHub',
+  [AuthMethod.EMAIL]: "Email",
+  [AuthMethod.GOOGLE]: "Google",
+  [AuthMethod.FACEBOOK]: "Facebook",
+  [AuthMethod.GITHUB]: "GitHub",
 };
 
 export default function SettingsChangePasswordPage() {
@@ -24,7 +24,8 @@ export default function SettingsChangePasswordPage() {
   const hasPassword = Boolean(user.hasPassword);
   const providerLabel = METHOD_LABELS[authMethod as AuthMethod];
 
-  const mode = hasPassword || authMethod === AuthMethod.EMAIL ? 'change' : 'create';
+  const mode =
+    hasPassword || authMethod === AuthMethod.EMAIL ? "change" : "create";
 
   return (
     <div className="space-y-6">

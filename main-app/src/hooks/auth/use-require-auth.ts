@@ -1,119 +1,154 @@
-'use client';
+"use client";
 
-import { useSession } from '@/hooks/auth/use-session';
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useSession } from "@/hooks/auth/use-session";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
-interface UseRequireAuthOptions {
+type AuthGuardType =
+  | "require"
+  | "redirect-if-auth"
+  | "redirect-to-dashboard"
+  | "flexible";
+
+interface UseAuthGuardOptions {
+  type?: AuthGuardType;
   redirectTo?: string;
   enabled?: boolean;
+  userDetails?: unknown;
 }
 
 /**
- * Hook that ensures user is authenticated
- * Redirects to login if not authenticated
+ * Unified authentication guard hook
+ * Replaces 4 separate hooks with single flexible implementation
+ *
+ * @param options - Configuration options
+ * @param options.type - Guard type: 'require' | 'redirect-if-auth' | 'redirect-to-dashboard' | 'flexible'
+ * @param options.redirectTo - URL to redirect to (default: '/log-in' for require, '/' for redirect-if-auth)
+ * @param options.enabled - Enable/disable the guard (default: true)
+ * @param options.userDetails - User details for redirect-to-dashboard type
+ *
+ * @example
+ * // Require authentication
+ * const { isReady } = useAuthGuard({ type: 'require' });
+ *
+ * @example
+ * // Redirect if already authenticated
+ * const { shouldShow } = useAuthGuard({ type: 'redirect-if-auth' });
+ *
+ * @example
+ * // Flexible manual checks
+ * const { requireAuth, redirectIfAuthenticated } = useAuthGuard({ type: 'flexible' });
  */
-export const useRequireAuth = (options: UseRequireAuthOptions = {}) => {
-  const { redirectTo = '/log-in', enabled = true } = options;
-  const { isAuthenticated, isLoading, user } = useSession();
-  const router = useRouter();
+export const useAuthGuard = (options: UseAuthGuardOptions = {}) => {
+  const {
+    type = "flexible",
+    redirectTo,
+    enabled = true,
+    userDetails,
+  } = options;
 
-  useEffect(() => {
-    if (enabled && !isLoading && !isAuthenticated) {
-      router.push(redirectTo);
-    }
-  }, [enabled, isAuthenticated, isLoading, router, redirectTo]);
-
-  return {
-    isAuthenticated,
-    isLoading,
-    user,
-    isReady: !isLoading && isAuthenticated,
-  };
-};
-
-/**
- * Hook that redirects authenticated users away from auth pages
- * Useful for login/signup pages that authenticated users shouldn't access
- */
-export const useRedirectIfAuthenticated = (
-  redirectTo: string = '/',
-  options: { enabled?: boolean } = {}
-) => {
-  const { enabled = true } = options;
-  const { isAuthenticated, isLoading } = useSession();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!enabled) {
-      return;
-    }
-
-    if (!isLoading && isAuthenticated) {
-      router.push(redirectTo);
-    }
-  }, [enabled, isAuthenticated, isLoading, router, redirectTo]);
-
-  return {
-    isAuthenticated,
-    isLoading,
-    shouldShow: !isLoading && (!isAuthenticated || !enabled),
-  };
-};
-
-/**
- * Hook for redirect to dashboard once authenticated
- * Redirects authenticated users to the dashboard
- */
-export const useAuthRedirect = (userDetails: unknown) => {
-  const { isAuthenticated, isLoading } = useSession();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!isLoading && isAuthenticated && userDetails) {
-      // Always redirect to dashboard
-      router.push('/dashboard');
-    }
-  }, [isAuthenticated, isLoading, userDetails, router]);
-
-  return {
-    isAuthenticated,
-    isLoading,
-    shouldRedirect: !isLoading && isAuthenticated && userDetails,
-  };
-};
-
-/**
- * Hook for conditional authentication checks
- * More flexible than useRequireAuth for custom logic
- */
-export const useAuthGuard = () => {
   const { isAuthenticated, isLoading, user, status } = useSession();
   const router = useRouter();
 
-  const requireAuth = (redirectTo: string = '/log-in') => {
+  // Handle 'require' type - redirect to login if not authenticated
+  useEffect(() => {
+    if (type !== "require" || !enabled || isLoading) {
+      return;
+    }
+
+    if (!isAuthenticated) {
+      router.push(redirectTo || "/log-in");
+    }
+  }, [type, enabled, isLoading, isAuthenticated, router, redirectTo]);
+
+  // Handle 'redirect-if-auth' type - redirect to home if authenticated
+  useEffect(() => {
+    if (type !== "redirect-if-auth" || !enabled || isLoading) {
+      return;
+    }
+
+    if (isAuthenticated) {
+      router.push(redirectTo || "/");
+    }
+  }, [type, enabled, isLoading, isAuthenticated, router, redirectTo]);
+
+  // Handle 'redirect-to-dashboard' type - redirect to dashboard when authenticated
+  useEffect(() => {
+    if (type !== "redirect-to-dashboard" || !enabled || isLoading) {
+      return;
+    }
+
+    if (isAuthenticated && userDetails) {
+      router.push(redirectTo || "/dashboard");
+    }
+  }, [
+    type,
+    enabled,
+    isLoading,
+    isAuthenticated,
+    userDetails,
+    router,
+    redirectTo,
+  ]);
+
+  // Flexible methods for manual checks
+  const requireAuth = (customRedirectTo = "/log-in"): boolean => {
     if (!isLoading && !isAuthenticated) {
-      router.push(redirectTo);
+      router.push(customRedirectTo);
       return false;
     }
     return isAuthenticated;
   };
 
-  const redirectIfAuthenticated = (redirectTo: string = '/') => {
+  const redirectIfAuthenticated = (customRedirectTo = "/"): boolean => {
     if (!isLoading && isAuthenticated) {
-      router.push(redirectTo);
+      router.push(customRedirectTo);
       return false;
     }
     return !isAuthenticated;
   };
 
   return {
+    // State
     isAuthenticated,
     isLoading,
     user,
     status,
+
+    // Computed
+    isReady: !isLoading && isAuthenticated,
+    shouldShow: !isLoading && (!isAuthenticated || !enabled),
+    shouldRedirect: !isLoading && isAuthenticated && userDetails,
+
+    // Methods for flexible type
     requireAuth,
     redirectIfAuthenticated,
-    isReady: !isLoading,
   };
+};
+
+// Backward compatibility exports
+/**
+ * @deprecated Use useAuthGuard({ type: 'require' }) instead
+ */
+export const useRequireAuth = (
+  options: { redirectTo?: string; enabled?: boolean } = {},
+) => {
+  return useAuthGuard({ type: "require", ...options });
+};
+
+/**
+ * @deprecated Use useAuthGuard({ type: 'redirect-if-auth' }) instead
+ */
+export const useRedirectIfAuthenticated = (
+  redirectTo = "/",
+  options: { enabled?: boolean } = {},
+) => {
+  return useAuthGuard({ type: "redirect-if-auth", redirectTo, ...options });
+};
+
+/**
+ * @deprecated Use useAuthGuard({ type: 'redirect-to-dashboard' }) instead
+ */
+export const useAuthRedirect = (userDetails: unknown) => {
+  return useAuthGuard({ type: "redirect-to-dashboard", userDetails });
 };

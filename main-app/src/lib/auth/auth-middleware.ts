@@ -1,10 +1,11 @@
-import { authenticateToken } from '@/helpers/jwt-token';
-import { sendResponse } from '@/lib/apis/send-response';
-import { touchSession } from '@/lib/auth/session-tracker';
-import dbConnect from '@/lib/config/db-connect';
-import { UserAuthModel } from '@/models/users';
-import type { AuthenticatedUser } from '@/types/user';
-import { NextRequest } from 'next/server';
+import crypto from "node:crypto";
+import { authenticateToken } from "@/helpers/jwt-token";
+import { touchSession } from "@/lib/auth/session-tracker";
+import dbConnect from "@/lib/config/db-connect";
+import { sendForbidden, sendUnauthorized } from "@/lib/utils/response";
+import { UserAuthModel } from "@/models/users";
+import type { AuthenticatedUser } from "@/types/user";
+import type { NextRequest } from "next/server";
 
 export interface AuthenticationResult {
   success: boolean;
@@ -16,7 +17,10 @@ export interface AuthenticationResult {
  * Authenticate user from JWT token
  * Returns user data if valid, or error response if invalid
  */
-export const authenticate = async (request: NextRequest): Promise<AuthenticationResult> => {
+export const authenticate = async (
+  request: NextRequest,
+): Promise<AuthenticationResult> => {
+  const requestId = crypto.randomUUID();
   try {
     // Extract and verify JWT token
     const decoded = authenticateToken(request);
@@ -29,23 +33,23 @@ export const authenticate = async (request: NextRequest): Promise<Authentication
     if (!userAuth) {
       return {
         success: false,
-        response: sendResponse('User not found', 401),
+        response: sendUnauthorized("User not found", requestId),
       };
     }
 
     if (!userAuth.isVerified) {
       return {
         success: false,
-        response: sendResponse('Account not verified', 403),
+        response: sendForbidden("Account not verified", requestId),
       };
     }
 
-    const sessionId = request.headers.get('x-session-id');
+    const sessionId = request.headers.get("x-session-id");
 
     if (!sessionId) {
       return {
         success: false,
-        response: sendResponse('Session context missing', 401),
+        response: sendUnauthorized("Session context missing", requestId),
       };
     }
 
@@ -54,7 +58,10 @@ export const authenticate = async (request: NextRequest): Promise<Authentication
     if (!activeSession) {
       return {
         success: false,
-        response: sendResponse('Session revoked. Please log in again.', 401),
+        response: sendUnauthorized(
+          "Session revoked. Please log in again.",
+          requestId,
+        ),
       };
     }
 
@@ -63,31 +70,32 @@ export const authenticate = async (request: NextRequest): Promise<Authentication
       user: {
         userId: decoded.userId,
         email: decoded.email,
-        firstName: userAuth.firstName || '',
-        lastName: userAuth.lastName || '',
-        username: userAuth.username || '',
+        firstName: userAuth.firstName || "",
+        lastName: userAuth.lastName || "",
+        username: userAuth.username || "",
       },
     };
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Authentication failed';
+    const errorMessage =
+      error instanceof Error ? error.message : "Authentication failed";
 
-    if (errorMessage.includes('No token provided')) {
+    if (errorMessage.includes("No token provided")) {
       return {
         success: false,
-        response: sendResponse('Authorization token required', 401),
+        response: sendUnauthorized("Authorization token required", requestId),
       };
     }
 
-    if (errorMessage.includes('Invalid or expired')) {
+    if (errorMessage.includes("Invalid or expired")) {
       return {
         success: false,
-        response: sendResponse('Invalid or expired token', 401),
+        response: sendUnauthorized("Invalid or expired token", requestId),
       };
     }
 
     return {
       success: false,
-      response: sendResponse('Authentication failed', 401),
+      response: sendUnauthorized("Authentication failed", requestId),
     };
   }
 };
@@ -96,13 +104,18 @@ export const authenticate = async (request: NextRequest): Promise<Authentication
  * Middleware wrapper for protected routes
  * Usage: const authResult = await requireAuth(request);
  */
-export const requireAuth = async (request: NextRequest): Promise<AuthenticationResult> => {
+export const requireAuth = async (
+  request: NextRequest,
+): Promise<AuthenticationResult> => {
   return await authenticate(request);
 };
 
 /**
  * Check if user can access resource (user must own the resource)
  */
-export const authorizeUser = (authenticatedUserId: string, resourceUserId: string): boolean => {
+export const authorizeUser = (
+  authenticatedUserId: string,
+  resourceUserId: string,
+): boolean => {
   return authenticatedUserId === resourceUserId;
 };

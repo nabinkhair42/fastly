@@ -5,14 +5,15 @@ import dbConnect from '@/lib/config/db-connect';
 import { sendWelcomeEmail } from '@/mail-templates/email-service';
 import { UserAuthModel, UserModel } from '@/models/users';
 import { AuthMethod } from '@/types/user';
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 
+// External API types - properties are defined by GitHub OAuth API
 interface GitHubUser {
   id: number;
   login: string;
   email: string;
   name: string;
-  avatar_url: string;
+  avatar_url: string; // eslint-disable-line @typescript-eslint/naming-convention
 }
 
 interface GitHubEmail {
@@ -22,8 +23,8 @@ interface GitHubEmail {
 }
 
 interface GitHubTokenResponse {
-  access_token: string;
-  token_type: string;
+  access_token: string; // eslint-disable-line @typescript-eslint/naming-convention
+  token_type: string; // eslint-disable-line @typescript-eslint/naming-convention
   scope: string;
 }
 
@@ -60,7 +61,7 @@ export async function GET(request: NextRequest) {
       },
       body: JSON.stringify({
         client_id: githubOAuth.clientId,
-        client_secret: githubOAuth.clientSecret,
+        client_secret: githubOAuth.clientId,
         code: code,
         redirect_uri: githubOAuth.redirectUri,
       }),
@@ -187,7 +188,7 @@ export async function GET(request: NextRequest) {
     redirectUrl.searchParams.set('username', userProfile?.username || '');
 
     // Send welcome email if new user
-    if (userAuth && userAuth.isVerified && userProfile) {
+    if (userAuth?.isVerified && userProfile) {
       await sendWelcomeEmail(userAuth.email, userAuth.firstName || '');
     }
     return NextResponse.redirect(redirectUrl.toString());

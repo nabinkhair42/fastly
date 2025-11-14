@@ -1,53 +1,94 @@
-import { generateOtp, generateOtpExpiration } from '@/helpers/generate-otp';
-import { sendResponse } from '@/lib/apis/send-response';
-import dbConnect from '@/lib/config/db-connect';
-import { sendForgotPasswordEmail } from '@/mail-templates';
-import { UserAuthModel } from '@/models/users';
-import { AuthMethod } from '@/types/user';
-import { forgotPasswordSchema } from '@/zod/authValidation';
-import { NextRequest } from 'next/server';
+import crypto from "node:crypto";
+import { generateOtp, generateOtpExpiration } from "@/helpers/generate-otp";
+import dbConnect from "@/lib/config/db-connect";
+import { handleApiError } from "@/lib/utils/error-handler";
+import { logApiError, logAuthEvent } from "@/lib/utils/logger";
+import {
+  sendAppError,
+  sendBadRequest,
+  sendNotFound,
+  sendSuccess,
+} from "@/lib/utils/response";
+import { sanitizeEmail, validateAndSanitize } from "@/lib/utils/validators";
+import { sendForgotPasswordEmail } from "@/mail-templates";
+import { UserAuthModel } from "@/models/users";
+import { AuthMethod } from "@/types/user";
+import { forgotPasswordSchema } from "@/zod/authValidation";
+import type { NextRequest } from "next/server";
 
+/**
+ * POST /api/(auth)/forgot-password
+ * Send password reset email
+ * @param request - NextRequest with email in body
+ * @returns Confirmation message
+ */
 export async function POST(request: NextRequest) {
-  await dbConnect();
+  const requestId = crypto.randomUUID();
+
   try {
-    const { email } = await request.json();
-    const { error } = forgotPasswordSchema.safeParse({ email });
+    await dbConnect();
 
-    if (error) {
-      return sendResponse(error.message, 400);
-    }
+    // Parse and validate request body
+    const body = await request.json();
+    const { email } = validateAndSanitize(body, forgotPasswordSchema);
+    const sanitizedEmail = sanitizeEmail(email);
 
-    // check if user exists
-    const userAuth = await UserAuthModel.findOne({ email });
+    // Find user by email
+    const userAuth = await UserAuthModel.findOne({ email: sanitizedEmail });
     if (!userAuth) {
-      return sendResponse('User not found. Please sign up first.', 404);
+      logAuthEvent("failed_login", undefined, {
+        reason: "user_not_found",
+        email: sanitizedEmail,
+      });
+      return sendNotFound("User not found. Please sign up first.", requestId);
     }
 
-    // check if user uses email authentication
+    // Verify user uses email authentication
     if (userAuth.authMethod !== AuthMethod.EMAIL) {
-      return sendResponse(
-        `User uses ${userAuth.authMethod} authentication. Please login try logging in with email.`,
-        400
+      logAuthEvent("failed_login", userAuth._id.toString(), {
+        reason: "non_email_auth",
+        authMethod: userAuth.authMethod,
+      });
+      return sendBadRequest(
+        `User uses ${userAuth.authMethod} authentication. Please try logging in with ${userAuth.authMethod}.`,
+        undefined,
+        requestId,
       );
     }
 
-    // generate reset password token
+    // Generate reset password token
     const resetPasswordToken = generateOtp();
-
-    // generate reset password token expires at
     const resetPasswordTokenExpiresAt = generateOtpExpiration();
 
-    // update user auth
+    // Update user with reset token
     userAuth.resetPasswordToken = resetPasswordToken;
     userAuth.resetPasswordTokenExpiresAt = resetPasswordTokenExpiresAt;
     await userAuth.save();
 
-    // send reset password email
-    await sendForgotPasswordEmail(userAuth.email, userAuth.firstName, resetPasswordToken);
+    // Send reset password email
+    await sendForgotPasswordEmail(
+      userAuth.email,
+      userAuth.firstName,
+      resetPasswordToken,
+    );
 
-    return sendResponse('Password reset email sent successfully', 200);
-  } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-    return sendResponse(errorMessage, 500, null, error);
+    // Log event
+    logAuthEvent("failed_login", userAuth._id.toString(), {
+      reason: "password_reset_requested",
+    });
+
+    // Return success response
+    return sendSuccess(
+      "Password reset email sent successfully",
+      { message: "Check your email for reset instructions" },
+      requestId,
+    );
+  } catch (error) {
+    logApiError("/api/forgot-password", error, { method: "POST" });
+    const appError = handleApiError(error, {
+      endpoint: "/api/forgot-password",
+      method: "POST",
+    });
+    return sendAppError(appError, requestId);
   }
 }
