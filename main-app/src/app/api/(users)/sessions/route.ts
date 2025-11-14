@@ -28,7 +28,11 @@ export async function GET(request: NextRequest) {
 
     const authResult = await requireAuth(request);
     if (!authResult.success) {
-      return authResult.response || sendAppError({ message: 'Unauthorized' }, crypto.randomUUID());
+      return authResult.response || sendAppError({
+        message: 'Unauthorized',
+        statusCode: 401,
+        name: 'Unauthorized'
+      }, crypto.randomUUID());
     }
 
     const sessions = await UserSessionModel.find({
@@ -80,7 +84,11 @@ export async function DELETE(request: NextRequest) {
 
     const authResult = await requireAuth(request);
     if (!authResult.success) {
-      return authResult.response || sendAppError({ message: 'Unauthorized' }, crypto.randomUUID());
+      return authResult.response || sendAppError({
+        message: 'Unauthorized',
+        statusCode: 401,
+        name: 'Unauthorized'
+      }, crypto.randomUUID());
     }
 
     const payload = await request.json().catch(() => ({}));
@@ -103,7 +111,7 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    await markSessionRevoked(authResult.user?.userId, sessionId);
+    await markSessionRevoked(authResult.user!.userId, sessionId);
 
     return sendSuccess('Session revoked successfully', { sessionId }, requestId);
   } catch (error) {

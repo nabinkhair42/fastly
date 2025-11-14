@@ -1,9 +1,0 @@
-packages:
-  - main-app
-
-onlyBuiltDependencies:
-  - "@tailwindcss/oxide"
-  - bcrypt
-  - msgpackr-extract
-  - sharp
-  - unrs-resolver
