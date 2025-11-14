@@ -132,7 +132,7 @@ function SocialInput({
           <Button
             type="button"
             variant="outline"
-            role="combobox"
+            aria-haspopup="listbox"
             aria-expanded={open}
             className="flex w-full items-center justify-between gap-3 sm:w-48"
           >
