@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import toast from 'react-hot-toast';
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import toast from "react-hot-toast";
 interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {
   items: {
     href: string;
@@ -21,26 +21,26 @@ export function SidebarNav({ className, items, ...props }: SidebarNavProps) {
   return (
     <nav
       className={cn(
-        'grid grid-cols-2 lg:grid-cols-1 space-x-2 lg:space-x-0 lg:space-y-1 p-2',
-        className
+        "grid grid-cols-2 lg:grid-cols-1 space-x-2 lg:space-x-0 lg:space-y-1 p-2",
+        className,
       )}
       {...props}
     >
-      {items.map(item => (
+      {items.map((item) => (
         <Button
-          asChild
+          asChild={true}
           key={item.href}
-          variant={'ghost'}
+          variant={"ghost"}
           className={cn(
-            'text-left justify-start text-sm col-span-1 w-full',
-            pathname === item.href && 'bg-primary/10 hover:bg-primary/15',
-            item.disabled && 'opacity-50 cursor-not-allowed'
+            "text-left justify-start text-sm col-span-1 w-full",
+            pathname === item.href && "bg-primary/10 hover:bg-primary/15",
+            item.disabled && "opacity-50 cursor-not-allowed",
           )}
           disabled={item.disabled}
           onClick={() => {
             if (item.disabled) {
               toast.error(
-                'Password change is only available for email-based accounts. OAuth users manage their passwords through their provider.'
+                "Password change is only available for email-based accounts. OAuth users manage their passwords through their provider.",
               );
             }
           }}

@@ -1,4 +1,4 @@
-import { SidebarTrigger } from '@/components/ui/sidebar';
+import { SidebarTrigger } from "@/components/ui/sidebar";
 
 const TopNavbar = () => {
   return (

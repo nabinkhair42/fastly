@@ -1,6 +1,6 @@
-'use client';
-import { ActionDialog } from '@/components/ui/action-dialog';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+"use client";
+import { ActionDialog } from "@/components/ui/action-dialog";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,12 +8,18 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { useLogout } from '@/hooks/auth/use-auth-mutations';
-import { useUserDetails } from '@/hooks/users/use-user-mutations';
-import { ChevronRight, LogOut, LucideIcon, Settings, User } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+} from "@/components/ui/dropdown-menu";
+import { useLogout } from "@/hooks/auth/use-auth-mutations";
+import { useUserDetails } from "@/hooks/users/use-user-mutations";
+import {
+  ChevronRight,
+  LogOut,
+  type LucideIcon,
+  Settings,
+  User,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 interface MenuItem {
   label: string;
@@ -26,22 +32,22 @@ interface MenuItem {
 export const UserDropdown = ({ avatarOnly }: { avatarOnly?: boolean }) => {
   const MenuList: MenuItem[] = [
     {
-      label: 'Profile',
+      label: "Profile",
       icon: User,
-      onClick: () => router.push('/edit-profile'),
-      description: 'View and manage your profile information.',
+      onClick: () => router.push("/edit-profile"),
+      description: "View and manage your profile information.",
     },
     {
-      label: 'Account Settings',
+      label: "Account Settings",
       icon: Settings,
-      onClick: () => router.push('/account'),
-      description: 'Manage your account settings and preferences.',
+      onClick: () => router.push("/account"),
+      description: "Manage your account settings and preferences.",
     },
     {
-      label: 'Logout',
+      label: "Logout",
       icon: LogOut,
       onClick: () => setShowLogoutDialog(true),
-      description: 'Logout of your account.',
+      description: "Logout of your account.",
     },
   ];
 
@@ -50,8 +56,8 @@ export const UserDropdown = ({ avatarOnly }: { avatarOnly?: boolean }) => {
   const router = useRouter();
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const avatarFallback =
-    (userDetails?.data?.user?.firstName?.charAt(0) || '') +
-    (userDetails?.data?.user?.lastName?.charAt(0) || '');
+    (userDetails?.data?.user?.firstName?.charAt(0) || "") +
+    (userDetails?.data?.user?.lastName?.charAt(0) || "");
 
   const handleLogout = () => {
     logoutMutation.mutate();
@@ -78,22 +84,23 @@ export const UserDropdown = ({ avatarOnly }: { avatarOnly?: boolean }) => {
         />
       )}
       <DropdownMenu>
-        <DropdownMenuTrigger asChild className="cursor-pointer">
+        <DropdownMenuTrigger asChild={true} className="cursor-pointer">
           {avatarOnly ? (
             <Avatar className="h-8 w-8 cursor-pointer border">
-              <AvatarImage src={userDetails?.data?.user?.avatar || ''} />
+              <AvatarImage src={userDetails?.data?.user?.avatar || ""} />
               <AvatarFallback>{avatarFallback}</AvatarFallback>
             </Avatar>
           ) : (
             <div className="flex items-center gap-2 justify-between cursor-pointer rounded-md hover:bg-accent transition-colors p-2">
               <div className="flex items-center gap-2">
                 <Avatar className="h-8 w-8 border">
-                  <AvatarImage src={userDetails?.data?.user?.avatar || ''} />
+                  <AvatarImage src={userDetails?.data?.user?.avatar || ""} />
                   <AvatarFallback>{avatarFallback}</AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-medium text-foreground">
-                    {userDetails?.data?.user?.firstName} {userDetails?.data?.user?.lastName}
+                    {userDetails?.data?.user?.firstName}{" "}
+                    {userDetails?.data?.user?.lastName}
                   </div>
                   <div className="text-xs text-muted-foreground truncate">
                     {userDetails?.data?.user?.username}
@@ -109,11 +116,12 @@ export const UserDropdown = ({ avatarOnly }: { avatarOnly?: boolean }) => {
             <DropdownMenuLabel>
               <div className="flex items-center gap-2">
                 <Avatar className="h-8 w-8">
-                  <AvatarImage src={userDetails?.data?.user?.avatar || ''} />
+                  <AvatarImage src={userDetails?.data?.user?.avatar || ""} />
                   <AvatarFallback>{avatarFallback}</AvatarFallback>
                 </Avatar>
                 <span className="text-sm font-medium flex flex-col">
-                  {userDetails?.data?.user?.firstName} {userDetails?.data?.user?.lastName}
+                  {userDetails?.data?.user?.firstName}{" "}
+                  {userDetails?.data?.user?.lastName}
                   <span className="text-xs text-muted-foreground">
                     {userDetails?.data?.user?.username}
                   </span>
@@ -122,12 +130,14 @@ export const UserDropdown = ({ avatarOnly }: { avatarOnly?: boolean }) => {
             </DropdownMenuLabel>
           )}
           {avatarOnly && <DropdownMenuSeparator />}
-          {MenuList.filter(item => item.isVisible !== false).map(item => (
+          {MenuList.filter((item) => item.isVisible !== false).map((item) => (
             <DropdownMenuItem key={item.label} onClick={item.onClick}>
               <item.icon className="mr-2 h-4 w-4" />
               <div>
                 <p className="text-sm font-medium">{item.label}</p>
-                <p className="text-xs text-muted-foreground">{item.description}</p>
+                <p className="text-xs text-muted-foreground">
+                  {item.description}
+                </p>
               </div>
             </DropdownMenuItem>
           ))}

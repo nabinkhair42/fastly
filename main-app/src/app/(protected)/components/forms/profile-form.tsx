@@ -1,16 +1,16 @@
-'use client';
+"use client";
 
-import DashboardSkeleton from '@/app/(protected)/components/dashboard-skeleton';
-import { UploadAvatar } from '@/app/(protected)/components/upload-avatar';
-import { Button } from '@/components/ui/button';
-import { Calendar } from '@/components/ui/calendar';
+import DashboardSkeleton from "@/app/(protected)/components/dashboard-skeleton";
+import { UploadAvatar } from "@/app/(protected)/components/upload-avatar";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
 import {
   Command,
   CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
-} from '@/components/ui/command';
+} from "@/components/ui/command";
 import {
   Form,
   FormControl,
@@ -19,14 +19,18 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Textarea } from '@/components/ui/textarea';
-import { useProfileForm } from '@/hooks/users/use-profile-form';
-import { cn } from '@/lib/utils';
-import { format } from 'date-fns';
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Textarea } from "@/components/ui/textarea";
+import { useProfileForm } from "@/hooks/users/use-profile-form";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
 import {
   CalendarIcon,
   Check,
@@ -37,8 +41,8 @@ import {
   RotateCcw,
   Trash2,
   XCircle,
-} from 'lucide-react';
-import { useState } from 'react';
+} from "lucide-react";
+import { useState } from "react";
 import {
   FaDiscord,
   FaFacebook,
@@ -49,56 +53,56 @@ import {
   FaTiktok,
   FaXTwitter,
   FaYoutube,
-} from 'react-icons/fa6';
+} from "react-icons/fa6";
 
 // Social platform constants
 const SOCIAL_PLATFORMS = {
   website: {
-    label: 'Website',
+    label: "Website",
     icon: FaGlobe,
-    placeholder: 'https://yourwebsite.com',
+    placeholder: "https://yourwebsite.com",
   },
   github: {
-    label: 'GitHub',
+    label: "GitHub",
     icon: FaGithub,
-    placeholder: 'https://github.com/username',
+    placeholder: "https://github.com/username",
   },
   twitter: {
-    label: 'Twitter',
+    label: "Twitter",
     icon: FaXTwitter,
-    placeholder: 'https://twitter.com/username',
+    placeholder: "https://twitter.com/username",
   },
   linkedin: {
-    label: 'LinkedIn',
+    label: "LinkedIn",
     icon: FaLinkedin,
-    placeholder: 'https://linkedin.com/in/username',
+    placeholder: "https://linkedin.com/in/username",
   },
   instagram: {
-    label: 'Instagram',
+    label: "Instagram",
     icon: FaInstagram,
-    placeholder: 'https://instagram.com/username',
+    placeholder: "https://instagram.com/username",
   },
   facebook: {
-    label: 'Facebook',
+    label: "Facebook",
     icon: FaFacebook,
-    placeholder: 'https://facebook.com/username',
+    placeholder: "https://facebook.com/username",
   },
   youtube: {
-    label: 'YouTube',
+    label: "YouTube",
     icon: FaYoutube,
-    placeholder: 'https://youtube.com/@username',
+    placeholder: "https://youtube.com/@username",
   },
   tiktok: {
-    label: 'TikTok',
+    label: "TikTok",
     icon: FaTiktok,
-    placeholder: 'https://tiktok.com/@username',
+    placeholder: "https://tiktok.com/@username",
   },
   discord: {
-    label: 'Discord',
+    label: "Discord",
     icon: FaDiscord,
-    placeholder: 'https://discord.gg/server',
+    placeholder: "https://discord.gg/server",
   },
-  other: { label: 'Other', icon: FaGlobe, placeholder: 'https://example.com' },
+  other: { label: "Other", icon: FaGlobe, placeholder: "https://example.com" },
 } as const;
 
 // Integrated Social Input Component
@@ -107,7 +111,7 @@ function SocialInput({
   url,
   onProviderChange,
   onUrlChange,
-  placeholder = 'https://example.com',
+  placeholder = "https://example.com",
 }: {
   provider: string;
   url: string;
@@ -116,14 +120,15 @@ function SocialInput({
   placeholder?: string;
 }) {
   const [open, setOpen] = useState(false);
-  const selectedPlatform = SOCIAL_PLATFORMS[provider as keyof typeof SOCIAL_PLATFORMS];
+  const selectedPlatform =
+    SOCIAL_PLATFORMS[provider as keyof typeof SOCIAL_PLATFORMS];
   const Icon = selectedPlatform?.icon || FaGlobe;
   const dynamicPlaceholder = selectedPlatform?.placeholder || placeholder;
 
   return (
     <div className="flex flex-col gap-2 sm:flex-row">
       <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
+        <PopoverTrigger asChild={true}>
           <Button
             type="button"
             variant="outline"
@@ -134,7 +139,7 @@ function SocialInput({
             <span className="flex flex-1 items-center gap-2 truncate">
               <Icon className="h-4 w-4 text-muted-foreground" />
               <span className="truncate text-sm">
-                {selectedPlatform?.label ?? 'Select platform'}
+                {selectedPlatform?.label ?? "Select platform"}
               </span>
             </span>
             <ChevronDown className="h-3 w-3 text-muted-foreground" />
@@ -147,23 +152,27 @@ function SocialInput({
             <CommandGroup>
               <ScrollArea className="max-h-60">
                 <div className="py-1">
-                  {Object.entries(SOCIAL_PLATFORMS).map(([key, { icon: PlatformIcon, label }]) => {
-                    const isSelected = provider === key;
-                    return (
-                      <CommandItem
-                        key={key}
-                        value={`${label} ${key}`}
-                        onSelect={() => {
-                          onProviderChange(key);
-                          setOpen(false);
-                        }}
-                      >
-                        <PlatformIcon className="h-4 w-4 text-muted-foreground" />
-                        <span className="flex-1 text-sm">{label}</span>
-                        {isSelected && <Check className="h-4 w-4 text-primary" />}
-                      </CommandItem>
-                    );
-                  })}
+                  {Object.entries(SOCIAL_PLATFORMS).map(
+                    ([key, { icon: PlatformIcon, label }]) => {
+                      const isSelected = provider === key;
+                      return (
+                        <CommandItem
+                          key={key}
+                          value={`${label} ${key}`}
+                          onSelect={() => {
+                            onProviderChange(key);
+                            setOpen(false);
+                          }}
+                        >
+                          <PlatformIcon className="h-4 w-4 text-muted-foreground" />
+                          <span className="flex-1 text-sm">{label}</span>
+                          {isSelected && (
+                            <Check className="h-4 w-4 text-primary" />
+                          )}
+                        </CommandItem>
+                      );
+                    },
+                  )}
                 </div>
               </ScrollArea>
             </CommandGroup>
@@ -172,7 +181,7 @@ function SocialInput({
       </Popover>
       <Input
         value={url}
-        onChange={e => onUrlChange(e.target.value)}
+        onChange={(e) => onUrlChange(e.target.value)}
         placeholder={dynamicPlaceholder}
         className="sm:flex-1"
       />
@@ -213,7 +222,10 @@ export function ProfileForm() {
       <div className="space-y-6 w-full">
         <UploadAvatar />
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
+          <form
+            onSubmit={form.handleSubmit(handleSubmit)}
+            className="space-y-8"
+          >
             <div className="flex flex-col lg:flex-row gap-4">
               <FormField
                 control={form.control}
@@ -225,7 +237,8 @@ export function ProfileForm() {
                       <Input placeholder="John" {...field} />
                     </FormControl>
                     <FormDescription>
-                      This is your first name. It will be displayed on your profile.
+                      This is your first name. It will be displayed on your
+                      profile.
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -242,7 +255,8 @@ export function ProfileForm() {
                       <Input placeholder="Doe" {...field} />
                     </FormControl>
                     <FormDescription>
-                      This is your last name. It will be displayed on your profile.
+                      This is your last name. It will be displayed on your
+                      profile.
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -263,7 +277,7 @@ export function ProfileForm() {
                           placeholder="shadcn"
                           {...field}
                           disabled={hasChangedUsername}
-                          onChange={e => {
+                          onChange={(e) => {
                             field.onChange(e);
                             handleUsernameChange(e);
                           }}
@@ -286,25 +300,35 @@ export function ProfileForm() {
                     <FormDescription>
                       {hasChangedUsername ? (
                         <span className="text-muted-foreground">
-                          Username can only be changed once. You have already updated your username.
+                          Username can only be changed once. You have already
+                          updated your username.
                         </span>
                       ) : (
                         <span className="text-warning">
-                          You can change your username only once. Choose carefully.
+                          You can change your username only once. Choose
+                          carefully.
                         </span>
                       )}
                     </FormDescription>
-                    {!hasChangedUsername && usernameValue && usernameValue !== user?.username && (
-                      <div className="text-sm">
-                        {checkingUsername ? (
-                          <span className="text-muted-foreground">Checking availability...</span>
-                        ) : usernameAvailable === true ? (
-                          <span className="text-green-600">✓ Username is available</span>
-                        ) : usernameAvailable === false ? (
-                          <span className="text-red-600">✗ Username is already taken</span>
-                        ) : null}
-                      </div>
-                    )}
+                    {!hasChangedUsername &&
+                      usernameValue &&
+                      usernameValue !== user?.username && (
+                        <div className="text-sm">
+                          {checkingUsername ? (
+                            <span className="text-muted-foreground">
+                              Checking availability...
+                            </span>
+                          ) : usernameAvailable === true ? (
+                            <span className="text-green-600">
+                              ✓ Username is available
+                            </span>
+                          ) : usernameAvailable === false ? (
+                            <span className="text-red-600">
+                              ✗ Username is already taken
+                            </span>
+                          ) : null}
+                        </div>
+                      )}
                     <FormMessage />
                   </FormItem>
                 )}
@@ -317,16 +341,20 @@ export function ProfileForm() {
                   <FormItem className="flex flex-col">
                     <FormLabel>Date of Birth</FormLabel>
                     <Popover>
-                      <PopoverTrigger asChild>
+                      <PopoverTrigger asChild={true}>
                         <FormControl>
                           <Button
                             variant="outline"
                             className={cn(
-                              'w-full pl-3 text-left font-normal',
-                              !field.value && 'text-muted-foreground'
+                              "w-full pl-3 text-left font-normal",
+                              !field.value && "text-muted-foreground",
                             )}
                           >
-                            {field.value ? format(field.value, 'PPP') : <span>Pick a date</span>}
+                            {field.value ? (
+                              format(field.value, "PPP")
+                            ) : (
+                              <span>Pick a date</span>
+                            )}
                             <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                           </Button>
                         </FormControl>
@@ -336,20 +364,23 @@ export function ProfileForm() {
                           mode="single"
                           selected={field.value}
                           onSelect={field.onChange}
-                          disabled={date => date > new Date() || date < new Date('1900-01-01')}
+                          disabled={(date) =>
+                            date > new Date() || date < new Date("1900-01-01")
+                          }
                           captionLayout="dropdown"
                           formatters={{
-                            formatMonthDropdown: date =>
-                              date.toLocaleString('default', { month: 'long' }),
-                            formatYearDropdown: date => date.getFullYear().toString(),
+                            formatMonthDropdown: (date) =>
+                              date.toLocaleString("default", { month: "long" }),
+                            formatYearDropdown: (date) =>
+                              date.getFullYear().toString(),
                           }}
-                          initialFocus
+                          initialFocus={true}
                         />
                       </PopoverContent>
                     </Popover>
                     <FormDescription>
-                      Your date of birth helps us personalize your experience. You can quickly
-                      select year and month using the dropdowns.
+                      Your date of birth helps us personalize your experience.
+                      You can quickly select year and month using the dropdowns.
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -382,10 +413,12 @@ export function ProfileForm() {
               <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <div className="space-y-1">
                   <h4 className="flex items-center gap-2 text-sm font-medium">
-                    <MapPin className="h-4 w-4 text-muted-foreground" /> Location
+                    <MapPin className="h-4 w-4 text-muted-foreground" />{" "}
+                    Location
                   </h4>
                   <p className="text-sm text-muted-foreground">
-                    Share where you&apos;re based. Leave any field blank to keep it hidden.
+                    Share where you&apos;re based. Leave any field blank to keep
+                    it hidden.
                   </p>
                 </div>
                 <Button
@@ -394,13 +427,13 @@ export function ProfileForm() {
                   size="sm"
                   className="gap-1 text-muted-foreground hover:text-foreground"
                   onClick={() =>
-                    form.resetField('location', {
+                    form.resetField("location", {
                       defaultValue: {
-                        address: '',
-                        city: '',
-                        state: '',
-                        country: '',
-                        zipCode: '',
+                        address: "",
+                        city: "",
+                        state: "",
+                        country: "",
+                        zipCode: "",
                       },
                       keepDirty: false,
                       keepTouched: false,
@@ -494,17 +527,27 @@ export function ProfileForm() {
                 </p>
               )}
               {fields.map((field, index) => (
-                <div key={field.id} className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                <div
+                  key={field.id}
+                  className="flex flex-col gap-2 sm:flex-row sm:items-center"
+                >
                   <SocialInput
-                    provider={form.watch(`socialAccounts.${index}.provider`) || 'website'}
-                    url={form.watch(`socialAccounts.${index}.url`) || ''}
-                    onProviderChange={provider => {
-                      form.setValue(`socialAccounts.${index}.provider`, provider, {
-                        shouldDirty: true,
-                        shouldTouch: true,
-                      });
+                    provider={
+                      form.watch(`socialAccounts.${index}.provider`) ||
+                      "website"
+                    }
+                    url={form.watch(`socialAccounts.${index}.url`) || ""}
+                    onProviderChange={(provider) => {
+                      form.setValue(
+                        `socialAccounts.${index}.provider`,
+                        provider,
+                        {
+                          shouldDirty: true,
+                          shouldTouch: true,
+                        },
+                      );
                     }}
-                    onUrlChange={url => {
+                    onUrlChange={(url) => {
                       form.setValue(`socialAccounts.${index}.url`, url, {
                         shouldDirty: true,
                         shouldTouch: true,
@@ -525,7 +568,7 @@ export function ProfileForm() {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => append({ provider: 'website', url: '' })}
+                onClick={() => append({ provider: "website", url: "" })}
               >
                 Add Social Account
               </Button>

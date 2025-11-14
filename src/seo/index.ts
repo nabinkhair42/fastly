@@ -21,6 +21,7 @@ export const siteConfig = {
     type: 'website',
     locale: 'en_US',
     url: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+    // biome-ignore lint/style/useNamingConvention: Open Graph standard requires snake_case
     site_name: 'Fastly',
   },
 

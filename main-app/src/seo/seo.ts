@@ -1,7 +1,7 @@
-import { siteConfig } from '@/seo/metadata';
-import { Metadata } from 'next';
+import { siteConfig } from "@/seo/metadata";
+import type { Metadata } from "next";
 
-interface SEOProps {
+interface SeoProps {
   title?: string;
   description?: string;
   keywords?: string[];
@@ -17,17 +17,17 @@ export function generatePageMetadata({
   canonical,
   ogImage,
   noIndex = false,
-}: SEOProps = {}): Metadata {
+}: SeoProps = {}): Metadata {
   const metaTitle = title ? `${title} | ${siteConfig.name}` : siteConfig.name;
   const metaDescription = description || siteConfig.description;
   const metaKeywords = [
     ...(keywords || []),
-    'SaaS',
-    'Next.js',
-    'TypeScript',
-    'Sample App',
-    'Demo',
-    'Fastly',
+    "SaaS",
+    "Next.js",
+    "TypeScript",
+    "Sample App",
+    "Demo",
+    "Fastly",
   ];
   const metaImage = ogImage || siteConfig.ogImage;
 
@@ -35,7 +35,9 @@ export function generatePageMetadata({
     title: metaTitle,
     description: metaDescription,
     keywords: metaKeywords,
-    robots: noIndex ? { index: false, follow: false } : { index: true, follow: true },
+    robots: noIndex
+      ? { index: false, follow: false }
+      : { index: true, follow: true },
     alternates: canonical ? { canonical } : undefined,
     openGraph: {
       title: metaTitle,
@@ -49,15 +51,15 @@ export function generatePageMetadata({
           alt: metaTitle,
         },
       ],
-      type: 'website',
+      type: "website",
       siteName: siteConfig.name,
     },
     twitter: {
-      card: 'summary_large_image',
+      card: "summary_large_image",
       title: metaTitle,
       description: metaDescription,
       images: [metaImage],
-      creator: '@nabinkhair42',
+      creator: "@nabinkhair42",
     },
   };
 }
@@ -65,65 +67,67 @@ export function generatePageMetadata({
 // Structured data generators
 export function generateWebsiteStructuredData() {
   return {
-    '@context': 'https://schema.org',
-    '@type': 'WebSite',
+    "@context": "https://schema.org",
+    "@type": "WebSite",
     name: siteConfig.name,
     url: siteConfig.url,
     description: siteConfig.description,
     potentialAction: {
-      '@type': 'SearchAction',
+      "@type": "SearchAction",
       target: `${siteConfig.url}/search?q={search_term_string}`,
-      'query-input': 'required name=search_term_string',
+      "query-input": "required name=search_term_string",
     },
   };
 }
 
 export function generateOrganizationStructuredData() {
   return {
-    '@context': 'https://schema.org',
-    '@type': 'Organization',
-    name: 'My SaaS App',
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "My SaaS App",
     url: siteConfig.url,
     logo: `${siteConfig.url}/icon.png`,
     description: siteConfig.description,
     sameAs: [siteConfig.links.github, siteConfig.links.twitter],
     founder: {
-      '@type': 'Person',
-      name: 'Nabin Khair',
-      url: 'https://nabinkhair.com.np',
+      "@type": "Person",
+      name: "Nabin Khair",
+      url: "https://nabinkhair.com.np",
     },
   };
 }
 
 export function generateWebApplicationStructuredData() {
   return {
-    '@context': 'https://schema.org',
-    '@type': 'WebApplication',
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
     name: siteConfig.name,
     url: siteConfig.url,
     description: siteConfig.description,
-    applicationCategory: 'BusinessApplication',
-    operatingSystem: 'Web Browser',
+    applicationCategory: "BusinessApplication",
+    operatingSystem: "Web Browser",
     offers: {
-      '@type': 'Offer',
-      price: '0',
-      priceCurrency: 'USD',
-      category: 'Demo',
+      "@type": "Offer",
+      price: "0",
+      priceCurrency: "USD",
+      category: "Demo",
     },
     creator: {
-      '@type': 'Organization',
-      name: 'Fastly',
-      url: 'https://github.com/nabinkhair42/saas-starter',
+      "@type": "Organization",
+      name: "Fastly",
+      url: "https://github.com/nabinkhair42/saas-starter",
     },
   };
 }
 
-export function generateBreadcrumbStructuredData(items: Array<{ name: string; url: string }>) {
+export function generateBreadcrumbStructuredData(
+  items: Array<{ name: string; url: string }>,
+) {
   return {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
     itemListElement: items.map((item, index) => ({
-      '@type': 'ListItem',
+      "@type": "ListItem",
       position: index + 1,
       name: item.name,
       item: item.url,

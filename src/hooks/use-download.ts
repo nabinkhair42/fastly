@@ -1,43 +1,68 @@
-import { downloadSaaSStarter, fetchStats, StatsData } from '@/services/download';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import toast from 'react-hot-toast';
+import { type StatsData, fetchStats } from "@/services/download";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 
 type ApiError = Error & {
-  response?: {
-    data?: {
-      message?: string;
-    };
-  };
+  message: string;
 };
 
-const extractErrorMessage = (error: ApiError, fallback: string) => {
-  return error.response?.data?.message ?? fallback;
-};
-
+/**
+ * Hook to initiate product bundle download from /api/download
+ */
 export const useDownload = () => {
-  return useMutation<void, ApiError>({
+  return useMutation({
     mutationFn: async () => {
-      return toast.promise(downloadSaaSStarter(), {
-        loading: 'Preparing your download',
-        success: 'Download started successfully!',
-        error: (error: ApiError) =>
-          extractErrorMessage(error, 'Failed to download. Please try again.'),
-      });
+      const response = await fetch("/api/download");
+
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        throw new Error(error?.message || "Failed to download file");
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "create-fastly-app.zip";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
     },
-    onError: error => {
-      console.error('Download failed:', error);
+    onMutate: () => {
+      toast.loading("Preparing your download…", { id: "download-status" });
+    },
+    onSuccess: () => {
+      toast.success("Download started!", { id: "download-status" });
+    },
+    onError: (error: ApiError) => {
+      console.error("Download failed:", error);
+      toast.error(error.message || "Failed to download. Please try again.", {
+        id: "download-status",
+        duration: 4000,
+      });
     },
   });
 };
 
+/**
+ * Hook to fetch download statistics
+ */
 export const useFetchStats = () => {
   return useQuery<StatsData, ApiError>({
-    queryKey: ['stats'],
+    queryKey: ["stats"],
     queryFn: async () => {
-      const response = await fetchStats();
-      return response.data;
+      try {
+        const response = await fetchStats();
+        return response.data;
+      } catch (error) {
+        console.error("Failed to fetch stats:", error);
+        throw new Error("Failed to load statistics");
+      }
     },
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
+    retry: 2,
   });
 };

@@ -1,76 +1,101 @@
-'use client';
+"use client";
 
-import { ThemeProvider } from '@/providers/theme-provider';
-import { useUserDetails } from '@/hooks/users/use-user-mutations';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useTheme } from 'next-themes';
-import { createContext, useContext, useEffect, useState } from 'react';
-import { Toaster } from 'react-hot-toast';
-import AuthProvider, { useAuth } from './auth-provider';
+import { useUserDetails } from "@/hooks/users/use-user-mutations";
+import { ThemeProvider } from "@/providers/theme-provider";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useTheme } from "next-themes";
+import {
+  type ReactNode,
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+import { Toaster } from "react-hot-toast";
+import AuthProvider, { useAuth } from "./auth-provider";
 
-// Simple font context
-type FontContextType = {
-  font: 'sans' | 'serif' | 'mono' | 'system';
-  setFont: (font: 'sans' | 'serif' | 'mono' | 'system') => void;
-};
+type FontType = "sans" | "serif" | "mono" | "system";
+
+interface FontContextType {
+  font: FontType;
+  setFont: (font: FontType) => void;
+}
 
 const FontContext = createContext<FontContextType | undefined>(undefined);
 
 export function useFont() {
   const ctx = useContext(FontContext);
-  if (!ctx) throw new Error('useFont must be used within FontProvider');
+  if (!ctx) {
+    throw new Error("useFont must be used within FontProvider");
+  }
   return ctx;
 }
 
-function FontProvider({ children }: { children: React.ReactNode }) {
+const TOASTER_OPTIONS = {
+  position: "top-center" as const,
+  toastOptions: {
+    style: {
+      background: "var(--sidebar)",
+      color: "var(--sidebar-foreground)",
+    },
+  },
+} as const;
+
+const DEFAULT_FONT: FontType = "sans";
+
+interface FontProviderProps {
+  children: ReactNode;
+}
+
+function FontProvider({ children }: FontProviderProps) {
   const { isAuthenticated } = useAuth();
   const { data: userDetails } = useUserDetails();
   const { setTheme } = useTheme();
+  const [font, setFont] = useState<FontType>(DEFAULT_FONT);
 
-  const [font, setFont] = useState<'sans' | 'serif' | 'mono' | 'system'>('sans');
-
-  // Sync with database when user is authenticated and data is loaded
+  // Sync preferences with database
   useEffect(() => {
     if (isAuthenticated && userDetails?.data?.user?.preferences) {
-      const dbPrefs = userDetails.data.user.preferences;
+      const { theme, font: dbFont } = userDetails.data.user.preferences;
 
-      // Update theme
-      if (dbPrefs.theme) {
-        setTheme(dbPrefs.theme);
+      if (theme) {
+        setTheme(theme);
       }
 
-      // Update font
-      if (dbPrefs.font) {
-        setFont(dbPrefs.font as 'sans' | 'serif' | 'mono' | 'system');
+      if (dbFont && ["sans", "serif", "mono", "system"].includes(dbFont)) {
+        setFont(dbFont as FontType);
       }
     }
   }, [isAuthenticated, userDetails, setTheme]);
 
+  const value = useMemo(() => ({ font, setFont }), [font]);
+
   return (
-    <FontContext.Provider value={{ font, setFont }}>
+    <FontContext.Provider value={value}>
       <div className={font}>{children}</div>
     </FontContext.Provider>
   );
 }
 
-export default function RootProvider({ children }: { children: React.ReactNode }) {
+interface RootProviderProps {
+  children: ReactNode;
+}
+
+export default function RootProvider({ children }: RootProviderProps) {
   const [queryClient] = useState(() => new QueryClient());
 
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem={true}
+        >
           <FontProvider>
             {children}
-            <Toaster
-              position="top-center"
-              toastOptions={{
-                style: {
-                  background: 'var(--sidebar)',
-                  color: 'var(--sidebar-foreground)',
-                },
-              }}
-            />
+            <Toaster {...TOASTER_OPTIONS} />
           </FontProvider>
         </ThemeProvider>
       </AuthProvider>

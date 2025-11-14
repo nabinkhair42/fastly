@@ -9,7 +9,7 @@ const cachedConnection = global._mongoose ?? null;
 const connect = async () => {
   if (!cachedConnection) {
     global._mongoose = mongoose
-      .connect(process.env.MONGODB_URI!, {
+      .connect(process.env.MONGODB_URI as string, {
         bufferCommands: false,
         serverSelectionTimeoutMS: 5000,
       })
@@ -24,7 +24,7 @@ const connect = async () => {
       });
   }
 
-  return global._mongoose!;
+  return global._mongoose as Promise<typeof mongoose>;
 };
 
 const dbConnect = async () => {

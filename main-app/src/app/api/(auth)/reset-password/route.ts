@@ -1,61 +1,106 @@
-import { hashPassword } from '@/helpers/hash-password';
-import { sendResponse } from '@/lib/apis/send-response';
-import dbConnect from '@/lib/config/db-connect';
-import { UserAuthModel } from '@/models/users';
-import { resetPasswordRequestSchema } from '@/zod/authValidation';
-import { NextRequest } from 'next/server';
+import crypto from "node:crypto";
+import { hashPassword } from "@/helpers/hash-password";
+import dbConnect from "@/lib/config/db-connect";
+import { handleApiError } from "@/lib/utils/error-handler";
+import { logApiError, logAuthEvent } from "@/lib/utils/logger";
+import {
+  sendAppError,
+  sendBadRequest,
+  sendNotFound,
+  sendSuccess,
+} from "@/lib/utils/response";
+import { sanitizeEmail, validateAndSanitize } from "@/lib/utils/validators";
+import { UserAuthModel } from "@/models/users";
+import { resetPasswordRequestSchema } from "@/zod/authValidation";
+import type { NextRequest } from "next/server";
 
+/**
+ * POST /api/(auth)/reset-password
+ * Reset user password with reset token
+ * @param request - NextRequest with email, resetToken, password, confirmPassword in body
+ * @returns Confirmation message
+ */
 export async function POST(request: NextRequest) {
-  await dbConnect();
+  const requestId = crypto.randomUUID();
+
   try {
-    const { email, resetToken, password, confirmPassword } = await request.json();
+    await dbConnect();
 
-    // Validate request body
-    const { error } = resetPasswordRequestSchema.safeParse({
-      email,
-      resetToken,
-      password,
-      confirmPassword,
-    });
+    // Parse and validate request body
+    const body = await request.json();
+    const { email, resetToken, password, confirmPassword } =
+      validateAndSanitize(body, resetPasswordRequestSchema);
+    const sanitizedEmail = sanitizeEmail(email);
 
-    if (error) {
-      return sendResponse(error.message, 400);
-    }
-
-    // check if user exists
-    const userAuth = await UserAuthModel.findOne({ email });
+    // Find user by email
+    const userAuth = await UserAuthModel.findOne({ email: sanitizedEmail });
     if (!userAuth) {
-      return sendResponse('User not found. Please sign up first.', 404);
+      logAuthEvent("failed_login", undefined, {
+        reason: "user_not_found",
+        email: sanitizedEmail,
+      });
+      return sendNotFound("User not found. Please sign up first.", requestId);
     }
 
-    // check if reset password token is valid
+    // Validate reset token
     if (userAuth.resetPasswordToken !== resetToken) {
-      return sendResponse('Invalid or expired reset password token', 400);
+      logAuthEvent("failed_login", userAuth._id.toString(), {
+        reason: "invalid_reset_token",
+      });
+      return sendBadRequest(
+        "Invalid or expired reset password token",
+        undefined,
+        requestId,
+      );
     }
 
-    // check if reset password token has expired
-    if (userAuth.resetPasswordTokenExpiresAt && userAuth.resetPasswordTokenExpiresAt < new Date()) {
-      return sendResponse('Reset password token has expired', 400);
+    // Check if reset token has expired
+    if (
+      userAuth.resetPasswordTokenExpiresAt &&
+      userAuth.resetPasswordTokenExpiresAt < new Date()
+    ) {
+      logAuthEvent("failed_login", userAuth._id.toString(), {
+        reason: "expired_reset_token",
+      });
+      return sendBadRequest(
+        "Reset password token has expired",
+        undefined,
+        requestId,
+      );
     }
 
-    // check if password and confirm password match
+    // Verify passwords match
     if (password !== confirmPassword) {
-      return sendResponse('Password and confirm password do not match', 400);
+      return sendBadRequest("Passwords do not match", undefined, requestId);
     }
 
-    // hash password
+    // Hash new password
     const hashedPassword = await hashPassword(password);
 
-    // update user auth and clear reset token
+    // Update user password and clear reset token
     userAuth.password = hashedPassword;
     userAuth.resetPasswordToken = null;
     userAuth.resetPasswordTokenExpiresAt = null;
     userAuth.updatedAt = new Date();
     await userAuth.save();
 
-    return sendResponse('Password reset successfully', 200);
-  } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-    return sendResponse(errorMessage, 500, null, error);
+    // Log password reset
+    logAuthEvent("failed_login", userAuth._id.toString(), {
+      reason: "password_reset_completed",
+    });
+
+    // Return success response
+    return sendSuccess(
+      "Password reset successfully",
+      { message: "You can now login with your new password" },
+      requestId,
+    );
+  } catch (error) {
+    logApiError("/api/reset-password", error, { method: "POST" });
+    const appError = handleApiError(error, {
+      endpoint: "/api/reset-password",
+      method: "POST",
+    });
+    return sendAppError(appError, requestId);
   }
 }

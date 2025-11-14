@@ -16,8 +16,8 @@ import { changePasswordSchema, setPasswordSchema } from '@/zod/usersUpdate';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Eye, EyeOff } from 'lucide-react';
 import { useState } from 'react';
-import { useForm, type Control, type FieldValues, type Path } from 'react-hook-form';
-import { z } from 'zod';
+import { type Control, type FieldValues, type Path, useForm } from 'react-hook-form';
+import type { z } from 'zod';
 
 type ChangePasswordValues = z.infer<typeof changePasswordSchema>;
 type CreatePasswordValues = z.infer<typeof setPasswordSchema>;
@@ -34,7 +34,7 @@ export default function ChangePasswordForm(props: ChangePasswordFormProps) {
   return <UpdatePasswordForm providerLabel={props.providerLabel} />;
 }
 
-function UpdatePasswordForm({}: { providerLabel?: string }) {
+function UpdatePasswordForm(_props: { providerLabel?: string }) {
   const { mutate: changePassword, isPending } = useChangePassword();
   const form = useForm<ChangePasswordValues>({
     resolver: zodResolver(changePasswordSchema),

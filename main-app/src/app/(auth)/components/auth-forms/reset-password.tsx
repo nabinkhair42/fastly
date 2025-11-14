@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -8,7 +8,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
+} from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -16,16 +16,16 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { useResetPassword } from '@/hooks/auth/use-auth-mutations';
-import { resetPasswordRequestSchema } from '@/zod/authValidation';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Eye, EyeOff, Lock } from 'lucide-react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { useResetPassword } from "@/hooks/auth/use-auth-mutations";
+import { resetPasswordRequestSchema } from "@/zod/authValidation";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Eye, EyeOff, Lock } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import type { z } from "zod";
 
 type ResetPasswordFormData = z.infer<typeof resetPasswordRequestSchema>;
 
@@ -35,36 +35,36 @@ export function ResetPasswordForm() {
   const resetPasswordMutation = useResetPassword();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [token, setToken] = useState<string>('');
-  const [email, setEmail] = useState<string>('');
+  const [token, setToken] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
 
   const form = useForm<ResetPasswordFormData>({
     resolver: zodResolver(resetPasswordRequestSchema),
     defaultValues: {
-      email: '',
-      resetToken: '',
-      password: '',
-      confirmPassword: '',
+      email: "",
+      resetToken: "",
+      password: "",
+      confirmPassword: "",
     },
-    mode: 'onChange',
+    mode: "onChange",
   });
 
   useEffect(() => {
     // Get token from URL query parameter
-    const tokenFromUrl = searchParams.get('token');
+    const tokenFromUrl = searchParams.get("token");
     if (tokenFromUrl) {
       setToken(tokenFromUrl);
-      form.setValue('resetToken', tokenFromUrl);
+      form.setValue("resetToken", tokenFromUrl);
     } else {
       // If no token, redirect to forgot password
-      router.push('/forgot-password');
+      router.push("/forgot-password");
     }
 
     // Get email from localStorage (if available from forgot password page)
-    const storedEmail = localStorage.getItem('resetPasswordEmail');
+    const storedEmail = localStorage.getItem("resetPasswordEmail");
     if (storedEmail) {
       setEmail(storedEmail);
-      form.setValue('email', storedEmail);
+      form.setValue("email", storedEmail);
     }
   }, [searchParams, form, router]);
 
@@ -72,9 +72,9 @@ export function ResetPasswordForm() {
     try {
       await resetPasswordMutation.mutateAsync(data);
       // Clear stored email
-      localStorage.removeItem('resetPasswordEmail');
+      localStorage.removeItem("resetPasswordEmail");
       // Redirect to login page after successful reset
-      router.push('/log-in');
+      router.push("/log-in");
     } catch (error) {
       console.error(error);
     }
@@ -86,9 +86,13 @@ export function ResetPasswordForm() {
         <CardContent className="pt-6">
           <div className="text-center">
             <p className="text-muted-foreground">
-              Invalid or missing reset token. Please request a new password reset.
+              Invalid or missing reset token. Please request a new password
+              reset.
             </p>
-            <Button onClick={() => router.push('/forgot-password')} className="mt-4">
+            <Button
+              onClick={() => router.push("/forgot-password")}
+              className="mt-4"
+            >
               Go to Forgot Password
             </Button>
           </div>
@@ -103,7 +107,9 @@ export function ResetPasswordForm() {
         <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-muted">
           <Lock className="h-6 w-6" />
         </div>
-        <CardTitle className="text-2xl font-bold">Reset Your Password</CardTitle>
+        <CardTitle className="text-2xl font-bold">
+          Reset Your Password
+        </CardTitle>
         <CardDescription>Enter your new password below</CardDescription>
       </CardHeader>
       <CardContent>
@@ -121,7 +127,7 @@ export function ResetPasswordForm() {
                       placeholder="Enter your email address"
                       {...field}
                       value={email}
-                      onChange={e => {
+                      onChange={(e) => {
                         setEmail(e.target.value);
                         field.onChange(e);
                       }}
@@ -141,7 +147,7 @@ export function ResetPasswordForm() {
                   <FormControl>
                     <div className="relative">
                       <Input
-                        type={showPassword ? 'text' : 'password'}
+                        type={showPassword ? "text" : "password"}
                         placeholder="Enter your new password"
                         {...field}
                       />
@@ -174,7 +180,7 @@ export function ResetPasswordForm() {
                   <FormControl>
                     <div className="relative">
                       <Input
-                        type={showConfirmPassword ? 'text' : 'password'}
+                        type={showConfirmPassword ? "text" : "password"}
                         placeholder="Confirm your new password"
                         {...field}
                       />
@@ -184,7 +190,9 @@ export function ResetPasswordForm() {
                         variant="ghost"
                         size="sm"
                         className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 p-0 hover:bg-transparent"
-                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        onClick={() =>
+                          setShowConfirmPassword(!showConfirmPassword)
+                        }
                       >
                         {showConfirmPassword ? (
                           <EyeOff className="h-4 w-4" />
@@ -213,7 +221,11 @@ export function ResetPasswordForm() {
       </CardContent>
       <CardFooter className="flex justify-center">
         <div className="text-center text-sm">
-          <Button variant="link" className="p-0 font-normal" onClick={() => router.push('/log-in')}>
+          <Button
+            variant="link"
+            className="p-0 font-normal"
+            onClick={() => router.push("/log-in")}
+          >
             Back to Sign In
           </Button>
         </div>

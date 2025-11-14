@@ -1,14 +1,18 @@
-'use client';
+"use client";
 
-import { Announcement, AnnouncementTag, AnnouncementTitle } from '@/components/ui/announcement-tag';
-import { Button } from '@/components/ui/button';
-import { ContainerTextFlip } from '@/components/ui/text-flip';
-import { useDownload, useFetchStats } from '@/hooks/use-download';
-import { ArrowUpRightIcon, Download } from 'lucide-react';
-import Image from 'next/image';
-import Reveal, { RevealY } from './reveal';
+import {
+  Announcement,
+  AnnouncementTag,
+  AnnouncementTitle,
+} from "@/components/ui/announcement-tag";
+import { Button } from "@/components/ui/button";
+import { ContainerTextFlip } from "@/components/ui/text-flip";
+import { useDownload, useFetchStats } from "@/hooks/use-download";
+import { ArrowUpRightIcon, Download } from "lucide-react";
+import Image from "next/image";
+import Reveal, { RevealY } from "./reveal";
 
-const words = ['15x faster', '10x secure', '10x safer', 'seamless'];
+const words = ["15x faster", "10x secure", "10x safer", "seamless"];
 export default function Hero() {
   const { mutate: download, isPending } = useDownload();
   const { data: stats } = useFetchStats();
@@ -23,11 +27,16 @@ export default function Hero() {
             <div className="flex flex-col items-center space-y-6 sm:space-y-8">
               {/* Announcement */}
               <Announcement>
-                <AnnouncementTag className="bg-emerald-300">Latest update</AnnouncementTag>
+                <AnnouncementTag className="bg-emerald-300">
+                  Latest update
+                </AnnouncementTag>
                 <AnnouncementTitle
                   className="cursor-pointer"
                   onClick={() =>
-                    window.open('https://github.com/nabinkhair42/saas-starter', '_blank')
+                    window.open(
+                      "https://github.com/nabinkhair42/saas-starter",
+                      "_blank",
+                    )
                   }
                 >
                   Open Sourced on GitHub
@@ -46,14 +55,19 @@ export default function Hero() {
               >
                 <span className="block">Build your SaaS</span>
                 <span className="block mt-2">
-                  <ContainerTextFlip words={words} interval={2500} animationDuration={600} />
+                  <ContainerTextFlip
+                    words={words}
+                    interval={2500}
+                    animationDuration={600}
+                  />
                 </span>
               </h1>
 
               {/* Description */}
               <p className="max-w-2xl text-lg sm:text-xl text-muted-foreground leading-relaxed">
-                Focus on building product features; not infrastructure. Start on a secure,
-                production‑ready foundation so you can ship faster with confidence.
+                Focus on building product features; not infrastructure. Start on
+                a secure, production‑ready foundation so you can ship faster
+                with confidence.
               </p>
 
               {/* CTA Button */}

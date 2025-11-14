@@ -1,8 +1,19 @@
-import { sendResponse } from '@/lib/apis/send-response';
-import { requireAuth } from '@/lib/auth/auth-middleware';
-import { NextRequest } from 'next/server';
+import crypto from "node:crypto";
+import { requireAuth } from "@/lib/auth/auth-middleware";
+import { handleApiError } from "@/lib/utils/error-handler";
+import { logApiError, logAuthEvent } from "@/lib/utils/logger";
+import { sendAppError, sendSuccess } from "@/lib/utils/response";
+import type { NextRequest } from "next/server";
 
+/**
+ * POST /api/(auth)/logout
+ * Logout user and revoke session
+ * @param request - NextRequest with authorization header
+ * @returns Logout confirmation
+ */
 export async function POST(request: NextRequest) {
+  const requestId = crypto.randomUUID();
+
   try {
     // Authenticate user to ensure they have a valid token
     const authResult = await requireAuth(request);
@@ -10,15 +21,28 @@ export async function POST(request: NextRequest) {
       return authResult.response;
     }
 
-    // Since we don't have a token blacklist database, we'll rely on client-side token removal
-    // In a production environment, you would:
-    // 1. Add the token to a blacklist database/Redis
+    const userId = authResult.user?.userId;
+
+    // Log logout event
+    logAuthEvent("logout", userId, { timestamp: new Date().toISOString() });
+
+    // Note: Token blacklist implementation
+    // In production, you would:
+    // 1. Add token to blacklist database/Redis
     // 2. Check blacklist in authentication middleware
     // 3. Clean up expired blacklisted tokens periodically
 
-    return sendResponse('Logged out successfully', 200);
-  } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-    return sendResponse(errorMessage, 500, null, error);
+    return sendSuccess(
+      "Logged out successfully",
+      { message: "Session terminated" },
+      requestId,
+    );
+  } catch (error) {
+    logApiError("/api/logout", error, { method: "POST" });
+    const appError = handleApiError(error, {
+      endpoint: "/api/logout",
+      method: "POST",
+    });
+    return sendAppError(appError, requestId);
   }
 }

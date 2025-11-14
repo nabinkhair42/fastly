@@ -1,5 +1,8 @@
-import { Changelog, ChangelogEntry } from '@/components/changelog/changelog';
-import changelogData from '@/components/changelog/changelog.json';
+import {
+  Changelog,
+  type ChangelogEntry,
+} from "@/components/changelog/changelog";
+import changelogData from "@/components/changelog/changelog.json";
 
 const changelogEntries = changelogData as ChangelogEntry[];
 

@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useTheme } from 'next-themes';
-import React from 'react';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useTheme } from "next-themes";
+import React from "react";
+import { useForm } from "react-hook-form";
+import type { z } from "zod";
 
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -15,23 +15,26 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+} from "@/components/ui/form";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from "@/components/ui/select";
 
-import { ActiveSessions } from '@/app/(protected)/components/active-sessions';
-import DashboardSkeleton from '@/app/(protected)/components/dashboard-skeleton';
-import { DeleteUser } from '@/app/(protected)/components/delete-user';
-import { Separator } from '@/components/ui/separator';
-import { useUpdateUserDetails, useUserDetails } from '@/hooks/users/use-user-mutations';
-import { useFont } from '@/providers/root-provider';
-import { accountPreferencesSchema } from '@/zod/usersUpdate';
+import { ActiveSessions } from "@/app/(protected)/components/active-sessions";
+import DashboardSkeleton from "@/app/(protected)/components/dashboard-skeleton";
+import { DeleteUser } from "@/app/(protected)/components/delete-user";
+import { Separator } from "@/components/ui/separator";
+import {
+  useUpdateUserDetails,
+  useUserDetails,
+} from "@/hooks/users/use-user-mutations";
+import { useFont } from "@/providers/root-provider";
+import { accountPreferencesSchema } from "@/zod/usersUpdate";
 
 type AccountFormValues = z.infer<typeof accountPreferencesSchema>;
 
@@ -44,22 +47,22 @@ export function AccountForm() {
   const form = useForm<AccountFormValues>({
     resolver: zodResolver(accountPreferencesSchema),
     defaultValues: {
-      theme: (theme as 'light' | 'dark' | 'system') || 'system',
-      font: font || 'sans',
+      theme: (theme as "light" | "dark" | "system") || "system",
+      font: font || "sans",
     },
-    mode: 'onChange',
+    mode: "onChange",
   });
 
-  const watchedTheme = form.watch('theme');
-  const watchedFont = form.watch('font');
+  const watchedTheme = form.watch("theme");
+  const watchedFont = form.watch("font");
 
   // Load values from database
   React.useEffect(() => {
     if (userDetails?.data?.user?.preferences) {
       const prefs = userDetails.data.user.preferences;
       form.reset({
-        theme: (prefs.theme as 'light' | 'dark' | 'system') || 'system',
-        font: (prefs.font as 'sans' | 'serif' | 'mono' | 'system') || 'sans',
+        theme: (prefs.theme as "light" | "dark" | "system") || "system",
+        font: (prefs.font as "sans" | "serif" | "mono" | "system") || "sans",
       });
     }
   }, [userDetails, form]);
@@ -78,7 +81,7 @@ export function AccountForm() {
           setTheme(data.theme);
           setFont(data.font);
         },
-      }
+      },
     );
   }
 
@@ -105,7 +108,9 @@ export function AccountForm() {
                 render={({ field }) => (
                   <FormItem className="space-y-1">
                     <FormLabel>Theme</FormLabel>
-                    <FormDescription>Select the theme for the dashboard.</FormDescription>
+                    <FormDescription>
+                      Select the theme for the dashboard.
+                    </FormDescription>
                     <FormMessage />
                     <RadioGroup
                       onValueChange={field.onChange}
@@ -115,7 +120,9 @@ export function AccountForm() {
                       <FormItem>
                         <FormLabel
                           className={`[&:has([data-state=checked])>div]:border-primary flex flex-col items-start ${
-                            watchedTheme === 'light' ? 'border-primary' : 'border-muted'
+                            watchedTheme === "light"
+                              ? "border-primary"
+                              : "border-muted"
                           }`}
                         >
                           <FormControl>
@@ -137,14 +144,18 @@ export function AccountForm() {
                               </div>
                             </div>
                           </div>
-                          <span className="block w-full p-2 font-normal">Light</span>
+                          <span className="block w-full p-2 font-normal">
+                            Light
+                          </span>
                         </FormLabel>
                       </FormItem>
 
                       <FormItem>
                         <FormLabel
                           className={`[&:has([data-state=checked])>div]:border-primary flex flex-col items-start ${
-                            watchedTheme === 'dark' ? 'border-primary' : 'border-muted'
+                            watchedTheme === "dark"
+                              ? "border-primary"
+                              : "border-muted"
                           }`}
                         >
                           <FormControl>
@@ -166,7 +177,9 @@ export function AccountForm() {
                               </div>
                             </div>
                           </div>
-                          <span className="block w-full p-2 font-normal">Dark</span>
+                          <span className="block w-full p-2 font-normal">
+                            Dark
+                          </span>
                         </FormLabel>
                       </FormItem>
                     </RadioGroup>
@@ -181,7 +194,9 @@ export function AccountForm() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Font</FormLabel>
-                    <FormDescription>Select the font for the dashboard.</FormDescription>
+                    <FormDescription>
+                      Select the font for the dashboard.
+                    </FormDescription>
                     <FormMessage />
                     <Select onValueChange={field.onChange} value={watchedFont}>
                       <FormControl>

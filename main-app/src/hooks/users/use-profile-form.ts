@@ -1,56 +1,56 @@
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect, useState } from 'react';
-import { useFieldArray, useForm } from 'react-hook-form';
-import { z } from 'zod';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect, useState } from "react";
+import { useFieldArray, useForm } from "react-hook-form";
+import type { z } from "zod";
 
-import { useDebounce } from '@/hooks/ui/use-debounce';
+import { useDebounce } from "@/hooks/ui/use-debounce";
 import {
   useChangeUsername,
   useUpdateUserDetails,
   useUserDetails,
-} from '@/hooks/users/use-user-mutations';
-import { userService } from '@/services/user-service';
-import { UpdateUserDetailsRequest } from '@/types/api';
-import { profileFormInputSchema } from '@/zod/usersUpdate';
-import toast from 'react-hot-toast';
+} from "@/hooks/users/use-user-mutations";
+import { userService } from "@/services/user-service";
+import type { UpdateUserDetailsRequest } from "@/types/api";
+import { profileFormInputSchema } from "@/zod/usersUpdate";
+import toast from "react-hot-toast";
 
 type ProfileFormValues = z.infer<typeof profileFormInputSchema>;
-type ProfileFormLocation = NonNullable<ProfileFormValues['location']>;
+type ProfileFormLocation = NonNullable<ProfileFormValues["location"]>;
 
 const EMPTY_LOCATION: ProfileFormLocation = {
-  address: '',
-  city: '',
-  state: '',
-  country: '',
-  zipCode: '',
+  address: "",
+  city: "",
+  state: "",
+  country: "",
+  zipCode: "",
 };
 
 const locationFromUser = (
-  location: Partial<ProfileFormLocation> | null | undefined
+  location: Partial<ProfileFormLocation> | null | undefined,
 ): ProfileFormLocation => ({
-  address: location?.address ?? '',
-  city: location?.city ?? '',
-  state: location?.state ?? '',
-  country: location?.country ?? '',
-  zipCode: location?.zipCode ?? '',
+  address: location?.address ?? "",
+  city: location?.city ?? "",
+  state: location?.state ?? "",
+  country: location?.country ?? "",
+  zipCode: location?.zipCode ?? "",
 });
 
 const normalizeLocation = (
-  location: Partial<ProfileFormLocation> | null | undefined
+  location: Partial<ProfileFormLocation> | null | undefined,
 ): ProfileFormLocation | null => {
   if (!location) {
     return null;
   }
 
   const trimmed: ProfileFormLocation = {
-    address: location.address?.trim() ?? '',
-    city: location.city?.trim() ?? '',
-    state: location.state?.trim() ?? '',
-    country: location.country?.trim() ?? '',
-    zipCode: location.zipCode?.trim() ?? '',
+    address: location.address?.trim() ?? "",
+    city: location.city?.trim() ?? "",
+    state: location.state?.trim() ?? "",
+    country: location.country?.trim() ?? "",
+    zipCode: location.zipCode?.trim() ?? "",
   };
 
-  const hasValues = Object.values(trimmed).some(value => value.length > 0);
+  const hasValues = Object.values(trimmed).some((value) => value.length > 0);
 
   return hasValues ? trimmed : null;
 };
@@ -60,27 +60,29 @@ export function useProfileForm() {
   const updateUserDetails = useUpdateUserDetails();
   const changeUsername = useChangeUsername();
 
-  const [usernameValue, setUsernameValue] = useState('');
-  const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null);
+  const [usernameValue, setUsernameValue] = useState("");
+  const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(
+    null,
+  );
   const [checkingUsername, setCheckingUsername] = useState(false);
   const debouncedUsername = useDebounce(usernameValue, 500);
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormInputSchema),
     defaultValues: {
-      firstName: '',
-      lastName: '',
-      username: '',
-      bio: '',
+      firstName: "",
+      lastName: "",
+      username: "",
+      bio: "",
       socialAccounts: [],
       dob: undefined,
       location: { ...EMPTY_LOCATION },
     },
-    mode: 'onChange',
+    mode: "onChange",
   });
 
   const { fields, append, remove } = useFieldArray({
-    name: 'socialAccounts',
+    name: "socialAccounts",
     control: form.control,
   });
 
@@ -88,15 +90,15 @@ export function useProfileForm() {
   useEffect(() => {
     if (userDetails?.data?.user) {
       const user = userDetails.data.user;
-      const initialUsername = user.username || '';
+      const initialUsername = user.username || "";
       form.reset({
-        firstName: user.firstName || '',
-        lastName: user.lastName || '',
+        firstName: user.firstName || "",
+        lastName: user.lastName || "",
         username: initialUsername,
-        bio: user.bio || '',
+        bio: user.bio || "",
         socialAccounts:
-          user.socialAccounts?.map(account => ({
-            provider: account.provider || 'website',
+          user.socialAccounts?.map((account) => ({
+            provider: account.provider || "website",
             url: account.url,
           })) || [],
         dob: user.dob ? new Date(user.dob) : undefined,
@@ -130,16 +132,16 @@ export function useProfileForm() {
 
       // Use the service directly instead of the mutation hook
       toast.promise(userService.checkUsernameAvailability(debouncedUsername), {
-        loading: 'Checking username availability...',
+        loading: "Checking username availability...",
         success: () => {
           setUsernameAvailable(true);
           setCheckingUsername(false);
-          return 'Username is available!';
+          return "Username is available!";
         },
         error: () => {
           setUsernameAvailable(false);
           setCheckingUsername(false);
-          return 'Username is not available';
+          return "Username is not available";
         },
       });
     }
@@ -148,7 +150,7 @@ export function useProfileForm() {
   const updateOtherDetails = (data: ProfileFormValues) => {
     // Transform social accounts to the expected format
     const socialAccounts =
-      data.socialAccounts?.map(account => ({
+      data.socialAccounts?.map((account) => ({
         url: account.url,
         provider: account.provider,
       })) || [];
@@ -156,7 +158,8 @@ export function useProfileForm() {
     const user = userDetails?.data?.user;
     const nextLocation = normalizeLocation(data.location);
     const currentLocation = normalizeLocation(locationFromUser(user?.location));
-    const locationHasChanged = JSON.stringify(nextLocation) !== JSON.stringify(currentLocation);
+    const locationHasChanged =
+      JSON.stringify(nextLocation) !== JSON.stringify(currentLocation);
 
     const payload: UpdateUserDetailsRequest = {
       firstName: data.firstName,
@@ -175,7 +178,9 @@ export function useProfileForm() {
 
   const handleSubmit = (data: ProfileFormValues) => {
     const user = userDetails?.data?.user;
-    if (!user) return;
+    if (!user) {
+      return;
+    }
 
     // Check if username has changed and user hasn't already changed it
     const usernameChanged = data.username !== user.username;
@@ -190,7 +195,7 @@ export function useProfileForm() {
             // After username change, update other details
             updateOtherDetails(data);
           },
-        }
+        },
       );
     } else {
       // Just update other details
@@ -207,7 +212,9 @@ export function useProfileForm() {
   const isSubmitDisabled =
     updateUserDetails.isPending ||
     changeUsername.isPending ||
-    (!hasChangedUsername && usernameValue !== user?.username && usernameAvailable === false);
+    (!hasChangedUsername &&
+      usernameValue !== user?.username &&
+      usernameAvailable === false);
 
   return {
     // Form controls

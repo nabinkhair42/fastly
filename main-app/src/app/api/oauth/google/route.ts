@@ -5,23 +5,24 @@ import dbConnect from '@/lib/config/db-connect';
 import { sendWelcomeEmail } from '@/mail-templates/email-service';
 import { UserAuthModel, UserModel } from '@/models/users';
 import { AuthMethod } from '@/types/user';
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 
+// External API types - properties are defined by Google OAuth API
 interface GoogleUser {
   id: string;
   email: string;
-  verified_email: boolean;
+  verified_email: boolean; // eslint-disable-line @typescript-eslint/naming-convention
   name: string;
-  given_name: string;
-  family_name: string;
+  given_name: string; // eslint-disable-line @typescript-eslint/naming-convention
+  family_name: string; // eslint-disable-line @typescript-eslint/naming-convention
   picture: string;
 }
 
 interface GoogleTokenResponse {
-  access_token: string;
-  token_type: string;
-  expires_in: number;
-  refresh_token?: string;
+  access_token: string; // eslint-disable-line @typescript-eslint/naming-convention
+  token_type: string; // eslint-disable-line @typescript-eslint/naming-convention
+  expires_in: number; // eslint-disable-line @typescript-eslint/naming-convention
+  refresh_token?: string; // eslint-disable-line @typescript-eslint/naming-convention
   scope: string;
 }
 
@@ -52,11 +53,11 @@ export async function GET(request: NextRequest) {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: new URLSearchParams({
-        client_id: googleOAuth.clientId!,
-        client_secret: googleOAuth.clientSecret!,
+        client_id: googleOAuth.clientId || '',
+        client_secret: googleOAuth.clientId || '',
         code: code,
         grant_type: 'authorization_code',
-        redirect_uri: googleOAuth.redirectUri!,
+        redirect_uri: googleOAuth.redirectUri || '',
       }),
     });
 
@@ -181,7 +182,7 @@ export async function GET(request: NextRequest) {
     redirectUrl.searchParams.set('username', userProfile?.username || '');
 
     // Send welcome email if new user
-    if (userAuth && userAuth.isVerified && userProfile) {
+    if (userAuth?.isVerified && userProfile) {
       await sendWelcomeEmail(userAuth.email, userAuth.firstName || '');
     }
 

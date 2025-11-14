@@ -1,13 +1,21 @@
-'use client';
+"use client";
 
-import DashboardSkeleton from '@/app/(protected)/components/dashboard-skeleton';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { useUserDetails } from '@/hooks/users/use-user-mutations';
-import { ArrowUpRight, Calendar, Mail, MapPin, Palette, Type, User } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import type { ReactNode } from 'react';
+import DashboardSkeleton from "@/app/(protected)/components/dashboard-skeleton";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { useUserDetails } from "@/hooks/users/use-user-mutations";
+import {
+  ArrowUpRight,
+  Calendar,
+  Mail,
+  MapPin,
+  Palette,
+  Type,
+  User,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
+import type { ReactNode } from "react";
 import {
   FaDiscord,
   FaFacebook,
@@ -18,7 +26,7 @@ import {
   FaTiktok,
   FaXTwitter,
   FaYoutube,
-} from 'react-icons/fa6';
+} from "react-icons/fa6";
 
 const socialIconMap: Record<string, ReactNode> = {
   website: <FaGlobe className="h-4 w-4 text-muted-foreground" />,
@@ -37,18 +45,24 @@ const formatLocation = (
     city?: string | null;
     state?: string | null;
     country?: string | null;
-  } | null
+  } | null,
 ) => {
-  if (!location) return '';
-  return [location.city, location.state, location.country].filter(Boolean).join(', ');
+  if (!location) {
+    return "";
+  }
+  return [location.city, location.state, location.country]
+    .filter(Boolean)
+    .join(", ");
 };
 
 const titleCase = (value?: string | null) => {
-  if (!value) return 'Not set';
+  if (!value) {
+    return "Not set";
+  }
   return value
-    .split(' ')
-    .map(segment => segment.charAt(0).toUpperCase() + segment.slice(1))
-    .join(' ');
+    .split(" ")
+    .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
+    .join(" ");
 };
 
 export default function DashboardContent() {
@@ -66,12 +80,15 @@ export default function DashboardContent() {
       <div className="space-y-6 p-6 lg:p-10 text-center">
         <h1 className="text-2xl font-semibold">Welcome back</h1>
         <p className="text-muted-foreground">
-          We could not load your profile details just yet. Try refreshing or update your
-          information.
+          We could not load your profile details just yet. Try refreshing or
+          update your information.
         </p>
         <div className="flex justify-center gap-3">
           <Button onClick={() => router.refresh()}>Refresh</Button>
-          <Button variant="outline" onClick={() => router.push('/edit-profile')}>
+          <Button
+            variant="outline"
+            onClick={() => router.push("/edit-profile")}
+          >
             Edit profile
           </Button>
         </div>
@@ -79,12 +96,14 @@ export default function DashboardContent() {
     );
   }
 
-  const fullName = `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim() || 'Unnamed User';
-  const initials = `${user.firstName?.[0] ?? ''}${user.lastName?.[0] ?? ''}` || 'UU';
+  const fullName =
+    `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim() || "Unnamed User";
+  const initials =
+    `${user.firstName?.[0] ?? ""}${user.lastName?.[0] ?? ""}` || "UU";
   const locationDisplay = formatLocation(user.location);
-  const authMethod = titleCase(user.authMethod ?? 'email');
-  const themePreference = titleCase(user.preferences?.theme) ?? 'System';
-  const fontPreference = titleCase(user.preferences?.font) ?? 'Sans';
+  const authMethod = titleCase(user.authMethod ?? "email");
+  const themePreference = titleCase(user.preferences?.theme) ?? "System";
+  const fontPreference = titleCase(user.preferences?.font) ?? "Sans";
   const canChangeUsername = !user.hasChangedUsername;
 
   return (
@@ -94,7 +113,9 @@ export default function DashboardContent() {
         <div className="flex items-start gap-4">
           <Avatar className="h-20 w-20 border-2 border-primary/40 shadow-2xl">
             <AvatarImage src={user.avatar ?? undefined} alt={fullName} />
-            <AvatarFallback className="text-xl font-semibold">{initials}</AvatarFallback>
+            <AvatarFallback className="text-xl font-semibold">
+              {initials}
+            </AvatarFallback>
           </Avatar>
           <div className="space-y-2">
             <div className="flex items-center gap-3">
@@ -103,7 +124,11 @@ export default function DashboardContent() {
                 {authMethod}
               </Badge>
             </div>
-            {user.bio && <p className="max-w-xl text-sm text-muted-foreground">{user.bio}</p>}
+            {user.bio && (
+              <p className="max-w-xl text-sm text-muted-foreground">
+                {user.bio}
+              </p>
+            )}
             <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
                 <Mail className="h-4 w-4" />
@@ -124,12 +149,14 @@ export default function DashboardContent() {
 
         <div className="space-y-3 text-sm">
           <p className="max-w-sm text-muted-foreground">
-            A modern snapshot of your account perfect for showcasing the starter kit&apos;s profile
-            and preference flows.
+            A modern snapshot of your account perfect for showcasing the starter
+            kit&apos;s profile and preference flows.
           </p>
           <div className="flex flex-wrap items-center gap-3">
             <Badge variant="outline" className="gap-1 text-xs">
-              {canChangeUsername ? 'Username change available' : 'Username locked'}
+              {canChangeUsername
+                ? "Username change available"
+                : "Username locked"}
             </Badge>
             {user.dob && (
               <Badge variant="outline" className="gap-1 text-xs">
@@ -150,7 +177,11 @@ export default function DashboardContent() {
               Essential details and preferences at a glance.
             </p>
           </div>
-          <Button size="sm" variant="outline" onClick={() => router.push('/edit-profile')}>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => router.push("/edit-profile")}
+          >
             Edit profile
             <ArrowUpRight size={3} />
           </Button>
@@ -169,7 +200,9 @@ export default function DashboardContent() {
           <div className="flex items-center gap-3 rounded-2xl border bg-card/40 p-4">
             <Type className="h-5 w-5 text-primary" />
             <div>
-              <p className="text-xs uppercase tracking-wide text-muted-foreground">Typeface</p>
+              <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                Typeface
+              </p>
               <p className="text-sm font-medium">{fontPreference}</p>
             </div>
           </div>
@@ -188,7 +221,7 @@ export default function DashboardContent() {
             </div>
           </header>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {user.socialAccounts!.map((account, index) => (
+            {user.socialAccounts?.map((account, index) => (
               <a
                 key={`${account.provider}-${index}`}
                 href={account.url}
@@ -198,15 +231,16 @@ export default function DashboardContent() {
               >
                 <div className="flex items-center gap-3">
                   <div className="flex h-9 w-9 items-center justify-center rounded-full bg-background">
-                    {socialIconMap[account.provider ?? 'website'] ?? (
+                    {socialIconMap[account.provider ?? "website"] ?? (
                       <FaGlobe className="h-4 w-4 text-muted-foreground" />
                     )}
                   </div>
                   <div className="space-y-1">
                     <p className="text-sm font-medium">
                       {account.provider
-                        ? account.provider.charAt(0).toUpperCase() + account.provider.slice(1)
-                        : 'Website'}
+                        ? account.provider.charAt(0).toUpperCase() +
+                          account.provider.slice(1)
+                        : "Website"}
                     </p>
                     <p className="text-xs text-muted-foreground group-hover:text-foreground/80">
                       {account.url}

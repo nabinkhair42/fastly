@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { setLastUsedProviderCookie } from '@/hooks/auth/use-last-used-provider';
-import { sanitizeRedirect } from '@/hooks/auth/use-safe-redirect';
-import { useAuth } from '@/providers/auth-provider';
-import { AuthMethod } from '@/types/user';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useRef } from 'react';
+import { setLastUsedProviderCookie } from "@/hooks/auth/use-last-used-provider";
+import { sanitizeRedirect } from "@/hooks/auth/use-safe-redirect";
+import { useAuth } from "@/providers/auth-provider";
+import { AuthMethod } from "@/types/user";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useRef } from "react";
 
 export const OAuthCallback = () => {
   const router = useRouter();
@@ -14,39 +14,41 @@ export const OAuthCallback = () => {
   const hasProcessed = useRef(false);
 
   useEffect(() => {
-    if (hasProcessed.current) return;
+    if (hasProcessed.current) {
+      return;
+    }
     hasProcessed.current = true;
 
-    const accessToken = searchParams.get('accessToken');
-    const refreshToken = searchParams.get('refreshToken');
-    const authMethod = searchParams.get('authMethod') as AuthMethod;
-    const error = searchParams.get('error');
+    const accessToken = searchParams.get("accessToken");
+    const refreshToken = searchParams.get("refreshToken");
+    const authMethod = searchParams.get("authMethod") as AuthMethod;
+    const error = searchParams.get("error");
 
     if (error) {
-      console.error('OAuth error:', error);
+      console.error("OAuth error:", error);
       router.replace(`/log-in?error=${error}`);
       return;
     }
 
     if (accessToken && refreshToken) {
       try {
-        const sessionIdFromParams = searchParams.get('sessionId') || undefined;
+        const sessionIdFromParams = searchParams.get("sessionId") || undefined;
         let redirectTarget: string | undefined;
-        if (typeof window !== 'undefined') {
-          const storedRedirect = localStorage.getItem('oauth_redirect');
+        if (typeof window !== "undefined") {
+          const storedRedirect = localStorage.getItem("oauth_redirect");
           if (storedRedirect) {
             redirectTarget = sanitizeRedirect(storedRedirect);
           }
-          localStorage.removeItem('oauth_redirect');
+          localStorage.removeItem("oauth_redirect");
         }
-        const resolvedRedirect = redirectTarget ?? '/dashboard';
+        const resolvedRedirect = redirectTarget ?? "/dashboard";
 
         // Get user data from URL parameters
-        const userId = searchParams.get('userId');
-        const email = searchParams.get('email');
-        const firstName = searchParams.get('firstName') || '';
-        const lastName = searchParams.get('lastName') || '';
-        const username = searchParams.get('username') || '';
+        const userId = searchParams.get("userId");
+        const email = searchParams.get("email");
+        const firstName = searchParams.get("firstName") || "";
+        const lastName = searchParams.get("lastName") || "";
+        const username = searchParams.get("username") || "";
 
         if (userId && email) {
           const userData = {
@@ -64,7 +66,8 @@ export const OAuthCallback = () => {
           // Set the last used OAuth provider if available
           if (
             authMethod &&
-            (authMethod === AuthMethod.GITHUB || authMethod === AuthMethod.GOOGLE)
+            (authMethod === AuthMethod.GITHUB ||
+              authMethod === AuthMethod.GOOGLE)
           ) {
             setLastUsedProviderCookie(authMethod);
           }
@@ -72,13 +75,13 @@ export const OAuthCallback = () => {
           router.replace(resolvedRedirect);
         } else {
           // Fallback: decode JWT token for minimal data
-          const tokenPayload = JSON.parse(atob(accessToken.split('.')[1]));
+          const tokenPayload = JSON.parse(atob(accessToken.split(".")[1]));
           const userData = {
             userId: tokenPayload.userId,
             email: tokenPayload.email,
-            firstName: '',
-            lastName: '',
-            username: '',
+            firstName: "",
+            lastName: "",
+            username: "",
           };
 
           login(accessToken, refreshToken, userData, {
@@ -88,7 +91,8 @@ export const OAuthCallback = () => {
           // Set the last used OAuth provider if available
           if (
             authMethod &&
-            (authMethod === AuthMethod.GITHUB || authMethod === AuthMethod.GOOGLE)
+            (authMethod === AuthMethod.GITHUB ||
+              authMethod === AuthMethod.GOOGLE)
           ) {
             setLastUsedProviderCookie(authMethod);
           }
@@ -96,18 +100,20 @@ export const OAuthCallback = () => {
           router.replace(resolvedRedirect);
         }
       } catch (error) {
-        console.error('OAuth callback error:', error);
-        router.replace('/log-in?error=token_processing_failed');
+        console.error("OAuth callback error:", error);
+        router.replace("/log-in?error=token_processing_failed");
       }
     } else {
-      router.replace('/log-in?error=no_tokens');
+      router.replace("/log-in?error=no_tokens");
     }
   }, [searchParams, router, login]);
 
   return (
     <div className="flex items-center justify-center min-h-[100svh]">
       <div className="text-center">
-        <p className="mt-4 text-muted-foreground">Completing authentication...</p>
+        <p className="mt-4 text-muted-foreground">
+          Completing authentication...
+        </p>
       </div>
     </div>
   );

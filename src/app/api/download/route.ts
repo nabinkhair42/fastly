@@ -1,12 +1,8 @@
-import dbConnect from '@/lib/db-connect';
-import AppStats from '@/models/app-stats';
-import { NextResponse } from 'next/server';
-import fetch from 'node-fetch';
-
-const OWNER = 'nabinkhair42';
-const REPO = 'fastly';
-const FOLDER_PATH = 'my-saas-app';
-const SERVER_URL = process.env.SERVER_URL!;
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
+import dbConnect from "@/lib/db-connect";
+import AppStats from "@/models/app-stats";
+import { NextResponse } from "next/server";
 
 export async function GET(): Promise<NextResponse> {
   try {
@@ -15,34 +11,28 @@ export async function GET(): Promise<NextResponse> {
     await AppStats.findOneAndUpdate(
       {},
       { $inc: { totalDownloads: 1 }, lastUpdated: new Date() },
-      { upsert: true, new: true }
+      { upsert: true, new: true },
     );
 
-    const repolinkUrl = `${SERVER_URL}?owner=${OWNER}&repo=${REPO}&folder_path=${FOLDER_PATH}`;
+    // Read the zip file from public folder
+    const zipPath = join(process.cwd(), "public", "create-fastly-app.zip");
+    const fileBuffer = await readFile(zipPath);
 
-    const res = await fetch(repolinkUrl, {
-      headers: { accept: 'application/json' },
+    // Return the zip file with appropriate headers
+    return new NextResponse(fileBuffer, {
+      status: 200,
+      headers: {
+        "Content-Type": "application/zip",
+        "Content-Disposition": 'attachment; filename="create-fastly-app.zip"',
+        "Content-Length": fileBuffer.length.toString(),
+      },
     });
-    if (!res.ok) throw new Error(`Repolink API error: ${res.statusText}`);
-
-    const data = (await res.json()) as {
-      success: boolean;
-      message: string;
-      data?: { download_url: string };
-    };
-
-    if (!data.success || !data.data?.download_url) {
-      throw new Error(data.message || 'Failed to get download URL');
-    }
-
-    // Return JSON with download URL to client
-    return NextResponse.json({ download_url: data.data.download_url });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    console.error('Download API error:', message);
+    console.error("Download API error:", message);
     return NextResponse.json(
-      { message: 'Failed to start download', error: message },
-      { status: 500 }
+      { message: "Failed to download file", error: message },
+      { status: 500 },
     );
   }
 }

@@ -1,11 +1,17 @@
-import { ForgotPasswordForm } from '@/app/(auth)/components/auth-forms';
-import { generatePageMetadata } from '@/seo/seo';
+import { ForgotPasswordForm } from "@/app/(auth)/components/auth-forms";
+import { generatePageMetadata } from "@/seo/seo";
 
 export const metadata = generatePageMetadata({
-  title: 'Reset Password',
-  description: 'Forgot your password? Reset your Fastly account password quickly and securely.',
-  keywords: ['forgot password', 'reset password', 'password recovery', 'account recovery'],
-  canonical: '/forgot-password',
+  title: "Reset Password",
+  description:
+    "Forgot your password? Reset your Fastly account password quickly and securely.",
+  keywords: [
+    "forgot password",
+    "reset password",
+    "password recovery",
+    "account recovery",
+  ],
+  canonical: "/forgot-password",
   noIndex: true, // Don't index password reset pages
 });
 

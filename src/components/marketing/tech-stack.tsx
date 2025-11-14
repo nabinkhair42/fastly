@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import Image from "next/image";
 import {
   SiMongodb,
   SiNextdotjs,
@@ -6,7 +6,7 @@ import {
   SiShadcnui,
   SiTailwindcss,
   SiTypescript,
-} from 'react-icons/si';
+} from "react-icons/si";
 export default function IntegrationsSection() {
   return (
     <section>
@@ -18,7 +18,8 @@ export default function IntegrationsSection() {
                 Built on top of your favorite Tech Stack
               </h2>
               <p className="text-muted-foreground">
-                Designed using modern and most popular tech stacks among developers.
+                Designed using modern and most popular tech stacks among
+                developers.
               </p>
             </div>
             <div className="mt-auto grid grid-cols-[auto_1fr] gap-3">
@@ -97,7 +98,9 @@ const Integration = ({
       <div className="flex size-fit items-center justify-center">{icon}</div>
       <div className="space-y-1">
         <h3 className="text-sm font-medium">{name}</h3>
-        <p className="text-muted-foreground line-clamp-1 text-sm md:line-clamp-2">{description}</p>
+        <p className="text-muted-foreground line-clamp-1 text-sm md:line-clamp-2">
+          {description}
+        </p>
       </div>
     </div>
   );

@@ -5,18 +5,18 @@ import { cn } from '@/lib/utils';
 import { CropIcon, RotateCcwIcon } from 'lucide-react';
 import { Slot } from 'radix-ui';
 import {
-  type ComponentProps,
   createContext,
-  type CSSProperties,
-  type MouseEvent,
-  type ReactNode,
-  type RefObject,
-  type SyntheticEvent,
   useCallback,
   useContext,
   useEffect,
   useRef,
   useState,
+  type CSSProperties,
+  type ComponentProps,
+  type MouseEvent,
+  type ReactNode,
+  type RefObject,
+  type SyntheticEvent,
 } from 'react';
 import ReactCrop, {
   centerCrop,
@@ -165,7 +165,6 @@ export const ImageCrop = ({
     onChange?.(pixelCrop, percentCrop);
   };
 
-  // biome-ignore lint/suspicious/useAwait: "onComplete is async"
   const handleComplete = async (pixelCrop: PixelCrop, percentCrop: PercentCrop) => {
     setCompletedCrop(pixelCrop);
     onComplete?.(pixelCrop, percentCrop);
@@ -231,7 +230,6 @@ export const ImageCropContent = ({ style, className }: ImageCropContentProps) =>
       {...reactCropProps}
     >
       {imgSrc && (
-        // eslint-disable-next-line @next/next/no-img-element
         <img alt="crop" className="size-full" onLoad={onImageLoad} ref={imgRef} src={imgSrc} />
       )}
     </ReactCrop>

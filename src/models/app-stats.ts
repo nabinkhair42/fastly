@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const AppStatsSchema = new mongoose.Schema(
   {
@@ -7,9 +7,10 @@ const AppStatsSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
-const AppStats = mongoose.models.AppStats || mongoose.model('AppStats', AppStatsSchema);
+const AppStats =
+  mongoose.models.AppStats || mongoose.model("AppStats", AppStatsSchema);
 
 export default AppStats;

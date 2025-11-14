@@ -1,27 +1,28 @@
-import RootProvider from '@/providers/root-provider';
-import { metadata } from '@/seo/metadata';
-import { Viewport } from 'next';
-import { Noto_Sans } from 'next/font/google';
-import './globals.css';
+import RootProvider from "@/providers/root-provider";
+import { metadata } from "@/seo/metadata";
+import type { Viewport } from "next";
+import { Noto_Sans } from "next/font/google";
+import type React from "react";
+import "./globals.css";
 
 const noto = Noto_Sans({
-  subsets: ['latin'],
-  variable: '--font-noto',
-  display: 'swap',
+  subsets: ["latin"],
+  variable: "--font-noto",
+  display: "swap",
 });
 
 export { metadata };
 
 export const viewport: Viewport = {
-  width: 'device-width',
+  width: "device-width",
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
-    { media: '(prefers-color-scheme: dark)', color: '#000000' },
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#000000" },
   ],
-  colorScheme: 'light dark',
+  colorScheme: "light dark",
 };
 
 export default function RootLayout({
@@ -30,8 +31,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${noto.variable}`} suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning={true}>
+      <body className={`${noto.variable}`} suppressHydrationWarning={true}>
         <RootProvider>{children}</RootProvider>
       </body>
     </html>

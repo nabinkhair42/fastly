@@ -1,8 +1,16 @@
-'use client';
+"use client";
 
-import { tokenManager } from '@/lib/config/axios';
-import { AuthenticatedUser } from '@/types/user';
-import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import { tokenManager } from "@/lib/config/axios";
+import type { AuthenticatedUser } from "@/types/user";
+import {
+  type ReactNode,
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
 interface AuthContextType {
   user: AuthenticatedUser | null;
@@ -12,7 +20,7 @@ interface AuthContextType {
     accessToken: string,
     refreshToken: string,
     user: AuthenticatedUser,
-    options?: { sessionId?: string }
+    options?: { sessionId?: string },
   ) => void;
   logout: () => void;
   updateUser: (user: AuthenticatedUser) => void;
@@ -23,7 +31,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };
@@ -31,6 +39,16 @@ export const useAuth = () => {
 interface AuthProviderProps {
   children: ReactNode;
 }
+
+const STORAGE_KEYS = {
+  USER: "user",
+  SESSION_ID: "sessionId",
+} as const;
+
+const API_ENDPOINTS = {
+  SESSIONS: "/api/sessions",
+  LOGOUT: "/api/auth/logout",
+} as const;
 
 export default function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<AuthenticatedUser | null>(null);
@@ -41,15 +59,13 @@ export default function AuthProvider({ children }: AuthProviderProps) {
     const initializeAuth = () => {
       try {
         const accessToken = tokenManager.getAccessToken();
-        const storedUser = localStorage.getItem('user');
+        const storedUser = localStorage.getItem(STORAGE_KEYS.USER);
 
         if (accessToken && storedUser) {
-          const parsedUser = JSON.parse(storedUser);
-          setUser(parsedUser);
+          setUser(JSON.parse(storedUser));
         }
       } catch (error) {
-        console.error('Failed to initialize auth:', error);
-        // Clear invalid data
+        console.error("Failed to initialize auth:", error);
         tokenManager.clearTokens();
       } finally {
         setIsLoading(false);
@@ -59,77 +75,81 @@ export default function AuthProvider({ children }: AuthProviderProps) {
     initializeAuth();
   }, []);
 
-  const login = (
-    accessToken: string,
-    refreshToken: string,
-    userData: AuthenticatedUser,
-    options?: { sessionId?: string }
-  ) => {
-    tokenManager.setTokens(accessToken, refreshToken, options?.sessionId);
-    localStorage.setItem('user', JSON.stringify(userData));
-    if (options?.sessionId) {
-      localStorage.setItem('sessionId', options.sessionId);
-    }
-    setUser(userData);
-  };
+  const login = useCallback(
+    (
+      accessToken: string,
+      refreshToken: string,
+      userData: AuthenticatedUser,
+      options?: { sessionId?: string },
+    ) => {
+      tokenManager.setTokens(accessToken, refreshToken, options?.sessionId);
+      localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(userData));
+      if (options?.sessionId) {
+        localStorage.setItem(STORAGE_KEYS.SESSION_ID, options.sessionId);
+      }
+      setUser(userData);
+    },
+    [],
+  );
 
-  const logout = () => {
-    // Get token before clearing it
+  const logout = useCallback(() => {
     const accessToken = tokenManager.getAccessToken();
     const sessionId = tokenManager.getSessionId();
 
     tokenManager.clearTokens();
     setUser(null);
 
+    // Revoke session
     if (sessionId && accessToken) {
-      fetch('/api/sessions', {
-        method: 'DELETE',
+      fetch(API_ENDPOINTS.SESSIONS, {
+        method: "DELETE",
         headers: {
           Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-          'X-Session-Id': sessionId,
+          "Content-Type": "application/json",
+          "X-Session-Id": sessionId,
         },
         body: JSON.stringify({ sessionId }),
       }).catch(() => {
-        /* swallow errors */
+        // Silently fail - user is already logged out locally
       });
     }
 
-    // Optional: Call logout API to invalidate tokens on server
-    // This is fire-and-forget, don't wait for response
+    // Invalidate tokens on server
     if (accessToken) {
-      fetch('/api/auth/logout', {
-        method: 'POST',
+      fetch(API_ENDPOINTS.LOGOUT, {
+        method: "POST",
         headers: {
           Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-          ...(sessionId
-            ? {
-                'X-Session-Id': sessionId,
-              }
-            : {}),
+          "Content-Type": "application/json",
+          ...(sessionId ? { "X-Session-Id": sessionId } : {}),
         },
       }).catch(() => {
-        // Ignore errors, user is logging out anyway
+        // Silently fail - user is already logged out locally
       });
     }
-  };
+  }, []);
 
-  const updateUser = (updatedUser: AuthenticatedUser) => {
+  const updateUser = useCallback((updatedUser: AuthenticatedUser) => {
     setUser(updatedUser);
-    localStorage.setItem('user', JSON.stringify(updatedUser));
-  };
+    localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(updatedUser));
+  }, []);
 
-  const isAuthenticated = !!user && !!tokenManager.getAccessToken();
+  const isAuthenticated = useMemo(
+    () => !!user && !!tokenManager.getAccessToken(),
+    [user],
+  );
 
-  const value: AuthContextType = {
-    user,
-    isAuthenticated,
-    isLoading,
-    login,
-    logout,
-    updateUser,
-  };
+  const value: AuthContextType = useMemo(
+    () => ({
+      user,
+      isAuthenticated,
+      isLoading,
+      login,
+      logout,
+      updateUser,
+    }),
+    [user, isAuthenticated, isLoading, login, logout, updateUser],
+  );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

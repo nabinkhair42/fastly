@@ -1,77 +1,109 @@
-import { generateOtp } from '@/helpers/generate-otp';
-import { hashPassword } from '@/helpers/hash-password';
-import { sendResponse } from '@/lib/apis/send-response';
-import dbConnect from '@/lib/config/db-connect';
-import { sendVerificationEmail } from '@/mail-templates';
-import { UserAuthModel } from '@/models/users';
-import { createAccountSchema } from '@/zod/authValidation';
-import { NextRequest } from 'next/server';
+import crypto from "node:crypto";
+import { generateOtp } from "@/helpers/generate-otp";
+import { hashPassword } from "@/helpers/hash-password";
+import dbConnect from "@/lib/config/db-connect";
+import { handleApiError } from "@/lib/utils/error-handler";
+import { logApiError, logAuthEvent } from "@/lib/utils/logger";
+import {
+  sendAppError,
+  sendBadRequest,
+  sendConflict,
+  sendCreated,
+} from "@/lib/utils/response";
+import { sanitizeEmail, validateAndSanitize } from "@/lib/utils/validators";
+import { sendVerificationEmail } from "@/mail-templates";
+import { UserAuthModel } from "@/models/users";
+import { createAccountSchema } from "@/zod/authValidation";
+import type { NextRequest } from "next/server";
 
+/**
+ * POST /api/create-account
+ * Create a new user account with email and password
+ * @param request - NextRequest with account details in body
+ * @returns Account creation response with verification email sent
+ */
 export async function POST(request: NextRequest) {
-  await dbConnect();
+  const requestId = crypto.randomUUID();
+
   try {
-    const { firstName, lastName, email, password, confirmPassword } = await request.json();
-    const { error } = createAccountSchema.safeParse({
-      firstName,
-      lastName,
-      email,
-      password,
-      confirmPassword,
-    });
+    await dbConnect();
 
-    if (error) {
-      return sendResponse(error.message, 400);
-    }
+    // Parse and validate request body
+    const body = await request.json();
+    const { firstName, lastName, email, password, confirmPassword } =
+      validateAndSanitize(body, createAccountSchema);
+    const sanitizedEmail = sanitizeEmail(email);
 
-    // check if user already exists
-    const existingUser = await UserAuthModel.findOne({ email });
+    // Check if user already exists
+    const existingUser = await UserAuthModel.findOne({ email: sanitizedEmail });
     if (existingUser) {
-      const existingUserAuthMethod =
-        (existingUser?.authMethod).charAt(0).toUpperCase() + (existingUser?.authMethod).slice(1);
-
-      return sendResponse(`User already exists with ${existingUserAuthMethod} method`, 400);
+      const authMethod =
+        existingUser.authMethod.charAt(0).toUpperCase() +
+        existingUser.authMethod.slice(1);
+      logAuthEvent("failed_login", undefined, {
+        reason: "user_exists",
+        email: sanitizedEmail,
+      });
+      return sendConflict(
+        `User already exists with ${authMethod} authentication method`,
+        undefined,
+        requestId,
+      );
     }
 
-    // check if password and confirm password match
+    // Verify password and confirm password match
     if (password !== confirmPassword) {
-      return sendResponse('Password and confirm password do not match', 400);
+      return sendBadRequest("Passwords do not match", undefined, requestId);
     }
 
-    // hash password
+    // Hash password
     const hashedPassword = await hashPassword(password);
 
-    // generate verification code
+    // Generate verification code
     const verificationCode = generateOtp();
+    const verificationCodeExpiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
 
-    // generate verification code expires at
-    const verificationCodeExpiresAt = new Date(Date.now() + 1000 * 60 * 5);
+    // Trim and validate names
+    const trimmedFirstName = firstName.trim();
+    const trimmedLastName = lastName.trim();
 
-    // Additional validation to ensure required fields are present
-    if (!firstName?.trim() || !lastName?.trim()) {
-      return sendResponse('First name and last name are required', 400);
-    }
-
-    // create user auth with temporary user details
-    await UserAuthModel.create({
-      email,
+    // Create user account
+    const newUser = await UserAuthModel.create({
+      email: sanitizedEmail,
       password: hashedPassword,
       verificationCode,
       verificationCodeExpiresAt,
-      firstName: firstName.trim(),
-      lastName: lastName.trim(),
+      firstName: trimmedFirstName,
+      lastName: trimmedLastName,
+      authMethod: "email",
     });
 
-    // send verification email
-    await sendVerificationEmail(email, firstName, verificationCode);
-
-    return sendResponse(
-      'Account created successfully. Please check your email for verification code.',
-      201
+    // Send verification email
+    await sendVerificationEmail(
+      sanitizedEmail,
+      trimmedFirstName,
+      verificationCode,
     );
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      return sendResponse(error.message, 500, null, error);
-    }
-    return sendResponse('Unknown error occurred', 500, null, error);
+
+    // Log signup event
+    logAuthEvent("signup", newUser._id.toString(), { provider: "email" });
+
+    // Return success response
+    return sendCreated(
+      "Account created successfully. Please check your email for verification code.",
+      {
+        userId: newUser._id,
+        email: newUser.email,
+        message: "Verification email sent",
+      },
+      requestId,
+    );
+  } catch (error) {
+    logApiError("/api/create-account", error, { method: "POST" });
+    const appError = handleApiError(error, {
+      endpoint: "/api/create-account",
+      method: "POST",
+    });
+    return sendAppError(appError, requestId);
   }
 }

@@ -1,14 +1,16 @@
+// Client-side OAuth config (IDs only - secrets are server-side only)
 export const githubOAuth = {
-  clientId: process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID,
-  clientSecret: process.env.NEXT_PUBLIC_GITHUB_CLIENT_SECRET,
+  clientId: process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID || '',
   redirectUri: `${process.env.NEXT_PUBLIC_APP_URL}/api/oauth/github`,
 };
 
 export const googleOAuth = {
-  clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
-  clientSecret: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_SECRET,
+  clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '',
   redirectUri: `${process.env.NEXT_PUBLIC_APP_URL}/api/oauth/google`,
 };
+
+// Server-side OAuth secrets (never expose to client)
+// These should only be used in server-side routes via process.env.GITHUB_CLIENT_SECRET, etc.
 
 // Generate a secure random state parameter
 const generateState = (): string => {
@@ -20,8 +22,8 @@ const generateState = (): string => {
 // GitHub OAuth authorization URL
 export const getGitHubAuthUrl = (state: string) => {
   const params = new URLSearchParams({
-    client_id: githubOAuth.clientId!,
-    redirect_uri: githubOAuth.redirectUri!,
+    client_id: githubOAuth.clientId,
+    redirect_uri: githubOAuth.redirectUri,
     scope: 'read:user user:email',
     state: state,
   });
@@ -32,8 +34,8 @@ export const getGitHubAuthUrl = (state: string) => {
 // Google OAuth authorization URL
 export const getGoogleAuthUrl = (state: string) => {
   const params = new URLSearchParams({
-    client_id: googleOAuth.clientId!,
-    redirect_uri: googleOAuth.redirectUri!,
+    client_id: googleOAuth.clientId,
+    redirect_uri: googleOAuth.redirectUri,
     response_type: 'code',
     scope: 'openid email profile',
     state: state,

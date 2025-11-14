@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogClose,
@@ -9,19 +9,22 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useDeleteUser, useUserDetails } from '@/hooks/users/use-user-mutations';
-import { AuthMethod } from '@/types/user';
-import { AlertTriangle, Eye, EyeOff, Trash } from 'lucide-react';
-import { useState } from 'react';
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  useDeleteUser,
+  useUserDetails,
+} from "@/hooks/users/use-user-mutations";
+import { AuthMethod } from "@/types/user";
+import { AlertTriangle, Eye, EyeOff, Trash } from "lucide-react";
+import { useState } from "react";
 
 const METHOD_LABELS: Record<AuthMethod, string> = {
-  [AuthMethod.EMAIL]: 'Email',
-  [AuthMethod.GOOGLE]: 'Google',
-  [AuthMethod.FACEBOOK]: 'Facebook',
-  [AuthMethod.GITHUB]: 'GitHub',
+  [AuthMethod.EMAIL]: "Email",
+  [AuthMethod.GOOGLE]: "Google",
+  [AuthMethod.FACEBOOK]: "Facebook",
+  [AuthMethod.GITHUB]: "GitHub",
 };
 
 type ApiError = Error & {
@@ -36,8 +39,8 @@ export const DeleteUser = () => {
   const deleteUser = useDeleteUser();
   const { data, isLoading } = useUserDetails();
   const [isOpen, setIsOpen] = useState(false);
-  const [confirmationText, setConfirmationText] = useState('');
-  const [password, setPassword] = useState('');
+  const [confirmationText, setConfirmationText] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<{
     password?: string;
@@ -50,29 +53,30 @@ export const DeleteUser = () => {
   const hasPassword = Boolean(user?.hasPassword);
   const requiresPassword = hasPassword;
 
-  const isConfirmed = confirmationText === 'DELETE';
+  const isConfirmed = confirmationText === "DELETE";
   const isPasswordValid = requiresPassword ? password.length >= 8 : true;
-  const canDelete = isConfirmed && isPasswordValid && !deleteUser.isPending && !isLoading;
+  const canDelete =
+    isConfirmed && isPasswordValid && !deleteUser.isPending && !isLoading;
 
   const validateForm = () => {
     const newErrors: { password?: string; confirmation?: string } = {};
 
     if (requiresPassword) {
       // Using constants for error messages to avoid false security warnings
-      const ERROR_REQUIRED = 'Password is required';
-      const ERROR_TOO_SHORT = 'Password must be at least 8 characters';
+      const errorRequired = "Password is required";
+      const errorTooShort = "Password must be at least 8 characters";
 
       if (!password) {
-        newErrors.password = ERROR_REQUIRED;
+        newErrors.password = errorRequired;
       } else if (password.length < 8) {
-        newErrors.password = ERROR_TOO_SHORT;
+        newErrors.password = errorTooShort;
       }
     }
 
     if (!confirmationText) {
-      newErrors.confirmation = 'Please type DELETE to confirm';
+      newErrors.confirmation = "Please type DELETE to confirm";
     } else if (!isConfirmed) {
-      newErrors.confirmation = 'Please type DELETE exactly as shown';
+      newErrors.confirmation = "Please type DELETE exactly as shown";
     }
 
     setErrors(newErrors);
@@ -80,20 +84,22 @@ export const DeleteUser = () => {
   };
 
   const handleDelete = () => {
-    if (!validateForm()) return;
+    if (!validateForm()) {
+      return;
+    }
 
     deleteUser.mutate(requiresPassword ? { password } : {}, {
       onSuccess: () => {
-        setConfirmationText('');
-        setPassword('');
+        setConfirmationText("");
+        setPassword("");
         setErrors({});
         setShowPassword(false);
         setIsOpen(false);
       },
       onError: (error: ApiError) => {
         if (requiresPassword) {
-          setPassword('');
-          const message = error.response?.data?.message || 'Incorrect password';
+          setPassword("");
+          const message = error.response?.data?.message || "Incorrect password";
           setErrors({ password: message });
         }
       },
@@ -102,15 +108,15 @@ export const DeleteUser = () => {
 
   const handleCancel = () => {
     setIsOpen(false);
-    setConfirmationText('');
-    setPassword('');
+    setConfirmationText("");
+    setPassword("");
     setErrors({});
   };
 
   const handleOpenDialog = () => {
     setIsOpen(true);
-    setConfirmationText('');
-    setPassword('');
+    setConfirmationText("");
+    setPassword("");
     setErrors({});
     setShowPassword(false);
   };
@@ -148,12 +154,14 @@ export const DeleteUser = () => {
                 <AlertTriangle className="h-5 w-5 text-destructive" />
               </div>
               <div>
-                <DialogTitle className="text-lg font-semibold">Delete Account</DialogTitle>
+                <DialogTitle className="text-lg font-semibold">
+                  Delete Account
+                </DialogTitle>
               </div>
             </div>
             <DialogDescription className="text-sm leading-relaxed">
-              Are you absolutely sure you want to delete your account? This action is irreversible
-              and will permanently remove:
+              Are you absolutely sure you want to delete your account? This
+              action is irreversible and will permanently remove:
             </DialogDescription>
           </DialogHeader>
 
@@ -187,14 +195,16 @@ export const DeleteUser = () => {
               <div className="relative">
                 <Input
                   id="password"
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   value={password}
-                  onChange={e => {
+                  onChange={(e) => {
                     setPassword(e.target.value);
-                    if (errors.password) setErrors(prev => ({ ...prev, password: undefined }));
+                    if (errors.password) {
+                      setErrors((prev) => ({ ...prev, password: undefined }));
+                    }
                   }}
                   placeholder="Enter your password"
-                  className={`pr-10 ${errors.password ? 'border-destructive focus:ring-destructive focus:border-destructive' : ''}`}
+                  className={`pr-10 ${errors.password ? "border-destructive focus:ring-destructive focus:border-destructive" : ""}`}
                   autoComplete="current-password"
                 />
                 <Button
@@ -204,16 +214,23 @@ export const DeleteUser = () => {
                   className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 p-0 hover:bg-transparent"
                   onClick={() => setShowPassword(!showPassword)}
                 >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
                 </Button>
               </div>
-              {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
+              {errors.password && (
+                <p className="text-sm text-destructive">{errors.password}</p>
+              )}
             </div>
           ) : (
             <div className="space-y-2 px-6 text-sm text-muted-foreground">
               <p>
-                You signed in with {providerLabel}. Since you don&apos;t have a password on this
-                account, confirming this action will delete it immediately.
+                You signed in with {providerLabel}. Since you don&apos;t have a
+                password on this account, confirming this action will delete it
+                immediately.
               </p>
             </div>
           )}
@@ -221,18 +238,24 @@ export const DeleteUser = () => {
           {/* Confirmation Input */}
           <div className="space-y-2 px-6">
             <Label htmlFor="confirmation" className="text-sm font-medium">
-              Type <span className="font-mono font-bold text-destructive">DELETE</span> to confirm:
+              Type{" "}
+              <span className="font-mono font-bold text-destructive">
+                DELETE
+              </span>{" "}
+              to confirm:
             </Label>
             <Input
               id="confirmation"
               type="text"
               value={confirmationText}
-              onChange={e => {
+              onChange={(e) => {
                 setConfirmationText(e.target.value);
-                if (errors.confirmation) setErrors(prev => ({ ...prev, confirmation: undefined }));
+                if (errors.confirmation) {
+                  setErrors((prev) => ({ ...prev, confirmation: undefined }));
+                }
               }}
               placeholder="Type DELETE here"
-              className={`font-mono ${errors.confirmation ? 'border-destructive focus:ring-destructive focus:border-destructive' : ''}`}
+              className={`font-mono ${errors.confirmation ? "border-destructive focus:ring-destructive focus:border-destructive" : ""}`}
               autoComplete="off"
             />
             {errors.confirmation && (
@@ -241,7 +264,7 @@ export const DeleteUser = () => {
           </div>
 
           <DialogFooter className="gap-2 p-4 px-6 ">
-            <DialogClose asChild>
+            <DialogClose asChild={true}>
               <Button
                 variant="outline"
                 onClick={handleCancel}

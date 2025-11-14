@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -8,7 +8,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
+} from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -16,15 +16,15 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { useForgotPassword } from '@/hooks/auth/use-auth-mutations';
-import { forgotPasswordSchema } from '@/zod/authValidation';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Lock } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { useForgotPassword } from "@/hooks/auth/use-auth-mutations";
+import { forgotPasswordSchema } from "@/zod/authValidation";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Lock } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import type { z } from "zod";
 
 type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
 
@@ -35,17 +35,16 @@ export function ForgotPasswordForm() {
   const form = useForm<ForgotPasswordFormData>({
     resolver: zodResolver(forgotPasswordSchema),
     defaultValues: {
-      email: '',
+      email: "",
     },
-    mode: 'onChange',
+    mode: "onChange",
   });
 
   const onSubmit = async (data: ForgotPasswordFormData) => {
     try {
       await forgotPasswordMutation.mutateAsync(data);
       // Store email in localStorage for reset-password page
-      localStorage.setItem('resetPasswordEmail', data.email);
-      // Could redirect to a success page or show success message
+      localStorage.setItem("resetPasswordEmail", data.email);
     } catch (error) {
       console.error(error);
     }
@@ -72,7 +71,11 @@ export function ForgotPasswordForm() {
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input type="email" placeholder="Enter your email address" {...field} />
+                    <Input
+                      type="email"
+                      placeholder="Enter your email address"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -93,7 +96,11 @@ export function ForgotPasswordForm() {
       </CardContent>
       <CardFooter className="flex justify-center">
         <div className="text-center text-sm">
-          <Button variant="link" className="p-0 font-normal" onClick={() => router.push('/log-in')}>
+          <Button
+            variant="link"
+            className="p-0 font-normal"
+            onClick={() => router.push("/log-in")}
+          >
             Back to Sign In
           </Button>
         </div>

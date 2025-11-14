@@ -1,23 +1,30 @@
-'use client';
+"use client";
 
-import { ActionDialog } from '@/components/ui/action-dialog';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { ActionDialog } from "@/components/ui/action-dialog";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { ImageCrop, ImageCropContent, useImageCrop } from '@/components/ui/image-crop';
-import { useAvatarUpload } from '@/hooks/users/use-avatar-upload';
-import { useUserDetails } from '@/hooks/users/use-user-mutations';
-import { Edit, ImagePlay, Trash2, Upload, X } from 'lucide-react';
-import { useRef, useState } from 'react';
+} from "@/components/ui/dropdown-menu";
+import {
+  ImageCrop,
+  ImageCropContent,
+  useImageCrop,
+} from "@/components/ui/image-crop";
+import { useAvatarUpload } from "@/hooks/users/use-avatar-upload";
+import { useUserDetails } from "@/hooks/users/use-user-mutations";
+import { Edit, ImagePlay, Trash2, Upload, X } from "lucide-react";
+import { useRef, useState } from "react";
 
 // Custom component that can access the ImageCrop context
-const CropControls = ({ isUploading, onClose }: { isUploading: boolean; onClose: () => void }) => {
+const CropControls = ({
+  isUploading,
+  onClose,
+}: { isUploading: boolean; onClose: () => void }) => {
   const { applyCrop, completedCrop } = useImageCrop();
 
   const handleUpload = async () => {
@@ -58,12 +65,12 @@ export function UploadAvatar() {
 
   const defaultAvatar = userDetails?.data?.user?.avatar;
   const avatarFallback =
-    (userDetails?.data?.user?.firstName?.charAt(0) || '') +
-    (userDetails?.data?.user?.lastName?.charAt(0) || '');
+    (userDetails?.data?.user?.firstName?.charAt(0) || "") +
+    (userDetails?.data?.user?.lastName?.charAt(0) || "");
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file && file.type.startsWith('image/')) {
+    if (file?.type.startsWith("image/")) {
       setSelectedFile(file);
       setIsOpen(true);
     }
@@ -76,15 +83,15 @@ export function UploadAvatar() {
       const blob = await response.blob();
 
       // Convert blob to file
-      const file = new File([blob], 'avatar.png', {
-        type: 'image/png',
+      const file = new File([blob], "avatar.png", {
+        type: "image/png",
       });
 
       await uploadAvatar(file);
       setIsOpen(false);
       setSelectedFile(null);
     } catch (error) {
-      console.error('Upload failed:', error);
+      console.error("Upload failed:", error);
     }
   };
 
@@ -99,7 +106,7 @@ export function UploadAvatar() {
       await deleteAvatar();
       setShowDeleteDialog(false);
     } catch (error) {
-      console.error('Delete failed:', error);
+      console.error("Delete failed:", error);
     } finally {
       setIsDeleting(false);
     }
@@ -111,12 +118,14 @@ export function UploadAvatar() {
 
       <div className="relative w-fit">
         <Avatar className="h-20 w-20">
-          <AvatarImage src={defaultAvatar || ''} />
-          <AvatarFallback className="text-lg border">{avatarFallback}</AvatarFallback>
+          <AvatarImage src={defaultAvatar || ""} />
+          <AvatarFallback className="text-lg border">
+            {avatarFallback}
+          </AvatarFallback>
         </Avatar>
         <DropdownMenu>
           <DropdownMenuTrigger
-            asChild
+            asChild={true}
             className="absolute rounded-full h-7 w-7 bottom-1 left-15 -translate-x-1/2 z-50"
           >
             <Button variant="outline" size="icon">
@@ -129,7 +138,10 @@ export function UploadAvatar() {
               Upload a photo
             </DropdownMenuItem>
             {defaultAvatar && (
-              <DropdownMenuItem onClick={() => setShowDeleteDialog(true)} disabled={isDeleting}>
+              <DropdownMenuItem
+                onClick={() => setShowDeleteDialog(true)}
+                disabled={isDeleting}
+              >
                 <Trash2 className="h-4 w-4 text-destructive" />
                 <span className="text-destructive">Remove photo</span>
               </DropdownMenuItem>
@@ -148,7 +160,9 @@ export function UploadAvatar() {
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent className="max-w-2xl p-0 gap-0">
-          <DialogTitle className="sr-only">Crop your new profile picture</DialogTitle>
+          <DialogTitle className="sr-only">
+            Crop your new profile picture
+          </DialogTitle>
           {selectedFile && (
             <div>
               {/* Header */}
@@ -156,7 +170,9 @@ export function UploadAvatar() {
                 <ImagePlay className="mt-1" />
                 <div className="flex flex-col">
                   <h2 className="text-lg font-semibold">Upload Avatar</h2>
-                  <p className="text-sm text-muted-foreground">Crop and upload your new avatar</p>
+                  <p className="text-sm text-muted-foreground">
+                    Crop and upload your new avatar
+                  </p>
                 </div>
               </div>
 
@@ -166,11 +182,14 @@ export function UploadAvatar() {
                   file={selectedFile}
                   onCrop={handleUpload}
                   aspect={1}
-                  circularCrop
+                  circularCrop={true}
                   className="flex flex-col gap-2"
                 >
                   <ImageCropContent className="max-h-[50vh]" />
-                  <CropControls isUploading={isUploading} onClose={handleClose} />
+                  <CropControls
+                    isUploading={isUploading}
+                    onClose={handleClose}
+                  />
                 </ImageCrop>
               </div>
             </div>

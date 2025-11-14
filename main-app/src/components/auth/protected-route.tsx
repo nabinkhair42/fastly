@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useSession } from '@/hooks/auth/use-session';
-import { Loader } from 'lucide-react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useMemo } from 'react';
+import { useSession } from "@/hooks/auth/use-session";
+import { Loader } from "lucide-react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useMemo } from "react";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -14,7 +14,10 @@ interface ProtectedRouteProps {
  * Component that protects routes by redirecting unauthenticated users
  * Usage: Wrap your protected pages/components with this
  */
-export default function ProtectedRoute({ children, fallback }: ProtectedRouteProps) {
+export default function ProtectedRoute({
+  children,
+  fallback,
+}: ProtectedRouteProps) {
   const { isAuthenticated, isLoading } = useSession();
   const router = useRouter();
   const pathname = usePathname();
@@ -57,7 +60,7 @@ export default function ProtectedRoute({ children, fallback }: ProtectedRoutePro
  */
 export function withProtectedRoute<T extends object>(
   Component: React.ComponentType<T>,
-  options?: { redirectTo?: string; fallback?: React.ReactNode }
+  options?: { redirectTo?: string; fallback?: React.ReactNode },
 ) {
   return function ProtectedComponent(props: T) {
     return (
