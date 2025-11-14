@@ -19,7 +19,7 @@ export async function GET(): Promise<NextResponse> {
     const fileBuffer = await readFile(zipPath);
 
     // Return the zip file with appropriate headers
-    return new NextResponse(fileBuffer, {
+    return new NextResponse(new Uint8Array(fileBuffer), {
       status: 200,
       headers: {
         "Content-Type": "application/zip",
