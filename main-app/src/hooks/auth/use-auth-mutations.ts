@@ -1,6 +1,7 @@
 "use client";
 
 import { setLastUsedProviderCookie } from "@/hooks/auth/use-last-used-provider";
+import { getErrorMessage } from "@/lib/utils/get-error-message";
 import { useAuth } from "@/providers/auth-provider";
 import { authService } from "@/services/auth-service";
 import type {
@@ -14,18 +15,6 @@ import { AuthMethod } from "@/types/user";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
-type ApiError = Error & {
-  response?: {
-    data?: {
-      message?: string;
-    };
-  };
-};
-
-const extractErrorMessage = (error: ApiError, fallback: string) => {
-  return error.response?.data?.message ?? fallback;
-};
-
 // Login mutation
 export const useLogin = () => {
   const { login } = useAuth();
@@ -35,8 +24,7 @@ export const useLogin = () => {
       return toast.promise(authService.login(data), {
         loading: "Logging in",
         success: (response) => response.message,
-        error: (error: ApiError) =>
-          extractErrorMessage(error, "Unable to log in. Please try again."),
+        error: (error: unknown) => getErrorMessage(error),
       });
     },
     onSuccess: (response) => {
@@ -57,11 +45,7 @@ export const useCreateAccount = () => {
       return toast.promise(authService.createAccount(data), {
         loading: "Creating account",
         success: (response) => response.message,
-        error: (error: ApiError) =>
-          extractErrorMessage(
-            error,
-            "Unable to create account right now. Please try again later.",
-          ),
+        error: (error: unknown) => getErrorMessage(error),
       });
     },
   });
@@ -76,11 +60,7 @@ export const useVerifyEmail = (onSuccessCallback?: () => void) => {
       return toast.promise(authService.verifyEmail(data), {
         loading: "Verifying email...",
         success: (response) => response.message,
-        error: (error: ApiError) =>
-          extractErrorMessage(
-            error,
-            "Unable to verify email right now. Please try again later.",
-          ),
+        error: (error: unknown) => getErrorMessage(error),
       });
     },
     onSuccess: (response) => {
@@ -105,11 +85,7 @@ export const useResendVerification = () => {
       return toast.promise(authService.resendVerification(email), {
         loading: "Sending verification email",
         success: (response) => response.message,
-        error: (error: ApiError) =>
-          extractErrorMessage(
-            error,
-            "Unable to send verification email. Please try again later.",
-          ),
+        error: (error: unknown) => getErrorMessage(error),
       });
     },
   });
@@ -122,11 +98,7 @@ export const useForgotPassword = () => {
       return toast.promise(authService.forgotPassword(data), {
         loading: "Sending password reset email",
         success: (response) => response.message,
-        error: (error: ApiError) =>
-          extractErrorMessage(
-            error,
-            "Unable to send password reset email. Please try again later.",
-          ),
+        error: (error: unknown) => getErrorMessage(error),
       });
     },
   });
@@ -139,11 +111,7 @@ export const useResetPassword = () => {
       return toast.promise(authService.resetPassword(data), {
         loading: "Resetting password",
         success: (response) => response.message,
-        error: (error: ApiError) =>
-          extractErrorMessage(
-            error,
-            "Unable to reset password right now. Please try again later.",
-          ),
+        error: (error: unknown) => getErrorMessage(error),
       });
     },
   });
@@ -159,11 +127,7 @@ export const useLogout = () => {
       return toast.promise(authService.logout(), {
         loading: "Logging out...",
         success: (response) => response.message,
-        error: (error: ApiError) =>
-          extractErrorMessage(
-            error,
-            "Unable to log out right now. Please try again later.",
-          ),
+        error: (error: unknown) => getErrorMessage(error),
       });
     },
     onSuccess: () => {

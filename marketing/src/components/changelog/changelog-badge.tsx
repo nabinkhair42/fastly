@@ -3,17 +3,17 @@ import { type VariantProps, cva } from "class-variance-authority";
 import type * as React from "react";
 
 const changelogBadgeVariants = cva(
-  "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+  "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
   {
     variants: {
       variant: {
-        new: "bg-changelog-new text-changelog-new-foreground hover:bg-changelog-new/80",
+        new: "border-changelog-new/30 bg-changelog-new/10 text-changelog-new hover:bg-changelog-new/20 hover:border-changelog-new/50",
         improved:
-          "border bg-changelog-improved text-changelog-improved-foreground hover:bg-changelog-improved/80",
+          "border-changelog-improved/30 bg-changelog-improved/10 text-changelog-improved hover:bg-changelog-improved/20 hover:border-changelog-improved/50",
         fixed:
-          "bg-changelog-fixed text-changelog-fixed-foreground hover:bg-changelog-fixed/80",
-        version: "bg-primary text-primary-foreground hover:bg-primary/80",
-        outline: "text-foreground",
+          "border-changelog-fixed/30 bg-changelog-fixed/10 text-changelog-fixed hover:bg-changelog-fixed/20 hover:border-changelog-fixed/50",
+        version: "border-changelog-version/30 bg-changelog-version/10 text-changelog-version hover:bg-changelog-version/20 hover:border-changelog-version/50",
+        outline: "border-border bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground",
       },
     },
     defaultVariants: {

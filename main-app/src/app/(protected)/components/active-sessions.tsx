@@ -15,7 +15,7 @@ import type { SessionData } from "@/types/api";
 import { AuthMethod } from "@/types/user";
 import { formatDistanceToNow } from "date-fns";
 import { Monitor, ShieldCheck, XCircleIcon } from "lucide-react";
-import { useEffect, useId, useMemo, useState } from "react";
+import { memo, useCallback, useEffect, useId, useMemo, useState } from "react";
 
 const methodLabel: Record<AuthMethod, string> = {
   [AuthMethod.EMAIL]: "Email",
@@ -38,17 +38,19 @@ const SessionSkeleton = () => (
   </div>
 );
 
-const SessionRow = ({
-  session,
-  isCurrent,
-  onRevoke,
-  isRevoking,
-}: {
+interface SessionRowProps {
   session: SessionData;
   isCurrent: boolean;
   onRevoke: () => void;
   isRevoking: boolean;
-}) => {
+}
+
+const SessionRow = memo(function SessionRow({
+  session,
+  isCurrent,
+  onRevoke,
+  isRevoking,
+}: SessionRowProps) {
   const deviceLabel = session.device || "Unknown device";
   const lastActive = formatDistanceToNow(new Date(session.lastActiveAt), {
     addSuffix: true,
@@ -96,7 +98,7 @@ const SessionRow = ({
       )}
     </div>
   );
-};
+});
 
 export const ActiveSessions = () => {
   const { data, isLoading } = useUserSessions();
@@ -146,8 +148,11 @@ export const ActiveSessions = () => {
 
   const sessions = useMemo(() => data?.data.sessions ?? [], [data]);
 
-  const isSessionBeingRevoked = (sessionId: string) =>
-    revokeSession.isPending && sessionToRevoke?.sessionId === sessionId;
+  const isSessionBeingRevoked = useCallback(
+    (sessionId: string) =>
+      revokeSession.isPending && sessionToRevoke?.sessionId === sessionId,
+    [revokeSession.isPending, sessionToRevoke?.sessionId],
+  );
 
   const handleConfirmRevoke = () => {
     if (!sessionToRevoke) {

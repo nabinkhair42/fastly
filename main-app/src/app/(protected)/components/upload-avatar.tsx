@@ -10,15 +10,25 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  ImageCrop,
-  ImageCropContent,
-  useImageCrop,
-} from "@/components/ui/image-crop";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useAvatarUpload } from "@/hooks/users/use-avatar-upload";
 import { useUserDetails } from "@/hooks/users/use-user-mutations";
 import { Edit, ImagePlay, Trash2, Upload, X } from "lucide-react";
-import { useRef, useState } from "react";
+import dynamic from "next/dynamic";
+import { Suspense, useRef, useState } from "react";
+
+// Lazy load the heavy image crop components
+const ImageCrop = dynamic(
+  () => import("@/components/ui/image-crop").then((mod) => mod.ImageCrop),
+  { ssr: false },
+);
+const ImageCropContent = dynamic(
+  () => import("@/components/ui/image-crop").then((mod) => mod.ImageCropContent),
+  { ssr: false },
+);
+
+// Import the hook separately since it's needed for CropControls
+import { useImageCrop } from "@/components/ui/image-crop";
 
 // Custom component that can access the ImageCrop context
 const CropControls = ({
@@ -178,19 +188,28 @@ export function UploadAvatar() {
 
               {/* Crop Area */}
               <div className="flex justify-center flex-col">
-                <ImageCrop
-                  file={selectedFile}
-                  onCrop={handleUpload}
-                  aspect={1}
-                  circularCrop={true}
-                  className="flex flex-col gap-2"
+                <Suspense
+                  fallback={
+                    <div className="p-8 flex flex-col items-center gap-4">
+                      <Skeleton className="h-64 w-64 rounded-full" />
+                      <Skeleton className="h-10 w-32" />
+                    </div>
+                  }
                 >
-                  <ImageCropContent className="max-h-[50vh]" />
-                  <CropControls
-                    isUploading={isUploading}
-                    onClose={handleClose}
-                  />
-                </ImageCrop>
+                  <ImageCrop
+                    file={selectedFile}
+                    onCrop={handleUpload}
+                    aspect={1}
+                    circularCrop={true}
+                    className="flex flex-col gap-2"
+                  >
+                    <ImageCropContent className="max-h-[50vh]" />
+                    <CropControls
+                      isUploading={isUploading}
+                      onClose={handleClose}
+                    />
+                  </ImageCrop>
+                </Suspense>
               </div>
             </div>
           )}
