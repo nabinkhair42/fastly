@@ -1,0 +1,125 @@
+---
+title: Deployment
+description: Deploy Fastly to production environments
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+import { Accordions, Accordion } from 'fumadocs-ui/components/accordion';
+
+This guide covers deploying Fastly to Vercel.
+
+## Prerequisites
+
+Before deploying, ensure you have completed the [Environment Setup](/docs/getting-started/environment-setup) for local development.
+
+---
+
+## Vercel Deployment
+
+<Steps>
+<Step>
+### Push to GitHub
+
+Ensure your code is pushed to a GitHub repository:
+
+```bash
+git add .
+git commit -m "Prepare for deployment"
+git push origin main
+```
+</Step>
+
+<Step>
+### Import to Vercel
+
+1. Go to [vercel.com](https://vercel.com) and sign in
+2. Click "Add New Project"
+3. Import your GitHub repository
+4. Vercel auto-detects Next.js settings
+</Step>
+
+<Step>
+### Configure environment variables
+
+Add all environment variables from your `.env.local` file in the Vercel dashboard. Update the following for production:
+
+```bash
+NEXT_PUBLIC_APP_URL=https://your-domain.vercel.app
+```
+</Step>
+
+<Step>
+### Update OAuth callback URLs
+
+Update callback URLs in your OAuth provider dashboards:
+
+| Provider | Callback URL |
+|----------|--------------|
+| GitHub | `https://your-domain.com/api/oauth/github` |
+| Google | `https://your-domain.com/api/oauth/google` |
+</Step>
+
+<Step>
+### Deploy
+
+Click "Deploy" and Vercel will build and deploy your application.
+
+Your app will be available at `https://your-project.vercel.app`.
+</Step>
+
+<Step>
+### Configure custom domain (optional)
+
+1. Go to Project Settings > Domains
+2. Add your custom domain
+3. Configure DNS records as instructed
+</Step>
+</Steps>
+
+<Callout type="info">
+After adding a custom domain, update `NEXT_PUBLIC_APP_URL` and OAuth callback URLs to match.
+</Callout>
+
+---
+
+## Pre-Deployment Checklist
+
+Before going live, verify:
+
+- JWT secrets are unique and 32+ characters
+- Database credentials are production-only
+- OAuth apps use production callback URLs
+- HTTPS is enabled
+- Email service is configured and tested
+- Build completes without errors
+
+---
+
+## Troubleshooting
+
+<Accordions>
+<Accordion title="Build fails on Vercel">
+- Check Node.js version matches (18.17+)
+- Verify all environment variables are set
+- Check for TypeScript errors: `pnpm build`
+</Accordion>
+
+<Accordion title="Database connection errors">
+- Verify MongoDB URI is correct
+- Check network access settings in Atlas (allow `0.0.0.0/0` for Vercel)
+- Ensure database user credentials are correct
+</Accordion>
+
+<Accordion title="OAuth not working">
+- Verify callback URLs match exactly
+- Check client ID and secret are production values
+- Ensure HTTPS is used in production
+</Accordion>
+
+<Accordion title="Emails not sending">
+- Test SMTP credentials
+- Check spam folder
+- Verify app password is correct (for Gmail)
+</Accordion>
+</Accordions>

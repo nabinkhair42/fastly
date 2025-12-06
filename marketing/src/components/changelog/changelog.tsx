@@ -65,7 +65,7 @@ export function Changelog({ entries, className }: ChangelogProps) {
       <section className="mb-16 space-y-3">
         <div className="space-y-2">
           <p className="text-xs text-muted-foreground">Release notes</p>
-          <h1 className="text-4xl font-bold text-foreground"># Changelog</h1>
+          <h1 className="text-4xl font-medium text-foreground"># Changelog</h1>
           <p className="text-muted-foreground">
             Keep track of all the latest updates, improvements, and bug fixes to
             our platform.
@@ -116,7 +116,7 @@ export function Changelog({ entries, className }: ChangelogProps) {
                         {entry.version}
                       </Badge>
                     </div>
-                    <h2 className="text-lg font-semibold leading-snug text-foreground">
+                    <h2 className="text-lg font-medium leading-snug text-foreground">
                       {entry.title}
                     </h2>
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">

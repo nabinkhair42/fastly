@@ -1,0 +1,232 @@
+---
+title: GitHub OAuth
+description: Implement GitHub sign-in for your application
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+import { TypeTable } from 'fumadocs-ui/components/type-table';
+
+GitHub OAuth allows users to sign in with their GitHub account. New users are automatically registered without email verification.
+
+## Prerequisites
+
+Before implementing GitHub OAuth, complete the [GitHub OAuth setup](/docs/getting-started/environment-setup#github-oauth) in the Environment Setup guide.
+
+## OAuth Flow
+
+<Steps>
+<Step>
+### User clicks GitHub button
+
+The login page includes a GitHub sign-in button that redirects to GitHub's authorization page.
+
+```typescript
+const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&scope=user:email`;
+window.location.href = githubAuthUrl;
+```
+</Step>
+
+<Step>
+### User authorizes application
+
+GitHub shows a consent screen. The user grants permission to access their profile and email.
+</Step>
+
+<Step>
+### GitHub redirects with code
+
+GitHub redirects to `/api/oauth/github?code=xxx` with an authorization code.
+</Step>
+
+<Step>
+### Backend exchanges code for token
+
+```typescript
+const tokenResponse = await fetch('https://github.com/login/oauth/access_token', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+  body: JSON.stringify({
+    client_id: process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID,
+    client_secret: process.env.NEXT_PUBLIC_GITHUB_CLIENT_SECRET,
+    code,
+  }),
+});
+```
+</Step>
+
+<Step>
+### Fetch user data from GitHub
+
+```typescript
+const userResponse = await fetch('https://api.github.com/user', {
+  headers: { Authorization: `Bearer ${accessToken}` },
+});
+
+const emailsResponse = await fetch('https://api.github.com/user/emails', {
+  headers: { Authorization: `Bearer ${accessToken}` },
+});
+```
+</Step>
+
+<Step>
+### Create or login user
+
+The backend checks if a user exists with this email:
+- **Existing GitHub user**: Logs them in
+- **New user**: Creates account (auto-verified) and profile
+- **Email exists with different auth**: Returns error
+</Step>
+
+<Step>
+### Redirect with tokens
+
+```typescript
+const redirectUrl = new URL('/oauth-callback', appUrl);
+redirectUrl.searchParams.set('accessToken', accessToken);
+redirectUrl.searchParams.set('refreshToken', refreshToken);
+redirectUrl.searchParams.set('sessionId', session.sessionId);
+return NextResponse.redirect(redirectUrl);
+```
+</Step>
+</Steps>
+
+## Callback Handler
+
+The callback handler at `src/app/api/oauth/github/route.ts` processes the OAuth response.
+
+### User Data Mapping
+
+| GitHub Field | Fastly Field |
+|--------------|--------------|
+| `login` | `username` |
+| `name` (split) or `login` | `firstName`, `lastName` |
+| Primary email | `email` |
+| `avatar_url` | `avatar` |
+
+### Account Linking Rules
+
+| Scenario | Result |
+|----------|--------|
+| New email | Create new account with `authMethod: 'github'` |
+| Existing GitHub account | Login to existing account |
+| Email exists with password auth | Error: `use_email_login` |
+| Email exists with Google auth | Error: `use_google_login` |
+
+<Callout type="info">
+Users cannot link multiple OAuth providers to the same email. Each email is tied to one authentication method.
+</Callout>
+
+## Error Handling
+
+The callback may redirect with error codes in the URL:
+
+| Error Code | Description |
+|------------|-------------|
+| `oauth_cancelled` | User clicked "Cancel" on GitHub consent screen |
+| `missing_code` | No authorization code in callback URL |
+| `no_email_access` | User's GitHub account has no accessible email |
+| `use_email_login` | Email registered with password authentication |
+| `use_google_login` | Email registered with Google OAuth |
+| `token_exchange_failed` | Failed to exchange code for access token |
+| `fetch_user_failed` | Failed to fetch user profile from GitHub |
+
+### Frontend Error Handling
+
+```typescript title="src/app/(auth)/oauth-callback/page.tsx"
+'use client';
+
+import { useSearchParams, useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+import { useAuth } from '@/providers/auth-provider';
+
+export default function OAuthCallback() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const { login } = useAuth();
+
+  useEffect(() => {
+    const error = searchParams.get('error');
+    const accessToken = searchParams.get('accessToken');
+    const refreshToken = searchParams.get('refreshToken');
+    const sessionId = searchParams.get('sessionId');
+
+    if (error) {
+      // Handle error - show message and redirect to login
+      router.push(`/log-in?error=${error}`);
+      return;
+    }
+
+    if (accessToken && refreshToken) {
+      // Store tokens and redirect to dashboard
+      login(accessToken, refreshToken, null, { sessionId });
+      router.push('/dashboard');
+    }
+  }, [searchParams]);
+
+  return <div>Processing...</div>;
+}
+```
+
+## Frontend Implementation
+
+### GitHub Sign-In Button
+
+```typescript title="src/app/(auth)/components/github-button.tsx"
+'use client';
+
+import { Button } from '@/components/ui/button';
+import { FaGithub } from 'react-icons/fa';
+
+export function GitHubButton() {
+  const handleClick = () => {
+    const clientId = process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID;
+    const redirectUri = `${window.location.origin}/api/oauth/github`;
+    const scope = 'user:email';
+
+    const url = new URL('https://github.com/login/oauth/authorize');
+    url.searchParams.set('client_id', clientId);
+    url.searchParams.set('redirect_uri', redirectUri);
+    url.searchParams.set('scope', scope);
+
+    window.location.href = url.toString();
+  };
+
+  return (
+    <Button variant="outline" onClick={handleClick} className="w-full">
+      <FaGithub className="mr-2 h-4 w-4" />
+      Continue with GitHub
+    </Button>
+  );
+}
+```
+
+## Session Metadata
+
+GitHub OAuth sessions include the following metadata:
+
+<TypeTable
+  type={{
+    authMethod: {
+      description: 'Authentication method used',
+      type: "'github'",
+    },
+    browser: {
+      description: 'Browser name and version',
+      type: 'string',
+    },
+    os: {
+      description: 'Operating system',
+      type: 'string',
+    },
+    ipAddress: {
+      description: 'Client IP address',
+      type: 'string',
+    },
+  }}
+/>
+
+## Next Steps
+
+- [Google OAuth](/docs/authentication/oauth-google) - Add Google sign-in
+- [Session Management](/docs/api-reference/session-endpoints) - Manage user sessions

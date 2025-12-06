@@ -1,0 +1,271 @@
+---
+title: Environment Setup
+description: Configure environment variables for database, authentication, and email
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
+import { Accordions, Accordion } from 'fumadocs-ui/components/accordion';
+
+Create a `.env.local` file in the root directory with the following variables.
+
+## Required Variables
+
+```bash title=".env.local"
+# Application
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+
+# Database
+MONGODB_URI=mongodb+srv://user:password@cluster.mongodb.net/database
+
+# JWT Secrets (generate unique random strings)
+JWT_SECRET=your-access-token-secret-min-32-chars
+JWT_REFRESH_SECRET=your-refresh-token-secret-min-32-chars
+
+# Email (Gmail SMTP)
+EMAIL_SERVER_HOST=smtp.gmail.com
+EMAIL_SERVER_PORT=587
+EMAIL_SERVER_USER=your-email@gmail.com
+EMAIL_SERVER_PASSWORD=your-app-password
+
+# OAuth - GitHub
+NEXT_PUBLIC_GITHUB_CLIENT_ID=your-github-client-id
+NEXT_PUBLIC_GITHUB_CLIENT_SECRET=your-github-client-secret
+
+# OAuth - Google
+NEXT_PUBLIC_GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
+NEXT_PUBLIC_GOOGLE_CLIENT_SECRET=your-google-client-secret
+
+# File Upload
+UPLOADTHING_TOKEN=sk_live_your-uploadthing-token
+```
+
+## Configuration Details
+
+### Database (MongoDB)
+
+<Steps>
+<Step>
+### Create a MongoDB Atlas cluster
+
+Go to [MongoDB Atlas](https://www.mongodb.com/atlas) and create a free cluster.
+</Step>
+
+<Step>
+### Get the connection string
+
+In the Atlas dashboard, click "Connect" and select "Connect your application". Copy the connection string.
+</Step>
+
+<Step>
+### Configure network access
+
+Add your IP address to the IP Access List. For development, you can allow access from anywhere (`0.0.0.0/0`).
+</Step>
+
+<Step>
+### Update the connection string
+
+Replace `<password>` with your database user password and add your database name:
+
+```bash
+MONGODB_URI=mongodb+srv://username:password@cluster0.xxxxx.mongodb.net/fastly?retryWrites=true&w=majority
+```
+</Step>
+</Steps>
+
+<Callout type="warn">
+Never commit your `.env.local` file to version control. It's already in `.gitignore`.
+</Callout>
+
+### JWT Secrets
+
+Generate secure random strings for your JWT secrets. Use at least 32 characters.
+
+<Tabs items={['OpenSSL', 'Node.js']}>
+<Tab value="OpenSSL">
+```bash
+openssl rand -base64 32
+```
+</Tab>
+<Tab value="Node.js">
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
+```
+</Tab>
+</Tabs>
+
+Generate two different secrets:
+
+```bash
+JWT_SECRET=<first-generated-secret>
+JWT_REFRESH_SECRET=<second-generated-secret>
+```
+
+### Email (Gmail SMTP)
+
+<Steps>
+<Step>
+### Enable 2-Factor Authentication
+
+Go to your Google Account settings and enable 2-Step Verification.
+</Step>
+
+<Step>
+### Create an App Password
+
+Navigate to [Google App Passwords](https://myaccount.google.com/apppasswords). Select "Mail" and generate a new password.
+</Step>
+
+<Step>
+### Configure environment variables
+
+```bash
+EMAIL_SERVER_HOST=smtp.gmail.com
+EMAIL_SERVER_PORT=587
+EMAIL_SERVER_USER=your-email@gmail.com
+EMAIL_SERVER_PASSWORD=xxxx-xxxx-xxxx-xxxx  # App password (no spaces)
+```
+</Step>
+</Steps>
+
+<Callout type="info">
+The app password is a 16-character code. Enter it without spaces.
+</Callout>
+
+### GitHub OAuth
+
+<Steps>
+<Step>
+### Create a GitHub OAuth App
+
+Go to [GitHub Developer Settings](https://github.com/settings/developers) and click "New OAuth App".
+</Step>
+
+<Step>
+### Configure the application
+
+| Field | Value |
+|-------|-------|
+| Application name | Your app name |
+| Homepage URL | `http://localhost:3000` |
+| Authorization callback URL | `http://localhost:3000/api/oauth/github` |
+</Step>
+
+<Step>
+### Copy credentials
+
+After creating the app, copy the Client ID and generate a Client Secret.
+
+```bash
+NEXT_PUBLIC_GITHUB_CLIENT_ID=your-client-id
+NEXT_PUBLIC_GITHUB_CLIENT_SECRET=your-client-secret
+```
+</Step>
+</Steps>
+
+### Google OAuth
+
+<Steps>
+<Step>
+### Create a Google Cloud project
+
+Go to [Google Cloud Console](https://console.cloud.google.com/) and create a new project.
+</Step>
+
+<Step>
+### Configure OAuth consent screen
+
+Navigate to "APIs & Services" > "OAuth consent screen". Select "External" and fill in the required fields.
+</Step>
+
+<Step>
+### Create OAuth credentials
+
+Go to "APIs & Services" > "Credentials" and click "Create Credentials" > "OAuth client ID".
+
+| Field | Value |
+|-------|-------|
+| Application type | Web application |
+| Authorized JavaScript origins | `http://localhost:3000` |
+| Authorized redirect URIs | `http://localhost:3000/api/oauth/google` |
+</Step>
+
+<Step>
+### Copy credentials
+
+```bash
+NEXT_PUBLIC_GOOGLE_CLIENT_ID=xxxxx.apps.googleusercontent.com
+NEXT_PUBLIC_GOOGLE_CLIENT_SECRET=GOCSPX-xxxxx
+```
+</Step>
+</Steps>
+
+### UploadThing (File Uploads)
+
+<Steps>
+<Step>
+### Create an UploadThing account
+
+Go to [uploadthing.com](https://uploadthing.com/) and sign up.
+</Step>
+
+<Step>
+### Create an app
+
+Create a new app in your UploadThing dashboard.
+</Step>
+
+<Step>
+### Copy the API key
+
+Navigate to the "API Keys" section and copy your secret key.
+
+```bash
+UPLOADTHING_TOKEN=sk_live_xxxxx
+```
+</Step>
+</Steps>
+
+## Production Configuration
+
+When deploying to production, update the following:
+
+```bash
+# Update to your production domain
+NEXT_PUBLIC_APP_URL=https://your-domain.com
+
+# Update OAuth callback URLs in provider dashboards
+# GitHub: https://your-domain.com/api/oauth/github
+# Google: https://your-domain.com/api/oauth/google
+```
+
+## Troubleshooting
+
+<Accordions>
+<Accordion title="Database connection failed">
+Verify that:
+- Your IP is whitelisted in MongoDB Atlas
+- The username and password are correct
+- The database name is included in the URI
+</Accordion>
+
+<Accordion title="Email not sending">
+Verify that:
+- 2FA is enabled on your Google account
+- You're using an App Password, not your regular password
+- The app password has no spaces
+</Accordion>
+
+<Accordion title="OAuth callback error">
+Verify that:
+- The callback URL matches exactly (including trailing slashes)
+- The client ID and secret are correct
+- For development, use `http://localhost:3000` (not `127.0.0.1`)
+</Accordion>
+</Accordions>
+
+## Next Steps
+
+With your environment configured, proceed to [Authentication](/docs/authentication) to understand how the auth system works.

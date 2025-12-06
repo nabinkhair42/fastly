@@ -1,0 +1,145 @@
+---
+title: Introduction
+description: Production-ready SaaS starter kit with authentication, user management, and session tracking
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Card, Cards } from 'fumadocs-ui/components/card';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+import { File, Folder, Files } from 'fumadocs-ui/components/files';
+
+Fastly is a full-stack authentication and user management system built with Next.js 16. It provides everything you need to handle user accounts, sessions, and profiles in production applications.
+
+## Features
+
+<Cards>
+  <Card title="Email/Password Auth" href="/docs/authentication/email-password">
+    Registration with OTP verification, password reset, and secure bcrypt hashing.
+  </Card>
+  <Card title="OAuth Integration" href="/docs/authentication/oauth-github">
+    GitHub and Google OAuth with automatic account creation and profile linking.
+  </Card>
+  <Card title="JWT Sessions" href="/docs/api-reference/auth-endpoints">
+    Access tokens (15 min) and refresh tokens (7 days) with automatic renewal.
+  </Card>
+  <Card title="Session Management" href="/docs/api-reference/session-endpoints">
+    Multi-device session tracking with browser, OS, and IP metadata.
+  </Card>
+</Cards>
+
+## Tech Stack
+
+| Category | Technology |
+|----------|------------|
+| Framework | Next.js 16 (App Router) |
+| Language | TypeScript |
+| Database | MongoDB with Mongoose |
+| Authentication | JWT with access/refresh tokens |
+| Styling | Tailwind CSS + shadcn/ui |
+| Validation | Zod schemas |
+| File Upload | UploadThing |
+| Email | React Email + Nodemailer |
+
+## Project Structure
+
+<Files>
+  <Folder name="src" defaultOpen>
+    <Folder name="app" defaultOpen>
+      <Folder name="(auth)">
+        <File name="create-account/page.tsx" />
+        <File name="log-in/page.tsx" />
+        <File name="email-verification/page.tsx" />
+        <File name="forgot-password/page.tsx" />
+        <File name="reset-password/page.tsx" />
+      </Folder>
+      <Folder name="(protected)">
+        <File name="dashboard/page.tsx" />
+        <File name="account/page.tsx" />
+        <File name="edit-profile/page.tsx" />
+      </Folder>
+      <Folder name="api">
+        <Folder name="(auth)">
+          <File name="create-account/route.ts" />
+          <File name="log-in/route.ts" />
+          <File name="email-verification/route.ts" />
+        </Folder>
+        <Folder name="(users)">
+          <File name="user-details/route.ts" />
+          <File name="change-password/route.ts" />
+          <File name="sessions/route.ts" />
+        </Folder>
+        <Folder name="oauth">
+          <File name="github/route.ts" />
+          <File name="google/route.ts" />
+        </Folder>
+      </Folder>
+    </Folder>
+    <Folder name="hooks">
+      <File name="auth/useSession.ts" />
+      <File name="auth/useAuthMutations.ts" />
+      <File name="users/useUserDetails.ts" />
+    </Folder>
+    <Folder name="lib">
+      <File name="auth/auth-middleware.ts" />
+      <File name="auth/session-tracker.ts" />
+      <File name="config/axios.ts" />
+    </Folder>
+    <Folder name="models">
+      <File name="users.ts" />
+      <File name="user-sessions.ts" />
+    </Folder>
+    <Folder name="services">
+      <File name="auth-service.ts" />
+      <File name="user-service.ts" />
+    </Folder>
+    <Folder name="zod">
+      <File name="authValidation.ts" />
+      <File name="usersUpdate.ts" />
+    </Folder>
+  </Folder>
+</Files>
+
+## How It Works
+
+<Steps>
+<Step>
+### User Registration
+
+User submits email and password. The system creates an unverified account and sends a 6-digit OTP to their email.
+</Step>
+
+<Step>
+### Email Verification
+
+User enters the OTP code. Once verified, the system creates their profile and generates JWT tokens.
+</Step>
+
+<Step>
+### Session Creation
+
+A session record is created with device metadata (browser, OS, IP). The session ID is returned alongside tokens.
+</Step>
+
+<Step>
+### Authenticated Requests
+
+All protected endpoints require the access token in the `Authorization` header and session ID in the `X-Session-Id` header.
+</Step>
+</Steps>
+
+## Next Steps
+
+<Cards>
+  <Card title="Installation" href="/docs/getting-started/installation">
+    Complete setup instructions and prerequisites.
+  </Card>
+  <Card title="Environment Setup" href="/docs/getting-started/environment-setup">
+    Configure MongoDB, JWT secrets, OAuth, and email settings.
+  </Card>
+  <Card title="Authentication" href="/docs/authentication">
+    Learn how the auth system works.
+  </Card>
+  <Card title="API Reference" href="/docs/api-reference">
+    Complete endpoint documentation.
+  </Card>
+</Cards>

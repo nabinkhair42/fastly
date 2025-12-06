@@ -1,0 +1,409 @@
+---
+title: Email Verification
+description: OTP-based email verification system
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+import { TypeTable } from 'fumadocs-ui/components/type-table';
+
+Email verification ensures that users own the email addresses they register with. New accounts must verify their email before accessing protected routes.
+
+## How It Works
+
+<Steps>
+<Step>
+### User submits registration
+
+User signs up with email and password. Account is created with `isVerified: false`.
+</Step>
+
+<Step>
+### OTP generated and stored
+
+A 6-digit OTP is generated using cryptographic random bytes and stored with a 5-minute expiration.
+
+```typescript
+const otp = generateOtp(); // "847291"
+const expiration = new Date(Date.now() + 5 * 60 * 1000);
+
+await UserAuth.updateOne({ _id: userId }, {
+  verificationCode: otp,
+  verificationCodeExpiresAt: expiration,
+});
+```
+</Step>
+
+<Step>
+### Email sent
+
+The verification email contains the OTP code. Users enter this code on the verification page.
+</Step>
+
+<Step>
+### User submits OTP
+
+The verification page collects the 6-digit code and submits it to the API.
+</Step>
+
+<Step>
+### Backend validates
+
+The API checks that:
+- Code matches the stored value
+- Code has not expired
+- User is not already verified
+</Step>
+
+<Step>
+### Account activated
+
+On success:
+- User profile is created
+- `isVerified` is set to `true`
+- Verification code is cleared
+- JWT tokens are generated
+- Session is created
+- Welcome email is sent
+</Step>
+</Steps>
+
+## OTP Generation
+
+The OTP generator at `src/helpers/generate-otp.ts` creates secure 6-digit codes:
+
+```typescript
+import crypto from 'crypto';
+
+const OTP_LENGTH = 6;
+const OTP_EXPIRY_MINUTES = 5;
+
+export const generateOtp = (): string => {
+  const buffer = crypto.randomBytes(3);
+  const randomNum = buffer.readUIntBE(0, 3) % 1000000;
+  return randomNum.toString().padStart(6, '0');
+};
+
+export const generateOtpExpiration = (): Date => {
+  return new Date(Date.now() + OTP_EXPIRY_MINUTES * 60 * 1000);
+};
+```
+
+<Callout type="info">
+The OTP uses cryptographically secure random bytes to prevent prediction attacks.
+</Callout>
+
+## Verification API
+
+**Endpoint:** `POST /api/email-verification`
+
+### Request Body
+
+<TypeTable
+  type={{
+    email: {
+      description: 'Email address to verify',
+      type: 'string',
+      required: true,
+    },
+    verificationCode: {
+      description: '6-digit verification code',
+      type: 'string',
+      required: true,
+    },
+  }}
+/>
+
+### Example Request
+
+```bash
+curl -X POST http://localhost:3000/api/email-verification \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "john@example.com",
+    "verificationCode": "847291"
+  }'
+```
+
+### Success Response
+
+```json
+{
+  "success": true,
+  "message": "Email verified successfully",
+  "data": {
+    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "session": {
+      "sessionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "browser": "Chrome 120",
+      "os": "macOS 14"
+    },
+    "user": {
+      "userId": "507f1f77bcf86cd799439011",
+      "email": "john@example.com",
+      "firstName": "John",
+      "lastName": "Doe",
+      "username": "john"
+    }
+  }
+}
+```
+
+### Error Responses
+
+| Status | Message | Cause |
+|--------|---------|-------|
+| 400 | Invalid verification code | Code doesn't match |
+| 400 | Verification code expired | Code older than 5 minutes |
+| 400 | Email already verified | User already verified |
+| 404 | User not found | No account with this email |
+
+## Resend OTP
+
+If the OTP expires or the user didn't receive the email, they can request a new code.
+
+**Endpoint:** `POST /api/email-verification/resend`
+
+### Request Body
+
+```json
+{
+  "email": "john@example.com"
+}
+```
+
+### Response
+
+```json
+{
+  "success": true,
+  "message": "Verification email sent",
+  "data": {
+    "email": "john@example.com"
+  }
+}
+```
+
+<Callout type="warn">
+Resending generates a new OTP. The previous code is invalidated.
+</Callout>
+
+### Rate Limiting
+
+Consider implementing rate limiting to prevent abuse:
+
+```typescript
+// Example: Maximum 3 resend requests per 15 minutes
+const RESEND_LIMIT = 3;
+const RESEND_WINDOW = 15 * 60 * 1000; // 15 minutes
+```
+
+## Frontend Implementation
+
+### Verification Page
+
+```typescript title="src/app/(auth)/email-verification/page.tsx"
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useVerifyEmail, useResendVerification } from '@/hooks/auth/useAuthMutations';
+import { useAuth } from '@/providers/auth-provider';
+
+export default function EmailVerificationPage() {
+  const router = useRouter();
+  const { login } = useAuth();
+  const [email, setEmail] = useState('');
+  const [code, setCode] = useState('');
+
+  const verifyEmail = useVerifyEmail();
+  const resendCode = useResendVerification();
+
+  useEffect(() => {
+    // Get email from session storage (set during registration)
+    const pendingEmail = sessionStorage.getItem('pendingEmail');
+    if (pendingEmail) {
+      setEmail(pendingEmail);
+    } else {
+      router.push('/create-account');
+    }
+  }, []);
+
+  const handleSubmit = () => {
+    verifyEmail.mutate(
+      { email, verificationCode: code },
+      {
+        onSuccess: (response) => {
+          const { accessToken, refreshToken, session, user } = response.data;
+          sessionStorage.removeItem('pendingEmail');
+          login(accessToken, refreshToken, user, { sessionId: session.sessionId });
+          router.push('/dashboard');
+        },
+      }
+    );
+  };
+
+  const handleResend = () => {
+    resendCode.mutate({ email });
+  };
+
+  return (
+    <div>
+      <h1>Verify your email</h1>
+      <p>Enter the 6-digit code sent to {email}</p>
+
+      <input
+        type="text"
+        maxLength={6}
+        value={code}
+        onChange={(e) => setCode(e.target.value)}
+        placeholder="000000"
+      />
+
+      <button onClick={handleSubmit} disabled={verifyEmail.isPending}>
+        Verify
+      </button>
+
+      <button onClick={handleResend} disabled={resendCode.isPending}>
+        Resend code
+      </button>
+    </div>
+  );
+}
+```
+
+### OTP Input Component
+
+For better UX, use an OTP input component with auto-focus:
+
+```typescript title="src/components/otp-input.tsx"
+'use client';
+
+import { useRef, useState, KeyboardEvent, ClipboardEvent } from 'react';
+
+interface OTPInputProps {
+  length?: number;
+  onComplete: (code: string) => void;
+}
+
+export function OTPInput({ length = 6, onComplete }: OTPInputProps) {
+  const [values, setValues] = useState<string[]>(Array(length).fill(''));
+  const inputs = useRef<(HTMLInputElement | null)[]>([]);
+
+  const handleChange = (index: number, value: string) => {
+    if (!/^\d*$/.test(value)) return;
+
+    const newValues = [...values];
+    newValues[index] = value.slice(-1);
+    setValues(newValues);
+
+    if (value && index < length - 1) {
+      inputs.current[index + 1]?.focus();
+    }
+
+    if (newValues.every((v) => v) && newValues.join('').length === length) {
+      onComplete(newValues.join(''));
+    }
+  };
+
+  const handleKeyDown = (index: number, e: KeyboardEvent) => {
+    if (e.key === 'Backspace' && !values[index] && index > 0) {
+      inputs.current[index - 1]?.focus();
+    }
+  };
+
+  const handlePaste = (e: ClipboardEvent) => {
+    e.preventDefault();
+    const pasted = e.clipboardData.getData('text').slice(0, length);
+    if (!/^\d+$/.test(pasted)) return;
+
+    const newValues = [...values];
+    pasted.split('').forEach((char, i) => {
+      if (i < length) newValues[i] = char;
+    });
+    setValues(newValues);
+
+    if (pasted.length === length) {
+      onComplete(pasted);
+    }
+  };
+
+  return (
+    <div className="flex gap-2">
+      {values.map((value, index) => (
+        <input
+          key={index}
+          ref={(el) => (inputs.current[index] = el)}
+          type="text"
+          inputMode="numeric"
+          maxLength={1}
+          value={value}
+          onChange={(e) => handleChange(index, e.target.value)}
+          onKeyDown={(e) => handleKeyDown(index, e)}
+          onPaste={handlePaste}
+          className="w-12 h-12 text-center text-2xl border rounded"
+        />
+      ))}
+    </div>
+  );
+}
+```
+
+## Email Template
+
+The verification email template at `src/mail-templates/verification-email.tsx`:
+
+```typescript
+import { Html, Body, Container, Text, Heading } from '@react-email/components';
+
+interface VerificationEmailProps {
+  firstName: string;
+  code: string;
+}
+
+export function VerificationEmail({ firstName, code }: VerificationEmailProps) {
+  return (
+    <Html>
+      <Body>
+        <Container>
+          <Heading>Verify your email</Heading>
+          <Text>Hi {firstName},</Text>
+          <Text>Your verification code is:</Text>
+          <Text style={{ fontSize: '32px', fontWeight: 'bold' }}>{code}</Text>
+          <Text>This code expires in 5 minutes.</Text>
+        </Container>
+      </Body>
+    </Html>
+  );
+}
+```
+
+## Development Bypass
+
+For development and testing, you can manually verify users via MongoDB:
+
+```javascript
+// MongoDB Shell or Compass
+db.userauths.updateOne(
+  { email: "test@example.com" },
+  { $set: { isVerified: true } }
+)
+```
+
+<Callout type="warn">
+Only use this in development. Never bypass verification in production.
+</Callout>
+
+## Security Considerations
+
+1. **OTP Expiration**: Codes expire after 5 minutes to limit the attack window
+2. **Single Use**: Each OTP can only be used once
+3. **Cryptographic Generation**: Uses `crypto.randomBytes` for unpredictable codes
+4. **Rate Limiting**: Implement limits on resend requests
+5. **Account Lockout**: Consider locking accounts after multiple failed attempts
+
+## Next Steps
+
+- [Email/Password](/docs/authentication/email-password) - Full registration flow
+- [Authentication Overview](/docs/authentication) - Complete auth system

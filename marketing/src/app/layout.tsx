@@ -1,8 +1,7 @@
-import { SiteFooter } from "@/components/site-footer";
-import { SiteHeader } from "@/components/site-header";
-import AppRootProvider from "@/providers/app-root-provider";
-import { metadata } from "@/seo/metadata";
-import "./globals.css";
+import AppRootProvider from '@/providers/app-root-provider';
+import { RootProvider } from 'fumadocs-ui/provider/next';
+import { metadata } from '@/seo/metadata';
+import './globals.css';
 export { metadata };
 
 export default function RootLayout({
@@ -11,12 +10,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning={true}>
-      <body>
+    <html lang="en" suppressHydrationWarning>
+      <body suppressHydrationWarning>
         <AppRootProvider>
-          <SiteHeader />
-          {children}
-          <SiteFooter />
+          <RootProvider>{children}</RootProvider>
         </AppRootProvider>
       </body>
     </html>

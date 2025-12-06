@@ -1,0 +1,250 @@
+---
+title: Google OAuth
+description: Implement Google sign-in for your application
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+import { TypeTable } from 'fumadocs-ui/components/type-table';
+
+Google OAuth allows users to sign in with their Google account. New users are automatically registered without email verification.
+
+## Prerequisites
+
+Before implementing Google OAuth, complete the [Google OAuth setup](/docs/getting-started/environment-setup#google-oauth) in the Environment Setup guide.
+
+## OAuth Flow
+
+<Steps>
+<Step>
+### User clicks Google button
+
+The login page includes a Google sign-in button that redirects to Google's authorization page.
+
+```typescript
+const googleAuthUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth');
+googleAuthUrl.searchParams.set('client_id', clientId);
+googleAuthUrl.searchParams.set('redirect_uri', redirectUri);
+googleAuthUrl.searchParams.set('response_type', 'code');
+googleAuthUrl.searchParams.set('scope', 'openid email profile');
+window.location.href = googleAuthUrl.toString();
+```
+</Step>
+
+<Step>
+### User selects Google account
+
+Google shows account selection. The user chooses which account to use.
+</Step>
+
+<Step>
+### Google redirects with code
+
+Google redirects to `/api/oauth/google?code=xxx` with an authorization code.
+</Step>
+
+<Step>
+### Backend exchanges code for token
+
+```typescript
+const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+  body: new URLSearchParams({
+    code,
+    client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+    client_secret: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_SECRET,
+    redirect_uri: `${appUrl}/api/oauth/google`,
+    grant_type: 'authorization_code',
+  }),
+});
+```
+</Step>
+
+<Step>
+### Fetch user data from Google
+
+```typescript
+const userResponse = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+  headers: { Authorization: `Bearer ${accessToken}` },
+});
+
+const userData = await userResponse.json();
+// { id, email, verified_email, name, given_name, family_name, picture }
+```
+</Step>
+
+<Step>
+### Validate email verification
+
+Google provides `verified_email` field. Only verified emails are accepted.
+
+```typescript
+if (!userData.verified_email) {
+  return redirect('/log-in?error=email_not_verified');
+}
+```
+</Step>
+
+<Step>
+### Create or login user
+
+The backend checks if a user exists with this email:
+- **Existing Google user**: Logs them in
+- **New user**: Creates account (auto-verified) and profile
+- **Email exists with different auth**: Returns error
+</Step>
+
+<Step>
+### Redirect with tokens
+
+```typescript
+const redirectUrl = new URL('/oauth-callback', appUrl);
+redirectUrl.searchParams.set('accessToken', accessToken);
+redirectUrl.searchParams.set('refreshToken', refreshToken);
+redirectUrl.searchParams.set('sessionId', session.sessionId);
+return NextResponse.redirect(redirectUrl);
+```
+</Step>
+</Steps>
+
+## Callback Handler
+
+The callback handler at `src/app/api/oauth/google/route.ts` processes the OAuth response.
+
+### User Data Mapping
+
+| Google Field | Fastly Field |
+|--------------|--------------|
+| `given_name` or email prefix | `firstName` |
+| `family_name` | `lastName` |
+| `email` | `email`, `username` (prefix) |
+| `picture` | `avatar` |
+
+### Account Linking Rules
+
+| Scenario | Result |
+|----------|--------|
+| New email | Create new account with `authMethod: 'google'` |
+| Existing Google account | Login to existing account |
+| Email exists with password auth | Error: `use_email_login` |
+| Email exists with GitHub auth | Error: `use_github_login` |
+
+<Callout type="info">
+Google requires email verification on their platform. Only verified emails can be used for OAuth.
+</Callout>
+
+## Error Handling
+
+The callback may redirect with error codes in the URL:
+
+| Error Code | Description |
+|------------|-------------|
+| `oauth_cancelled` | User closed the consent screen |
+| `missing_code` | No authorization code in callback URL |
+| `invalid_grant` | Authorization code expired or already used |
+| `email_not_verified` | Google email is not verified |
+| `use_email_login` | Email registered with password authentication |
+| `use_github_login` | Email registered with GitHub OAuth |
+| `token_exchange_failed` | Failed to exchange code for access token |
+| `fetch_user_failed` | Failed to fetch user profile from Google |
+
+### Frontend Error Handling
+
+```typescript title="src/app/(auth)/oauth-callback/page.tsx"
+'use client';
+
+import { useSearchParams, useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+import { useAuth } from '@/providers/auth-provider';
+
+export default function OAuthCallback() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const { login } = useAuth();
+
+  useEffect(() => {
+    const error = searchParams.get('error');
+    const accessToken = searchParams.get('accessToken');
+    const refreshToken = searchParams.get('refreshToken');
+    const sessionId = searchParams.get('sessionId');
+
+    if (error) {
+      router.push(`/log-in?error=${error}`);
+      return;
+    }
+
+    if (accessToken && refreshToken) {
+      login(accessToken, refreshToken, null, { sessionId });
+      router.push('/dashboard');
+    }
+  }, [searchParams]);
+
+  return <div>Processing...</div>;
+}
+```
+
+## Frontend Implementation
+
+### Google Sign-In Button
+
+```typescript title="src/app/(auth)/components/google-button.tsx"
+'use client';
+
+import { Button } from '@/components/ui/button';
+import { FcGoogle } from 'react-icons/fc';
+
+export function GoogleButton() {
+  const handleClick = () => {
+    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+    const redirectUri = `${window.location.origin}/api/oauth/google`;
+
+    const url = new URL('https://accounts.google.com/o/oauth2/v2/auth');
+    url.searchParams.set('client_id', clientId);
+    url.searchParams.set('redirect_uri', redirectUri);
+    url.searchParams.set('response_type', 'code');
+    url.searchParams.set('scope', 'openid email profile');
+    url.searchParams.set('access_type', 'offline');
+    url.searchParams.set('prompt', 'consent');
+
+    window.location.href = url.toString();
+  };
+
+  return (
+    <Button variant="outline" onClick={handleClick} className="w-full">
+      <FcGoogle className="mr-2 h-4 w-4" />
+      Continue with Google
+    </Button>
+  );
+}
+```
+
+## Session Metadata
+
+Google OAuth sessions include the following metadata:
+
+<TypeTable
+  type={{
+    authMethod: {
+      description: 'Authentication method used',
+      type: "'google'",
+    },
+    browser: {
+      description: 'Browser name and version',
+      type: 'string',
+    },
+    os: {
+      description: 'Operating system',
+      type: 'string',
+    },
+    ipAddress: {
+      description: 'Client IP address',
+      type: 'string',
+    },
+  }}
+/>
+
+## Next Steps
+
+- [GitHub OAuth](/docs/authentication/oauth-github) - Add GitHub sign-in
+- [Session Management](/docs/api-reference/session-endpoints) - Manage user sessions

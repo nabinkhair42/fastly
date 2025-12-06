@@ -1,0 +1,560 @@
+---
+title: Customization
+description: Extend and customize Fastly for your application
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+import { File, Folder, Files } from 'fumadocs-ui/components/files';
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
+
+Fastly is designed to be extended. This guide covers common customization scenarios.
+
+## Add OAuth Provider
+
+Add a new OAuth provider (e.g., Twitter, Discord, LinkedIn):
+
+<Steps>
+<Step>
+### Update AuthMethod enum
+
+```typescript title="src/types/user.ts"
+export enum AuthMethod {
+  EMAIL = 'email',
+  GOOGLE = 'google',
+  GITHUB = 'github',
+  TWITTER = 'twitter', // Add new provider
+}
+```
+</Step>
+
+<Step>
+### Create callback route
+
+<Files>
+  <Folder name="src/app/api/oauth" defaultOpen>
+    <Folder name="twitter" defaultOpen>
+      <File name="route.ts" />
+    </Folder>
+  </Folder>
+</Files>
+
+```typescript title="src/app/api/oauth/twitter/route.ts"
+import { NextRequest, NextResponse } from 'next/server';
+import { connectDB } from '@/lib/config/db-connect';
+import { UserAuth, User } from '@/models/users';
+import { generateTokenPair } from '@/helpers/jwt-token';
+import { createUserSession } from '@/lib/auth/session-tracker';
+
+export async function GET(request: NextRequest) {
+  const searchParams = request.nextUrl.searchParams;
+  const code = searchParams.get('code');
+  const error = searchParams.get('error');
+
+  if (error || !code) {
+    return NextResponse.redirect(
+      new URL('/log-in?error=oauth_cancelled', process.env.NEXT_PUBLIC_APP_URL!)
+    );
+  }
+
+  try {
+    // 1. Exchange code for access token
+    const tokenResponse = await fetch('https://api.twitter.com/2/oauth2/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        code,
+        grant_type: 'authorization_code',
+        client_id: process.env.TWITTER_CLIENT_ID!,
+        redirect_uri: `${process.env.NEXT_PUBLIC_APP_URL}/api/oauth/twitter`,
+        code_verifier: 'challenge', // Implement PKCE
+      }),
+    });
+
+    const { access_token } = await tokenResponse.json();
+
+    // 2. Fetch user profile
+    const userResponse = await fetch('https://api.twitter.com/2/users/me', {
+      headers: { Authorization: `Bearer ${access_token}` },
+    });
+
+    const userData = await userResponse.json();
+
+    // 3. Create or login user
+    await connectDB();
+
+    let userAuth = await UserAuth.findOne({ email: userData.email });
+
+    if (!userAuth) {
+      // Create new user
+      userAuth = await UserAuth.create({
+        email: userData.email,
+        isVerified: true,
+        authMethod: 'twitter',
+      });
+
+      await User.create({
+        userAuth: userAuth._id,
+        email: userData.email,
+        firstName: userData.name.split(' ')[0],
+        lastName: userData.name.split(' ').slice(1).join(' '),
+        username: userData.username,
+        avatar: userData.profile_image_url,
+      });
+    }
+
+    // 4. Generate tokens and session
+    const tokens = generateTokenPair(userAuth._id.toString(), userAuth.email);
+    const session = await createUserSession({
+      userAuthId: userAuth._id,
+      authMethod: 'twitter',
+      request,
+    });
+
+    // 5. Redirect with tokens
+    const redirectUrl = new URL('/oauth-callback', process.env.NEXT_PUBLIC_APP_URL);
+    redirectUrl.searchParams.set('accessToken', tokens.accessToken);
+    redirectUrl.searchParams.set('refreshToken', tokens.refreshToken);
+    redirectUrl.searchParams.set('sessionId', session.sessionId);
+
+    return NextResponse.redirect(redirectUrl);
+  } catch (error) {
+    return NextResponse.redirect(
+      new URL('/log-in?error=oauth_failed', process.env.NEXT_PUBLIC_APP_URL!)
+    );
+  }
+}
+```
+</Step>
+
+<Step>
+### Add OAuth button
+
+```typescript title="src/app/(auth)/components/twitter-button.tsx"
+'use client';
+
+import { Button } from '@/components/ui/button';
+import { FaTwitter } from 'react-icons/fa';
+
+export function TwitterButton() {
+  const handleClick = () => {
+    const clientId = process.env.NEXT_PUBLIC_TWITTER_CLIENT_ID;
+    const redirectUri = `${window.location.origin}/api/oauth/twitter`;
+
+    const url = new URL('https://twitter.com/i/oauth2/authorize');
+    url.searchParams.set('response_type', 'code');
+    url.searchParams.set('client_id', clientId!);
+    url.searchParams.set('redirect_uri', redirectUri);
+    url.searchParams.set('scope', 'users.read tweet.read');
+    url.searchParams.set('state', 'state');
+    url.searchParams.set('code_challenge', 'challenge');
+    url.searchParams.set('code_challenge_method', 'plain');
+
+    window.location.href = url.toString();
+  };
+
+  return (
+    <Button variant="outline" onClick={handleClick} className="w-full">
+      <FaTwitter className="mr-2 h-4 w-4" />
+      Continue with Twitter
+    </Button>
+  );
+}
+```
+</Step>
+
+<Step>
+### Update environment variables
+
+```bash title=".env.local"
+NEXT_PUBLIC_TWITTER_CLIENT_ID=your-client-id
+TWITTER_CLIENT_SECRET=your-client-secret
+```
+</Step>
+</Steps>
+
+---
+
+## Extend User Model
+
+Add custom fields to the user profile:
+
+<Steps>
+<Step>
+### Update Mongoose schema
+
+```typescript title="src/models/users.ts"
+const userSchema = new mongoose.Schema({
+  // Existing fields...
+
+  // Add new fields
+  company: { type: String, default: null },
+  website: { type: String, default: null },
+  phoneNumber: { type: String, default: null },
+  role: {
+    type: String,
+    enum: ['user', 'admin', 'moderator'],
+    default: 'user'
+  },
+});
+```
+</Step>
+
+<Step>
+### Update TypeScript types
+
+```typescript title="src/types/user.ts"
+export interface User {
+  // Existing fields...
+
+  company: string | null;
+  website: string | null;
+  phoneNumber: string | null;
+  role: 'user' | 'admin' | 'moderator';
+}
+```
+</Step>
+
+<Step>
+### Update Zod validation
+
+```typescript title="src/zod/usersUpdate.ts"
+export const updateUserDetailsSchema = z.object({
+  // Existing fields...
+
+  company: z.string().max(100).nullable().optional(),
+  website: z.string().url().nullable().optional(),
+  phoneNumber: z.string().regex(/^\+?[0-9]{10,15}$/).nullable().optional(),
+});
+```
+</Step>
+
+<Step>
+### Update API handler
+
+The `POST /api/user-details` handler will automatically accept the new fields if they pass Zod validation.
+</Step>
+</Steps>
+
+---
+
+## Modify Password Requirements
+
+Customize password complexity rules:
+
+```typescript title="src/zod/authValidation.ts"
+const passwordSchema = z
+  .string()
+  .min(12, 'Minimum 12 characters')
+  .max(128, 'Maximum 128 characters')
+  .regex(/[A-Z]/, 'Must contain uppercase letter')
+  .regex(/[a-z]/, 'Must contain lowercase letter')
+  .regex(/[0-9]/, 'Must contain number')
+  .regex(/[!@#$%^&*(),.?":{}|<>]/, 'Must contain special character')
+  .refine(
+    (password) => !/(.)\1{2,}/.test(password),
+    'Cannot contain repeated characters'
+  );
+
+export const createAccountSchema = z.object({
+  firstName: z.string().min(1).max(20),
+  lastName: z.string().min(1).max(20),
+  email: z.string().email(),
+  password: passwordSchema,
+  confirmPassword: z.string(),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: 'Passwords do not match',
+  path: ['confirmPassword'],
+});
+```
+
+---
+
+## Add Protected Routes
+
+Create new protected pages:
+
+<Files>
+  <Folder name="src/app/(protected)" defaultOpen>
+    <File name="layout.tsx" />
+    <Folder name="dashboard">
+      <File name="page.tsx" />
+    </Folder>
+    <Folder name="settings" defaultOpen>
+      <File name="page.tsx" />
+    </Folder>
+    <Folder name="billing" defaultOpen>
+      <File name="page.tsx" />
+    </Folder>
+  </Folder>
+</Files>
+
+```typescript title="src/app/(protected)/settings/page.tsx"
+'use client';
+
+import { useSession } from '@/hooks/auth/useSession';
+
+export default function SettingsPage() {
+  const { user, isLoading } = useSession();
+
+  if (isLoading) return <div>Loading...</div>;
+
+  return (
+    <div>
+      <h1>Settings</h1>
+      <p>Welcome, {user?.firstName}</p>
+      {/* Settings content */}
+    </div>
+  );
+}
+```
+
+The `(protected)` route group layout handles authentication:
+
+```typescript title="src/app/(protected)/layout.tsx"
+'use client';
+
+import { useRequireAuth } from '@/hooks/auth/useRequireAuth';
+
+export default function ProtectedLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  useRequireAuth(); // Redirects to login if not authenticated
+
+  return <>{children}</>;
+}
+```
+
+---
+
+## Custom Email Templates
+
+Email templates use React Email components:
+
+<Files>
+  <Folder name="src/mail-templates" defaultOpen>
+    <File name="verification-email.tsx" />
+    <File name="forgot-password-email.tsx" />
+    <File name="welcome-email.tsx" />
+    <File name="email-service.tsx" />
+  </Folder>
+</Files>
+
+### Customize Verification Email
+
+```typescript title="src/mail-templates/verification-email.tsx"
+import {
+  Html,
+  Head,
+  Body,
+  Container,
+  Section,
+  Heading,
+  Text,
+  Button,
+} from '@react-email/components';
+
+interface VerificationEmailProps {
+  firstName: string;
+  code: string;
+}
+
+export function VerificationEmail({ firstName, code }: VerificationEmailProps) {
+  return (
+    <Html>
+      <Head />
+      <Body style={main}>
+        <Container style={container}>
+          <Section>
+            <Heading style={heading}>Verify your email</Heading>
+            <Text style={text}>Hi {firstName},</Text>
+            <Text style={text}>
+              Thanks for signing up! Use this code to verify your email:
+            </Text>
+            <Section style={codeContainer}>
+              <Text style={codeText}>{code}</Text>
+            </Section>
+            <Text style={text}>This code expires in 5 minutes.</Text>
+            <Text style={footer}>
+              If you didn't create an account, you can ignore this email.
+            </Text>
+          </Section>
+        </Container>
+      </Body>
+    </Html>
+  );
+}
+
+const main = {
+  backgroundColor: '#f6f9fc',
+  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+};
+
+const container = {
+  backgroundColor: '#ffffff',
+  margin: '0 auto',
+  padding: '40px',
+  borderRadius: '8px',
+};
+
+const heading = {
+  fontSize: '24px',
+  fontWeight: '600',
+  color: '#1a1a1a',
+  marginBottom: '24px',
+};
+
+const text = {
+  fontSize: '16px',
+  color: '#4a4a4a',
+  lineHeight: '24px',
+};
+
+const codeContainer = {
+  backgroundColor: '#f4f4f5',
+  borderRadius: '8px',
+  padding: '16px',
+  textAlign: 'center' as const,
+  margin: '24px 0',
+};
+
+const codeText = {
+  fontSize: '32px',
+  fontWeight: '700',
+  letterSpacing: '8px',
+  color: '#1a1a1a',
+};
+
+const footer = {
+  fontSize: '14px',
+  color: '#6b7280',
+  marginTop: '32px',
+};
+```
+
+---
+
+## Theming
+
+### CSS Variables
+
+Customize the color palette in `src/app/globals.css`:
+
+```css title="src/app/globals.css"
+:root {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --primary: oklch(0.985 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.396 0.141 25.723);
+  --border: oklch(0.269 0 0);
+  --ring: oklch(0.439 0 0);
+}
+```
+
+### User Theme Preference
+
+The user's theme preference is stored in `User.preferences.theme`:
+
+```typescript
+// Update theme preference
+await userService.updateUserDetails({
+  preferences: {
+    theme: 'dark', // 'light' | 'dark' | 'system'
+  },
+});
+```
+
+---
+
+## Custom Hooks
+
+Create custom hooks for your features:
+
+```typescript title="src/hooks/useSubscription.ts"
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { subscriptionService } from '@/services/subscription-service';
+
+export function useSubscription() {
+  return useQuery({
+    queryKey: ['subscription'],
+    queryFn: () => subscriptionService.getSubscription(),
+  });
+}
+
+export function useCancelSubscription() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: () => subscriptionService.cancel(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['subscription'] });
+    },
+  });
+}
+```
+
+---
+
+## Add API Endpoints
+
+Create new API routes following the existing pattern:
+
+```typescript title="src/app/api/subscription/route.ts"
+import { NextRequest } from 'next/server';
+import { authenticate } from '@/lib/auth/auth-middleware';
+import { sendSuccess, sendBadRequest } from '@/lib/utils/response';
+import { connectDB } from '@/lib/config/db-connect';
+
+export async function GET(request: NextRequest) {
+  const auth = await authenticate(request);
+  if (!auth.success) return auth.response;
+
+  await connectDB();
+
+  // Fetch subscription data
+  const subscription = await getSubscription(auth.user.userId);
+
+  return sendSuccess('Subscription fetched', { subscription });
+}
+
+export async function POST(request: NextRequest) {
+  const auth = await authenticate(request);
+  if (!auth.success) return auth.response;
+
+  const body = await request.json();
+
+  // Validate and process
+  // ...
+
+  return sendSuccess('Subscription updated');
+}
+```
+
+<Callout type="info">
+Use the `authenticate` middleware for protected endpoints. It validates the access token and session.
+</Callout>

@@ -14,7 +14,7 @@ export default function IntegrationsSection() {
         <div className="mx-auto flex flex-col md:grid max-w-5xl px-4 xl:px-0 md:grid-cols-2 md:gap-12">
           <div className="order-last mt-6 flex flex-col gap-12 md:order-first">
             <div className="space-y-3 text-center md:text-left">
-              <h2 className="text-balance text-3xl font-semibold md:text-4xl lg:text-5xl">
+              <h2 className="text-balance text-3xl font-medium md:text-4xl lg:text-5xl">
                 Built on top of your favorite Tech Stack
               </h2>
               <p className="text-muted-foreground">

@@ -1,0 +1,193 @@
+---
+title: Installation
+description: Get Fastly running on your local machine
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
+
+## Prerequisites
+
+Before you begin, ensure you have the following installed:
+
+| Requirement | Version | Notes |
+|------------|---------|-------|
+| Node.js | 18.17 or higher | Required for Next.js 16 |
+| pnpm | 8.0 or higher | Recommended package manager |
+| MongoDB | 6.0 or higher | Local instance or MongoDB Atlas |
+| Git | 2.0 or higher | For cloning the repository |
+
+<Callout type="info">
+MongoDB Atlas offers a free tier that works well for development. Create an account at [mongodb.com/atlas](https://www.mongodb.com/atlas).
+</Callout>
+
+## Installation
+
+<Steps>
+<Step>
+### Clone the repository
+
+Clone only the `main-app` directory (the SaaS starter kit):
+
+```bash
+git clone --filter=blob:none --sparse https://github.com/nabinkhair42/fastly.git my-app
+cd my-app
+git sparse-checkout set main-app
+cd main-app
+```
+
+Or download directly from [GitHub](https://github.com/nabinkhair42/fastly/tree/main/main-app).
+</Step>
+
+<Step>
+### Install dependencies
+
+<Tabs items={['pnpm', 'npm', 'yarn']}>
+<Tab value="pnpm">
+```bash
+pnpm install
+```
+</Tab>
+<Tab value="npm">
+```bash
+npm install
+```
+</Tab>
+<Tab value="yarn">
+```bash
+yarn install
+```
+</Tab>
+</Tabs>
+</Step>
+
+<Step>
+### Create environment file
+
+```bash
+cp env.example .env.local
+```
+
+Open `.env.local` and configure the required variables. See [Environment Setup](/docs/getting-started/environment-setup) for details.
+</Step>
+
+<Step>
+### Start the development server
+
+<Tabs items={['pnpm', 'npm', 'yarn']}>
+<Tab value="pnpm">
+```bash
+pnpm dev
+```
+</Tab>
+<Tab value="npm">
+```bash
+npm run dev
+```
+</Tab>
+<Tab value="yarn">
+```bash
+yarn dev
+```
+</Tab>
+</Tabs>
+
+The application will be available at [http://localhost:3000](http://localhost:3000).
+</Step>
+</Steps>
+
+## Verify Installation
+
+After starting the server, verify that everything is working:
+
+| URL | Expected Result |
+|-----|-----------------|
+| `/` | Landing page loads |
+| `/create-account` | Registration form appears |
+| `/log-in` | Login form appears |
+
+<Callout type="warn">
+If you see database connection errors, verify your `MONGODB_URI` is correct and the database is accessible.
+</Callout>
+
+## Production Build
+
+<Steps>
+<Step>
+### Build the application
+
+<Tabs items={['pnpm', 'npm', 'yarn']}>
+<Tab value="pnpm">
+```bash
+pnpm build
+```
+</Tab>
+<Tab value="npm">
+```bash
+npm run build
+```
+</Tab>
+<Tab value="yarn">
+```bash
+yarn build
+```
+</Tab>
+</Tabs>
+</Step>
+
+<Step>
+### Start the production server
+
+<Tabs items={['pnpm', 'npm', 'yarn']}>
+<Tab value="pnpm">
+```bash
+pnpm start
+```
+</Tab>
+<Tab value="npm">
+```bash
+npm start
+```
+</Tab>
+<Tab value="yarn">
+```bash
+yarn start
+```
+</Tab>
+</Tabs>
+
+The production server runs on port 3000 by default. Use the `PORT` environment variable to change it.
+</Step>
+</Steps>
+
+## Common Issues
+
+### Port already in use
+
+If port 3000 is occupied, specify a different port:
+
+```bash
+PORT=3001 pnpm dev
+```
+
+### Module not found errors
+
+Clear the cache and reinstall dependencies:
+
+```bash
+rm -rf node_modules .next
+pnpm install
+```
+
+### TypeScript errors
+
+Ensure you're using the correct Node.js version:
+
+```bash
+node --version  # Should be 18.17+
+```
+
+## Next Steps
+
+Continue to [Environment Setup](/docs/getting-started/environment-setup) to configure your database, OAuth providers, and email service.

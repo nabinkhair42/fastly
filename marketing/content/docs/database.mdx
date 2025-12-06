@@ -1,0 +1,533 @@
+---
+title: Database
+description: MongoDB models, schemas, and database configuration
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { TypeTable } from 'fumadocs-ui/components/type-table';
+import { File, Folder, Files } from 'fumadocs-ui/components/files';
+
+Fastly uses MongoDB with Mongoose ODM. All models are located in `src/models/`.
+
+## Data Model Overview
+
+The application uses three main collections:
+
+| Collection | Purpose |
+|------------|---------|
+| `userauths` | Authentication credentials and verification tokens |
+| `users` | User profile information |
+| `usersessions` | Active and revoked session records |
+
+### Relationships
+
+```
+UserAuth (1) ─────────── (1) User
+    │
+    └──────────────── (n) UserSession
+```
+
+- Each `UserAuth` has exactly one `User` profile (created after email verification)
+- Each `UserAuth` can have multiple `UserSession` records
+
+## Model Files
+
+<Files>
+  <Folder name="src/models" defaultOpen>
+    <File name="users.ts" />
+    <File name="user-sessions.ts" />
+  </Folder>
+</Files>
+
+---
+
+## UserAuth Model
+
+Stores authentication credentials and verification tokens.
+
+**Collection:** `userauths`
+
+**File:** `src/models/users.ts`
+
+### Schema
+
+<TypeTable
+  type={{
+    _id: {
+      description: 'MongoDB ObjectId',
+      type: 'ObjectId',
+    },
+    firstName: {
+      description: 'User first name (from registration)',
+      type: 'string | null',
+    },
+    lastName: {
+      description: 'User last name (from registration)',
+      type: 'string | null',
+    },
+    email: {
+      description: 'User email address',
+      type: 'string (unique, indexed)',
+      required: true,
+    },
+    password: {
+      description: 'Bcrypt hashed password',
+      type: 'string | null',
+    },
+    isVerified: {
+      description: 'Email verification status',
+      type: 'boolean',
+      default: 'false',
+    },
+    authMethod: {
+      description: 'Registration method',
+      type: "'email' | 'google' | 'github' | 'facebook'",
+      required: true,
+    },
+    verificationCode: {
+      description: '6-digit OTP for email verification',
+      type: 'string | null',
+    },
+    verificationCodeExpiresAt: {
+      description: 'OTP expiration (5 minutes)',
+      type: 'Date | null',
+    },
+    resetPasswordToken: {
+      description: '6-digit OTP for password reset',
+      type: 'string | null',
+    },
+    resetPasswordTokenExpiresAt: {
+      description: 'Reset token expiration (10 minutes)',
+      type: 'Date | null',
+    },
+    createdAt: {
+      description: 'Account creation timestamp',
+      type: 'Date',
+    },
+    updatedAt: {
+      description: 'Last update timestamp',
+      type: 'Date',
+    },
+  }}
+/>
+
+### Schema Definition
+
+```typescript title="src/models/users.ts"
+const userAuthSchema = new mongoose.Schema(
+  {
+    firstName: { type: String, default: null },
+    lastName: { type: String, default: null },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+      index: true,
+    },
+    password: { type: String, default: null },
+    isVerified: { type: Boolean, default: false, index: true },
+    authMethod: {
+      type: String,
+      enum: ['email', 'google', 'github', 'facebook'],
+      required: true,
+    },
+    verificationCode: { type: String, default: null },
+    verificationCodeExpiresAt: { type: Date, default: null },
+    resetPasswordToken: { type: String, default: null },
+    resetPasswordTokenExpiresAt: { type: Date, default: null },
+  },
+  { timestamps: true }
+);
+```
+
+---
+
+## User Model
+
+Stores user profile information.
+
+**Collection:** `users`
+
+**File:** `src/models/users.ts`
+
+### Schema
+
+<TypeTable
+  type={{
+    _id: {
+      description: 'MongoDB ObjectId',
+      type: 'ObjectId',
+    },
+    userAuth: {
+      description: 'Reference to UserAuth document',
+      type: 'ObjectId (indexed)',
+      required: true,
+    },
+    firstName: {
+      description: 'User first name',
+      type: 'string',
+      required: true,
+    },
+    lastName: {
+      description: 'User last name',
+      type: 'string',
+      required: true,
+    },
+    email: {
+      description: 'User email (denormalized)',
+      type: 'string (unique, indexed)',
+      required: true,
+    },
+    username: {
+      description: 'Unique username',
+      type: 'string (unique, indexed)',
+      required: true,
+    },
+    avatar: {
+      description: 'Avatar URL from UploadThing',
+      type: 'string | null',
+    },
+    bio: {
+      description: 'User biography (max 200 chars)',
+      type: 'string | null',
+    },
+    location: {
+      description: 'Address information object',
+      type: 'object | null',
+    },
+    socialAccounts: {
+      description: 'Array of social profile links',
+      type: 'array',
+    },
+    hasChangedUsername: {
+      description: 'Tracks one-time username change',
+      type: 'boolean',
+      default: 'false',
+    },
+    preferences: {
+      description: 'Theme and font preferences',
+      type: 'object',
+    },
+    dob: {
+      description: 'Date of birth',
+      type: 'Date | null',
+    },
+  }}
+/>
+
+### Location Object
+
+```typescript
+interface Location {
+  address: string;
+  city: string;
+  state: string;
+  country: string;
+  zipCode: string;
+}
+```
+
+### Social Accounts Array
+
+```typescript
+interface SocialAccount {
+  url: string;
+  provider: string;
+}
+```
+
+### Preferences Object
+
+```typescript
+interface Preferences {
+  theme: 'light' | 'dark' | 'system';
+  font: 'sans' | 'serif' | 'mono' | 'system';
+}
+```
+
+### Schema Definition
+
+```typescript title="src/models/users.ts"
+const userSchema = new mongoose.Schema(
+  {
+    userAuth: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'UserAuth',
+      required: true,
+      index: true,
+    },
+    firstName: { type: String, required: true },
+    lastName: { type: String, required: true },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      index: true,
+    },
+    username: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      index: true,
+    },
+    avatar: { type: String, default: null },
+    bio: { type: String, default: null, maxLength: 200 },
+    location: {
+      address: String,
+      city: String,
+      state: String,
+      country: String,
+      zipCode: String,
+    },
+    socialAccounts: [
+      {
+        url: String,
+        provider: String,
+      },
+    ],
+    hasChangedUsername: { type: Boolean, default: false },
+    preferences: {
+      theme: {
+        type: String,
+        enum: ['light', 'dark', 'system'],
+        default: 'system',
+      },
+      font: {
+        type: String,
+        enum: ['sans', 'serif', 'mono', 'system'],
+        default: 'system',
+      },
+    },
+    dob: { type: Date, default: null },
+  },
+  { timestamps: true }
+);
+```
+
+---
+
+## UserSession Model
+
+Tracks active and revoked user sessions.
+
+**Collection:** `usersessions`
+
+**File:** `src/models/user-sessions.ts`
+
+### Schema
+
+<TypeTable
+  type={{
+    _id: {
+      description: 'MongoDB ObjectId',
+      type: 'ObjectId',
+    },
+    userAuth: {
+      description: 'Reference to UserAuth document',
+      type: 'ObjectId (indexed)',
+      required: true,
+    },
+    sessionId: {
+      description: 'Unique session identifier',
+      type: 'string (UUID, unique, indexed)',
+      required: true,
+    },
+    authMethod: {
+      description: 'How the user logged in',
+      type: "'email' | 'google' | 'github'",
+      required: true,
+    },
+    userAgent: {
+      description: 'Full user agent string',
+      type: 'string',
+    },
+    browser: {
+      description: 'Browser name and version',
+      type: 'string',
+    },
+    os: {
+      description: 'Operating system name and version',
+      type: 'string',
+    },
+    device: {
+      description: 'Device vendor and model',
+      type: 'string',
+    },
+    ipAddress: {
+      description: 'Client IP address',
+      type: 'string',
+    },
+    location: {
+      description: 'Geographic location (if available)',
+      type: 'string | null',
+    },
+    createdAt: {
+      description: 'Session creation timestamp',
+      type: 'Date',
+    },
+    lastActiveAt: {
+      description: 'Last API activity timestamp',
+      type: 'Date',
+    },
+    revokedAt: {
+      description: 'Session revocation timestamp',
+      type: 'Date | null (indexed)',
+    },
+  }}
+/>
+
+### Schema Definition
+
+```typescript title="src/models/user-sessions.ts"
+const userSessionSchema = new mongoose.Schema({
+  userAuth: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'UserAuth',
+    required: true,
+    index: true,
+  },
+  sessionId: {
+    type: String,
+    required: true,
+    unique: true,
+    index: true,
+  },
+  authMethod: {
+    type: String,
+    enum: ['email', 'google', 'github'],
+    required: true,
+  },
+  userAgent: { type: String },
+  browser: { type: String },
+  os: { type: String },
+  device: { type: String },
+  ipAddress: { type: String },
+  location: { type: String, default: null },
+  createdAt: { type: Date, default: Date.now, immutable: true },
+  lastActiveAt: { type: Date, default: Date.now },
+  revokedAt: { type: Date, default: null, index: true },
+});
+
+// Compound index for efficient session queries
+userSessionSchema.index({ userAuth: 1, revokedAt: 1 });
+```
+
+---
+
+## Database Indexes
+
+Proper indexing ensures efficient queries:
+
+```typescript
+// UserAuth indexes
+{ email: 1 }         // unique
+{ isVerified: 1 }
+
+// User indexes
+{ email: 1 }         // unique
+{ username: 1 }      // unique
+{ userAuth: 1 }
+
+// UserSession indexes
+{ sessionId: 1 }     // unique
+{ userAuth: 1 }
+{ revokedAt: 1 }
+{ userAuth: 1, revokedAt: 1 }  // compound
+```
+
+---
+
+## Database Connection
+
+**File:** `src/lib/config/db-connect.ts`
+
+```typescript
+import mongoose from 'mongoose';
+
+const MONGODB_URI = process.env.MONGODB_URI!;
+
+if (!MONGODB_URI) {
+  throw new Error('Please define MONGODB_URI in environment variables');
+}
+
+let cached = global.mongoose;
+
+if (!cached) {
+  cached = global.mongoose = { conn: null, promise: null };
+}
+
+export async function connectDB() {
+  if (cached.conn) {
+    return cached.conn;
+  }
+
+  if (!cached.promise) {
+    cached.promise = mongoose.connect(MONGODB_URI, {
+      bufferCommands: false,
+      connectTimeoutMS: 5000,
+      serverSelectionTimeoutMS: 5000,
+    });
+  }
+
+  cached.conn = await cached.promise;
+  return cached.conn;
+}
+```
+
+<Callout type="info">
+The connection is cached globally to prevent creating multiple connections during development hot reloads.
+</Callout>
+
+---
+
+## Common Queries
+
+### Find user by email
+
+```typescript
+const userAuth = await UserAuth.findOne({ email: email.toLowerCase() });
+```
+
+### Find user with profile
+
+```typescript
+const user = await User.findOne({ userAuth: userAuthId })
+  .populate('userAuth', 'authMethod isVerified');
+```
+
+### Get active sessions
+
+```typescript
+const sessions = await UserSession.find({
+  userAuth: userAuthId,
+  revokedAt: null,
+}).sort({ lastActiveAt: -1 });
+```
+
+### Update session activity
+
+```typescript
+await UserSession.updateOne(
+  { userAuth: userAuthId, sessionId, revokedAt: null },
+  { $set: { lastActiveAt: new Date() } }
+);
+```
+
+### Revoke session
+
+```typescript
+await UserSession.updateOne(
+  { userAuth: userAuthId, sessionId },
+  { $set: { revokedAt: new Date() } }
+);
+```
+
+
+
+<Callout type="info">
+For extending the database schema with custom fields, see the [Customization](/docs/customization#extend-user-model) guide.
+</Callout>
