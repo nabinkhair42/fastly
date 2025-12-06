@@ -40,6 +40,17 @@
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
 
+  /* Changelog colors */
+  --changelog-new: oklch(0.723 0.219 149.579);
+  --changelog-new-foreground: oklch(0.166 0.058 149.214);
+  --changelog-improved: oklch(0.768 0.189 85.032);
+  --changelog-improved-foreground: oklch(0.279 0.077 45.635);
+  --changelog-fixed: oklch(0.704 0.191 22.216);
+  --changelog-fixed-foreground: oklch(0.21 0.034 17.911);
+  --changelog-version: oklch(0.623 0.214 259.815);
+  --changelog-version-foreground: oklch(0.985 0 0);
+  --changelog-timeline: oklch(0.87 0 0);
+  --changelog-dot: oklch(0.7 0 0);
 }
 
 .dark {
@@ -75,6 +86,18 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(0.269 0 0);
   --sidebar-ring: oklch(0.439 0 0);
+
+  /* Changelog colors - dark mode */
+  --changelog-new: oklch(0.627 0.194 149.214);
+  --changelog-new-foreground: oklch(0.925 0.084 155.995);
+  --changelog-improved: oklch(0.679 0.174 75.634);
+  --changelog-improved-foreground: oklch(0.959 0.077 95.277);
+  --changelog-fixed: oklch(0.637 0.237 25.331);
+  --changelog-fixed-foreground: oklch(0.969 0.015 12.422);
+  --changelog-version: oklch(0.623 0.214 259.815);
+  --changelog-version-foreground: oklch(0.985 0 0);
+  --changelog-timeline: oklch(0.35 0 0);
+  --changelog-dot: oklch(0.5 0 0);
 }
 
 @theme inline {
@@ -114,6 +137,18 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  
+  /* Changelog theme colors */
+  --color-changelog-new: var(--changelog-new);
+  --color-changelog-new-foreground: var(--changelog-new-foreground);
+  --color-changelog-improved: var(--changelog-improved);
+  --color-changelog-improved-foreground: var(--changelog-improved-foreground);
+  --color-changelog-fixed: var(--changelog-fixed);
+  --color-changelog-fixed-foreground: var(--changelog-fixed-foreground);
+  --color-changelog-version: var(--changelog-version);
+  --color-changelog-version-foreground: var(--changelog-version-foreground);
+  --color-changelog-timeline: var(--changelog-timeline);
+  --color-changelog-dot: var(--changelog-dot);
 }
 
 @layer base {

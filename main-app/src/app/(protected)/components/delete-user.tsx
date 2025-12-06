@@ -279,18 +279,11 @@ export const DeleteUser = () => {
               onClick={handleDelete}
               disabled={!canDelete}
               className="flex-1 sm:flex-none font-semibold"
+              loading={deleteUser.isPending}
+              loadingText="Deleting Account"
             >
-              {deleteUser.isPending ? (
-                <>
-                  <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                  Deleting Account...
-                </>
-              ) : (
-                <>
-                  <Trash className="mr-2 h-4 w-4" />
-                  Delete Account
-                </>
-              )}
+              <Trash className="h-4 w-4" />
+              Delete Account
             </Button>
           </DialogFooter>
         </DialogContent>

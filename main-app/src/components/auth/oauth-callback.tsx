@@ -75,7 +75,16 @@ export const OAuthCallback = () => {
           router.replace(resolvedRedirect);
         } else {
           // Fallback: decode JWT token for minimal data
-          const tokenPayload = JSON.parse(atob(accessToken.split(".")[1]));
+          const tokenParts = accessToken.split(".");
+          if (tokenParts.length !== 3) {
+            throw new Error("Invalid token format");
+          }
+
+          const tokenPayload = JSON.parse(atob(tokenParts[1]));
+          if (!tokenPayload.userId || !tokenPayload.email) {
+            throw new Error("Invalid token payload");
+          }
+
           const userData = {
             userId: tokenPayload.userId,
             email: tokenPayload.email,
