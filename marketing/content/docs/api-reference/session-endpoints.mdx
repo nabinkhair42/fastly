@@ -1,0 +1,331 @@
+---
+title: Session Endpoints
+description: Session management API endpoints for viewing and revoking sessions
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { TypeTable } from 'fumadocs-ui/components/type-table';
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
+
+All endpoints require authentication headers:
+
+```
+Authorization: Bearer <access-token>
+X-Session-Id: <session-id>
+```
+
+## Get Sessions
+
+Retrieve all active sessions for the current user.
+
+```
+GET /api/sessions
+```
+
+### Example
+
+<Tabs items={['Request', 'Response 200']}>
+<Tab value="Request">
+```bash
+curl http://localhost:3000/api/sessions \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+  -H "X-Session-Id: a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+```
+</Tab>
+<Tab value="Response 200">
+```json
+{
+  "success": true,
+  "data": {
+    "sessions": [
+      {
+        "sessionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+        "authMethod": "email",
+        "browser": "Chrome 120.0.0",
+        "os": "macOS 14.2",
+        "device": "Desktop",
+        "ipAddress": "192.168.1.100",
+        "location": null,
+        "createdAt": "2024-01-15T10:30:00.000Z",
+        "lastActiveAt": "2024-01-15T14:22:00.000Z",
+        "revokedAt": null
+      },
+      {
+        "sessionId": "b2c3d4e5-f6a7-8901-bcde-f23456789012",
+        "authMethod": "github",
+        "browser": "Safari 17.2",
+        "os": "iOS 17.2",
+        "device": "iPhone",
+        "ipAddress": "10.0.0.50",
+        "location": null,
+        "createdAt": "2024-01-14T08:15:00.000Z",
+        "lastActiveAt": "2024-01-14T18:45:00.000Z",
+        "revokedAt": null
+      },
+      {
+        "sessionId": "c3d4e5f6-a7b8-9012-cdef-345678901234",
+        "authMethod": "google",
+        "browser": "Firefox 121.0",
+        "os": "Windows 11",
+        "device": "Desktop",
+        "ipAddress": "172.16.0.25",
+        "location": null,
+        "createdAt": "2024-01-13T16:00:00.000Z",
+        "lastActiveAt": "2024-01-13T20:30:00.000Z",
+        "revokedAt": null
+      }
+    ]
+  }
+}
+```
+</Tab>
+</Tabs>
+
+### Session Fields
+
+<TypeTable
+  type={{
+    sessionId: {
+      description: 'Unique session identifier (UUID)',
+      type: 'string',
+    },
+    authMethod: {
+      description: 'How the user authenticated for this session',
+      type: "'email' | 'github' | 'google'",
+    },
+    browser: {
+      description: 'Browser name and version',
+      type: 'string',
+    },
+    os: {
+      description: 'Operating system name and version',
+      type: 'string',
+    },
+    device: {
+      description: 'Device type or model',
+      type: 'string',
+    },
+    ipAddress: {
+      description: 'Client IP address at session creation',
+      type: 'string',
+    },
+    location: {
+      description: 'Geographic location (if available)',
+      type: 'string | null',
+    },
+    createdAt: {
+      description: 'When the session was created',
+      type: 'string (ISO 8601)',
+    },
+    lastActiveAt: {
+      description: 'Last API activity timestamp',
+      type: 'string (ISO 8601)',
+    },
+    revokedAt: {
+      description: 'When the session was revoked (null if active)',
+      type: 'string | null',
+    },
+  }}
+/>
+
+<Callout type="info">
+The `lastActiveAt` timestamp is updated each time the user makes an authenticated API request.
+</Callout>
+
+---
+
+## Revoke Session
+
+Terminate a specific session. The user will be logged out on that device.
+
+```
+DELETE /api/sessions
+```
+
+### Request Body
+
+<TypeTable
+  type={{
+    sessionId: {
+      description: 'Session ID to revoke',
+      type: 'string',
+      required: true,
+    },
+  }}
+/>
+
+### Example
+
+<Tabs items={['Request', 'Response 200', 'Error 400', 'Error 404']}>
+<Tab value="Request">
+```bash
+curl -X DELETE http://localhost:3000/api/sessions \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+  -H "X-Session-Id: a1b2c3d4-e5f6-7890-abcd-ef1234567890" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "sessionId": "b2c3d4e5-f6a7-8901-bcde-f23456789012"
+  }'
+```
+</Tab>
+<Tab value="Response 200">
+```json
+{
+  "success": true,
+  "message": "Session revoked successfully",
+  "data": {
+    "sessionId": "b2c3d4e5-f6a7-8901-bcde-f23456789012"
+  }
+}
+```
+</Tab>
+<Tab value="Error 400">
+```json
+{
+  "success": false,
+  "message": "Cannot revoke your current session"
+}
+```
+</Tab>
+<Tab value="Error 404">
+```json
+{
+  "success": false,
+  "message": "Session not found"
+}
+```
+</Tab>
+</Tabs>
+
+<Callout type="warn">
+You cannot revoke your current session. Use the logout endpoint instead.
+</Callout>
+
+---
+
+## Session Lifecycle
+
+### Creation
+
+Sessions are created when:
+
+1. User logs in with email/password
+2. User verifies email after registration
+3. User completes OAuth flow (GitHub/Google)
+
+### Metadata Collection
+
+The session tracker parses the request to extract:
+
+```typescript
+import { UAParser } from 'ua-parser-js';
+
+const parser = new UAParser(request.headers.get('user-agent'));
+
+const sessionData = {
+  browser: `${parser.getBrowser().name} ${parser.getBrowser().version}`,
+  os: `${parser.getOS().name} ${parser.getOS().version}`,
+  device: parser.getDevice().model || parser.getDevice().type || 'Desktop',
+  ipAddress: request.headers.get('x-forwarded-for') ||
+             request.headers.get('x-real-ip') ||
+             'unknown',
+};
+```
+
+### Activity Tracking
+
+The `lastActiveAt` timestamp is updated on each authenticated API request:
+
+```typescript
+// In auth middleware
+await touchSession(userAuthId, sessionId);
+```
+
+### Revocation
+
+When a session is revoked:
+
+1. `revokedAt` is set to current timestamp
+2. Session is excluded from validation
+3. Any request with this session ID returns 401
+
+---
+
+## Frontend Implementation
+
+### Sessions List
+
+```typescript title="src/app/(protected)/account/sessions.tsx"
+'use client';
+
+import { useUserSessions, useRevokeSession } from '@/hooks/users/useUserSessions';
+import { tokenManager } from '@/lib/config/token-manager';
+
+export function SessionsList() {
+  const { data, isLoading } = useUserSessions();
+  const revokeSession = useRevokeSession();
+  const currentSessionId = tokenManager.getSessionId();
+
+  if (isLoading) return <div>Loading sessions...</div>;
+
+  return (
+    <div>
+      <h2>Active Sessions</h2>
+      {data?.sessions.map((session) => (
+        <div key={session.sessionId}>
+          <div>
+            <strong>{session.browser}</strong> on {session.os}
+          </div>
+          <div>
+            {session.device} - {session.ipAddress}
+          </div>
+          <div>
+            Last active: {new Date(session.lastActiveAt).toLocaleString()}
+          </div>
+          {session.sessionId === currentSessionId ? (
+            <span>Current session</span>
+          ) : (
+            <button
+              onClick={() => revokeSession.mutate({ sessionId: session.sessionId })}
+              disabled={revokeSession.isPending}
+            >
+              Revoke
+            </button>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+```
+
+### Revoke All Other Sessions
+
+To revoke all sessions except the current one:
+
+```typescript
+async function revokeAllOtherSessions() {
+  const currentSessionId = tokenManager.getSessionId();
+  const { sessions } = await userService.getSessions();
+
+  const otherSessions = sessions.filter(
+    (s) => s.sessionId !== currentSessionId
+  );
+
+  await Promise.all(
+    otherSessions.map((s) =>
+      userService.revokeSession({ sessionId: s.sessionId })
+    )
+  );
+}
+```
+
+---
+
+## Security Considerations
+
+1. **Session Validation**: Every authenticated request validates the session is not revoked
+2. **IP Tracking**: IP addresses are recorded for audit purposes
+3. **Device Fingerprinting**: Browser and OS information helps identify unauthorized access
+4. **Immediate Revocation**: Revoked sessions are immediately invalidated
+5. **Current Session Protection**: Users cannot accidentally revoke their current session

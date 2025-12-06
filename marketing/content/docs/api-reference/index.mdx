@@ -1,0 +1,245 @@
+---
+title: API Reference
+description: Complete REST API documentation for Fastly
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Card, Cards } from 'fumadocs-ui/components/card';
+import { TypeTable } from 'fumadocs-ui/components/type-table';
+
+All API endpoints are available under the `/api/` path. This reference covers authentication, user management, and session endpoints.
+
+## Base URL
+
+```
+http://localhost:3000/api
+```
+
+For production, replace with your domain.
+
+## Authentication
+
+Protected endpoints require two headers:
+
+```bash
+Authorization: Bearer <access-token>
+X-Session-Id: <session-id>
+```
+
+Both values are returned from login, OAuth, or email verification endpoints.
+
+<Callout type="info">
+Access tokens expire after 15 minutes. Use the refresh token endpoint to get new tokens.
+</Callout>
+
+## Response Format
+
+All responses follow a consistent structure:
+
+### Success Response
+
+```json
+{
+  "success": true,
+  "message": "Operation completed successfully",
+  "data": {
+    // Response data here
+  },
+  "timestamp": "2024-01-15T10:30:00.000Z",
+  "requestId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+}
+```
+
+### Error Response
+
+```json
+{
+  "success": false,
+  "message": "Error description",
+  "errors": [
+    // Validation errors or additional details
+  ],
+  "timestamp": "2024-01-15T10:30:00.000Z",
+  "requestId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+}
+```
+
+## HTTP Status Codes
+
+| Code | Description | When Used |
+|------|-------------|-----------|
+| 200 | OK | Successful GET, POST, DELETE |
+| 201 | Created | Resource created successfully |
+| 400 | Bad Request | Invalid input or validation error |
+| 401 | Unauthorized | Missing or invalid token |
+| 403 | Forbidden | Valid token but insufficient permissions |
+| 404 | Not Found | Resource doesn't exist |
+| 409 | Conflict | Resource already exists (e.g., duplicate email) |
+| 429 | Too Many Requests | Rate limit exceeded |
+| 500 | Internal Server Error | Server-side error |
+
+## Endpoints Overview
+
+### Authentication
+
+| Endpoint | Method | Auth | Description |
+|----------|--------|:----:|-------------|
+| `/api/create-account` | POST | - | Register new user |
+| `/api/log-in` | POST | - | Login with credentials |
+| `/api/auth/logout` | POST | Yes | End current session |
+| `/api/auth/refresh-token` | POST | - | Get new token pair |
+| `/api/email-verification` | POST | - | Verify email with OTP |
+| `/api/email-verification/resend` | POST | - | Resend verification code |
+| `/api/forgot-password` | POST | - | Request password reset |
+| `/api/reset-password` | POST | - | Set new password |
+
+### OAuth
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/oauth/github` | GET | GitHub OAuth callback |
+| `/api/oauth/google` | GET | Google OAuth callback |
+
+### User Management
+
+| Endpoint | Method | Auth | Description |
+|----------|--------|:----:|-------------|
+| `/api/user-details` | GET | Yes | Get user profile |
+| `/api/user-details` | POST | Yes | Update user profile |
+| `/api/change-password` | POST | Yes | Change or set password |
+| `/api/change-username` | GET | Yes | Check username availability |
+| `/api/change-username` | POST | Yes | Change username (one-time) |
+| `/api/delete-user` | DELETE | Yes | Delete account |
+| `/api/upload-avatar` | POST | Yes | Upload avatar image |
+| `/api/upload-avatar` | DELETE | Yes | Remove avatar |
+
+### Sessions
+
+| Endpoint | Method | Auth | Description |
+|----------|--------|:----:|-------------|
+| `/api/sessions` | GET | Yes | List all sessions |
+| `/api/sessions` | DELETE | Yes | Revoke a session |
+
+## Making Requests
+
+### Using cURL
+
+```bash
+# Public endpoint
+curl -X POST http://localhost:3000/api/log-in \
+  -H "Content-Type: application/json" \
+  -d '{"email": "user@example.com", "password": "Pass123!"}'
+
+# Protected endpoint
+curl http://localhost:3000/api/user-details \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+  -H "X-Session-Id: a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+```
+
+### Using Fetch
+
+```typescript
+// Public endpoint
+const response = await fetch('/api/log-in', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ email, password }),
+});
+
+// Protected endpoint
+const response = await fetch('/api/user-details', {
+  headers: {
+    'Authorization': `Bearer ${accessToken}`,
+    'X-Session-Id': sessionId,
+  },
+});
+```
+
+### Using the Service Layer
+
+The app includes a pre-configured axios instance with interceptors:
+
+```typescript
+import { authService } from '@/services/auth-service';
+import { userService } from '@/services/user-service';
+
+// Auth requests
+const result = await authService.login({ email, password });
+
+// User requests (auth headers added automatically)
+const profile = await userService.getUserDetails();
+await userService.updateUserDetails({ firstName: 'John' });
+```
+
+## Error Handling
+
+<TypeTable
+  type={{
+    ValidationError: {
+      description: 'Invalid input data',
+      type: '400',
+    },
+    UnauthorizedError: {
+      description: 'Missing or invalid authentication',
+      type: '401',
+    },
+    ForbiddenError: {
+      description: 'Insufficient permissions',
+      type: '403',
+    },
+    NotFoundError: {
+      description: 'Resource not found',
+      type: '404',
+    },
+    ConflictError: {
+      description: 'Resource already exists',
+      type: '409',
+    },
+  }}
+/>
+
+### Validation Errors
+
+When request validation fails, the response includes details:
+
+```json
+{
+  "success": false,
+  "message": "Validation failed",
+  "errors": [
+    {
+      "field": "email",
+      "message": "Invalid email format"
+    },
+    {
+      "field": "password",
+      "message": "Must contain at least one uppercase letter"
+    }
+  ]
+}
+```
+
+## Rate Limiting
+
+Consider implementing rate limiting for production:
+
+| Endpoint Type | Suggested Limit |
+|---------------|-----------------|
+| Login attempts | 5 per minute |
+| Password reset | 3 per 15 minutes |
+| Email verification resend | 3 per 15 minutes |
+| General API | 100 per minute |
+
+## Detailed Documentation
+
+<Cards>
+  <Card title="Auth Endpoints" href="/docs/api-reference/auth-endpoints">
+    Registration, login, logout, token refresh, password reset.
+  </Card>
+  <Card title="User Endpoints" href="/docs/api-reference/user-endpoints">
+    Profile management, password change, account deletion.
+  </Card>
+  <Card title="Session Endpoints" href="/docs/api-reference/session-endpoints">
+    View and revoke sessions across devices.
+  </Card>
+</Cards>

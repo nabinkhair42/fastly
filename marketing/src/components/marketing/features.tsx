@@ -56,7 +56,7 @@ export default function FeatureGrid() {
     <section className="py-16 md:py-32">
       <div className="mx-auto max-w-5xl px-4 lg:px-0 space-y-8 md:space-y-16">
         <div className="text-center">
-          <h2 className="text-balance text-4xl font-semibold lg:text-5xl">
+          <h2 className="text-balance text-4xl font-medium lg:text-5xl">
             Existing Features
           </h2>
           <p className="mt-4">

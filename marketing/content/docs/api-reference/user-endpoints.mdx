@@ -1,0 +1,553 @@
+---
+title: User Endpoints
+description: User profile and account management API endpoints
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { TypeTable } from 'fumadocs-ui/components/type-table';
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
+
+All endpoints require authentication headers:
+
+```
+Authorization: Bearer <access-token>
+X-Session-Id: <session-id>
+```
+
+## Get User Details
+
+Fetch the current user's profile.
+
+```
+GET /api/user-details
+```
+
+### Example
+
+<Tabs items={['Request', 'Response 200']}>
+<Tab value="Request">
+```bash
+curl http://localhost:3000/api/user-details \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+  -H "X-Session-Id: a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+```
+</Tab>
+<Tab value="Response 200">
+```json
+{
+  "success": true,
+  "data": {
+    "user": {
+      "_id": "507f1f77bcf86cd799439011",
+      "firstName": "John",
+      "lastName": "Doe",
+      "username": "johndoe",
+      "email": "john@example.com",
+      "avatar": "https://utfs.io/f/abc123.jpg",
+      "bio": "Full-stack developer",
+      "location": {
+        "address": "123 Main St",
+        "city": "San Francisco",
+        "state": "CA",
+        "country": "USA",
+        "zipCode": "94102"
+      },
+      "socialAccounts": [
+        {
+          "url": "https://github.com/johndoe",
+          "provider": "github"
+        }
+      ],
+      "preferences": {
+        "theme": "dark",
+        "font": "mono"
+      },
+      "dob": "1990-01-15T00:00:00.000Z",
+      "hasChangedUsername": false,
+      "authMethod": "email",
+      "hasPassword": true
+    }
+  }
+}
+```
+</Tab>
+</Tabs>
+
+### Response Fields
+
+<TypeTable
+  type={{
+    firstName: {
+      description: 'User first name',
+      type: 'string',
+    },
+    lastName: {
+      description: 'User last name',
+      type: 'string',
+    },
+    username: {
+      description: 'Unique username',
+      type: 'string',
+    },
+    email: {
+      description: 'Email address',
+      type: 'string',
+    },
+    avatar: {
+      description: 'Avatar image URL',
+      type: 'string | null',
+    },
+    bio: {
+      description: 'User biography',
+      type: 'string | null',
+    },
+    location: {
+      description: 'Address information',
+      type: 'object | null',
+    },
+    socialAccounts: {
+      description: 'Linked social profiles',
+      type: 'array',
+    },
+    preferences: {
+      description: 'Theme and font settings',
+      type: 'object',
+    },
+    dob: {
+      description: 'Date of birth',
+      type: 'string | null',
+    },
+    hasChangedUsername: {
+      description: 'Whether username was changed',
+      type: 'boolean',
+    },
+    authMethod: {
+      description: 'How user registered',
+      type: "'email' | 'github' | 'google'",
+    },
+    hasPassword: {
+      description: 'Whether user has a password set',
+      type: 'boolean',
+    },
+  }}
+/>
+
+---
+
+## Update User Details
+
+Update the current user's profile.
+
+```
+POST /api/user-details
+```
+
+### Request Body
+
+All fields are optional. Only include fields you want to update.
+
+<TypeTable
+  type={{
+    firstName: {
+      description: 'First name (1-20 chars)',
+      type: 'string',
+    },
+    lastName: {
+      description: 'Last name (1-20 chars)',
+      type: 'string',
+    },
+    bio: {
+      description: 'Biography (max 200 chars)',
+      type: 'string | null',
+    },
+    dob: {
+      description: 'Date of birth (ISO string or Date)',
+      type: 'string | null',
+    },
+    location: {
+      description: 'Location object with address fields',
+      type: 'object | null',
+    },
+    socialAccounts: {
+      description: 'Array of social account objects',
+      type: 'array',
+    },
+    preferences: {
+      description: 'Theme and font preferences',
+      type: 'object',
+    },
+  }}
+/>
+
+### Example
+
+<Tabs items={['Request', 'Response 200']}>
+<Tab value="Request">
+```bash
+curl -X POST http://localhost:3000/api/user-details \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+  -H "X-Session-Id: a1b2c3d4-e5f6-7890-abcd-ef1234567890" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "firstName": "John",
+    "lastName": "Smith",
+    "bio": "Senior developer at Acme Inc.",
+    "location": {
+      "city": "New York",
+      "country": "USA"
+    },
+    "preferences": {
+      "theme": "dark",
+      "font": "sans"
+    }
+  }'
+```
+</Tab>
+<Tab value="Response 200">
+```json
+{
+  "success": true,
+  "message": "Profile updated successfully"
+}
+```
+</Tab>
+</Tabs>
+
+---
+
+## Change Password
+
+Change or set account password.
+
+```
+POST /api/change-password
+```
+
+### Request Body
+
+<TypeTable
+  type={{
+    currentPassword: {
+      description: 'Current password (required if user has password)',
+      type: 'string',
+    },
+    newPassword: {
+      description: 'New password (8+ chars, complexity requirements)',
+      type: 'string',
+      required: true,
+    },
+    confirmPassword: {
+      description: 'Must match newPassword',
+      type: 'string',
+      required: true,
+    },
+  }}
+/>
+
+### For Users with Password
+
+<Tabs items={['Request', 'Response 200', 'Error 401']}>
+<Tab value="Request">
+```bash
+curl -X POST http://localhost:3000/api/change-password \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+  -H "X-Session-Id: a1b2c3d4-e5f6-7890-abcd-ef1234567890" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "currentPassword": "OldPass123!",
+    "newPassword": "NewSecurePass456!",
+    "confirmPassword": "NewSecurePass456!"
+  }'
+```
+</Tab>
+<Tab value="Response 200">
+```json
+{
+  "success": true,
+  "message": "Password changed successfully"
+}
+```
+</Tab>
+<Tab value="Error 401">
+```json
+{
+  "success": false,
+  "message": "Current password is incorrect"
+}
+```
+</Tab>
+</Tabs>
+
+### For OAuth Users (Setting Password)
+
+OAuth users can set a password to enable email/password login:
+
+```bash
+curl -X POST http://localhost:3000/api/change-password \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+  -H "X-Session-Id: a1b2c3d4-e5f6-7890-abcd-ef1234567890" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "newPassword": "NewSecurePass456!",
+    "confirmPassword": "NewSecurePass456!"
+  }'
+```
+
+<Callout type="info">
+Use `hasPassword` from the user profile to determine which request format to use.
+</Callout>
+
+---
+
+## Check Username Availability
+
+Check if a username is available.
+
+```
+GET /api/change-username?username=<username>
+```
+
+### Query Parameters
+
+| Parameter | Description |
+|-----------|-------------|
+| `username` | Username to check (1-20 chars, alphanumeric + underscore) |
+
+### Example
+
+<Tabs items={['Request', 'Available', 'Taken']}>
+<Tab value="Request">
+```bash
+curl "http://localhost:3000/api/change-username?username=newusername" \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+  -H "X-Session-Id: a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+```
+</Tab>
+<Tab value="Available">
+```json
+{
+  "success": true,
+  "data": {
+    "available": true
+  }
+}
+```
+</Tab>
+<Tab value="Taken">
+```json
+{
+  "success": true,
+  "data": {
+    "available": false
+  }
+}
+```
+</Tab>
+</Tabs>
+
+---
+
+## Change Username
+
+Change the user's username. Can only be done once.
+
+```
+POST /api/change-username
+```
+
+### Request Body
+
+<TypeTable
+  type={{
+    username: {
+      description: 'New username (1-20 chars, alphanumeric + underscore)',
+      type: 'string',
+      required: true,
+    },
+  }}
+/>
+
+### Example
+
+<Tabs items={['Request', 'Response 200', 'Error 400', 'Error 409']}>
+<Tab value="Request">
+```bash
+curl -X POST http://localhost:3000/api/change-username \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+  -H "X-Session-Id: a1b2c3d4-e5f6-7890-abcd-ef1234567890" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "newusername"
+  }'
+```
+</Tab>
+<Tab value="Response 200">
+```json
+{
+  "success": true,
+  "message": "Username changed successfully",
+  "data": {
+    "username": "newusername"
+  }
+}
+```
+</Tab>
+<Tab value="Error 400">
+```json
+{
+  "success": false,
+  "message": "You have already changed your username"
+}
+```
+</Tab>
+<Tab value="Error 409">
+```json
+{
+  "success": false,
+  "message": "Username is already taken"
+}
+```
+</Tab>
+</Tabs>
+
+<Callout type="warn">
+Username can only be changed once. The `hasChangedUsername` field tracks this.
+</Callout>
+
+---
+
+## Delete Account
+
+Permanently delete the user account.
+
+```
+DELETE /api/delete-user
+```
+
+### Request Body
+
+<TypeTable
+  type={{
+    password: {
+      description: 'Current password (required if user has password)',
+      type: 'string',
+    },
+  }}
+/>
+
+### For Users with Password
+
+<Tabs items={['Request', 'Response 200']}>
+<Tab value="Request">
+```bash
+curl -X DELETE http://localhost:3000/api/delete-user \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+  -H "X-Session-Id: a1b2c3d4-e5f6-7890-abcd-ef1234567890" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "password": "CurrentPass123!"
+  }'
+```
+</Tab>
+<Tab value="Response 200">
+```json
+{
+  "success": true,
+  "message": "Account deleted successfully"
+}
+```
+</Tab>
+</Tabs>
+
+### For OAuth Users
+
+OAuth users without a password don't need to provide one:
+
+```bash
+curl -X DELETE http://localhost:3000/api/delete-user \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+  -H "X-Session-Id: a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+```
+
+<Callout type="error">
+This action is irreversible. All user data, sessions, and profile information are permanently deleted.
+</Callout>
+
+---
+
+## Upload Avatar
+
+Upload or update user avatar. Uses UploadThing for file handling.
+
+```
+POST /api/upload-avatar
+```
+
+### Request Body
+
+<TypeTable
+  type={{
+    avatar: {
+      description: 'Avatar image URL from UploadThing',
+      type: 'string',
+      required: true,
+    },
+  }}
+/>
+
+### Example
+
+<Tabs items={['Request', 'Response 200']}>
+<Tab value="Request">
+```bash
+curl -X POST http://localhost:3000/api/upload-avatar \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+  -H "X-Session-Id: a1b2c3d4-e5f6-7890-abcd-ef1234567890" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "avatar": "https://utfs.io/f/abc123.jpg"
+  }'
+```
+</Tab>
+<Tab value="Response 200">
+```json
+{
+  "success": true,
+  "message": "Avatar updated",
+  "data": {
+    "avatar": "https://utfs.io/f/abc123.jpg"
+  }
+}
+```
+</Tab>
+</Tabs>
+
+---
+
+## Delete Avatar
+
+Remove the current avatar.
+
+```
+DELETE /api/upload-avatar
+```
+
+### Example
+
+<Tabs items={['Request', 'Response 200']}>
+<Tab value="Request">
+```bash
+curl -X DELETE http://localhost:3000/api/upload-avatar \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+  -H "X-Session-Id: a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+```
+</Tab>
+<Tab value="Response 200">
+```json
+{
+  "success": true,
+  "message": "Avatar removed"
+}
+```
+</Tab>
+</Tabs>

@@ -1,5 +1,39 @@
 [
   {
+    "version": "v1.3.0",
+    "date": "December 6, 2025",
+    "title": "Comprehensive Documentation with Fumadocs",
+    "description": "Launched full documentation site powered by Fumadocs, covering authentication flows, API reference, database schemas, and deployment guides.",
+    "type": "new",
+    "image": "/changelog/changelog-docs-feature.png",
+    "changes": [
+      {
+        "type": "new",
+        "description": "Added complete documentation site with Fumadocs integration featuring search, syntax highlighting, and responsive navigation."
+      },
+      {
+        "type": "new",
+        "description": "Documented authentication system including email/password, GitHub OAuth, Google OAuth, and email verification flows."
+      },
+      {
+        "type": "new",
+        "description": "Created API reference with detailed endpoint documentation, request/response examples, and TypeTable schemas."
+      },
+      {
+        "type": "new",
+        "description": "Added database documentation covering MongoDB models, schemas, indexes, and common query patterns."
+      },
+      {
+        "type": "new",
+        "description": "Included customization guide for extending OAuth providers, user models, and email templates."
+      },
+      {
+        "type": "new",
+        "description": "Published deployment guide with Vercel setup, environment variables, and OAuth configuration steps."
+      }
+    ]
+  },
+  {
     "version": "v1.2.0",
     "date": "October 3, 2025",
     "title": "Monorepo Architecture and Developer Tooling Overhaul",

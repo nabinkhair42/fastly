@@ -1,0 +1,518 @@
+---
+title: Auth Endpoints
+description: Authentication API endpoints for registration, login, and password management
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { TypeTable } from 'fumadocs-ui/components/type-table';
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
+
+## Create Account
+
+Register a new user account. Sends verification email with OTP.
+
+```
+POST /api/create-account
+```
+
+### Request Body
+
+<TypeTable
+  type={{
+    firstName: {
+      description: 'User first name',
+      type: 'string',
+      required: true,
+    },
+    lastName: {
+      description: 'User last name',
+      type: 'string',
+      required: true,
+    },
+    email: {
+      description: 'Valid email address',
+      type: 'string',
+      required: true,
+    },
+    password: {
+      description: 'Password (8+ chars, uppercase, lowercase, number, special)',
+      type: 'string',
+      required: true,
+    },
+    confirmPassword: {
+      description: 'Must match password',
+      type: 'string',
+      required: true,
+    },
+  }}
+/>
+
+### Example
+
+<Tabs items={['Request', 'Response 201', 'Error 409']}>
+<Tab value="Request">
+```bash
+curl -X POST http://localhost:3000/api/create-account \
+  -H "Content-Type: application/json" \
+  -d '{
+    "firstName": "John",
+    "lastName": "Doe",
+    "email": "john@example.com",
+    "password": "SecurePass123!",
+    "confirmPassword": "SecurePass123!"
+  }'
+```
+</Tab>
+<Tab value="Response 201">
+```json
+{
+  "success": true,
+  "message": "Account created. Please verify your email.",
+  "data": {
+    "userId": "507f1f77bcf86cd799439011",
+    "email": "john@example.com"
+  }
+}
+```
+</Tab>
+<Tab value="Error 409">
+```json
+{
+  "success": false,
+  "message": "Email already registered"
+}
+```
+</Tab>
+</Tabs>
+
+---
+
+## Login
+
+Authenticate with email and password.
+
+```
+POST /api/log-in
+```
+
+### Request Body
+
+<TypeTable
+  type={{
+    email: {
+      description: 'Registered email address',
+      type: 'string',
+      required: true,
+    },
+    password: {
+      description: 'Account password',
+      type: 'string',
+      required: true,
+    },
+  }}
+/>
+
+### Example
+
+<Tabs items={['Request', 'Response 200', 'Error 401', 'Error 403']}>
+<Tab value="Request">
+```bash
+curl -X POST http://localhost:3000/api/log-in \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "john@example.com",
+    "password": "SecurePass123!"
+  }'
+```
+</Tab>
+<Tab value="Response 200">
+```json
+{
+  "success": true,
+  "message": "Login successful",
+  "data": {
+    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "session": {
+      "sessionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "browser": "Chrome 120",
+      "os": "macOS 14",
+      "device": "Desktop"
+    },
+    "user": {
+      "userId": "507f1f77bcf86cd799439011",
+      "email": "john@example.com",
+      "firstName": "John",
+      "lastName": "Doe",
+      "username": "john"
+    }
+  }
+}
+```
+</Tab>
+<Tab value="Error 401">
+```json
+{
+  "success": false,
+  "message": "Invalid email or password"
+}
+```
+</Tab>
+<Tab value="Error 403">
+```json
+{
+  "success": false,
+  "message": "Please verify your email before logging in"
+}
+```
+</Tab>
+</Tabs>
+
+---
+
+## Logout
+
+End the current session. Requires authentication.
+
+```
+POST /api/auth/logout
+```
+
+### Headers
+
+```
+Authorization: Bearer <access-token>
+X-Session-Id: <session-id>
+```
+
+### Example
+
+<Tabs items={['Request', 'Response 200']}>
+<Tab value="Request">
+```bash
+curl -X POST http://localhost:3000/api/auth/logout \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
+  -H "X-Session-Id: a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+```
+</Tab>
+<Tab value="Response 200">
+```json
+{
+  "success": true,
+  "message": "Logged out successfully"
+}
+```
+</Tab>
+</Tabs>
+
+---
+
+## Refresh Token
+
+Get a new access token using the refresh token.
+
+```
+POST /api/auth/refresh-token
+```
+
+### Headers
+
+```
+X-Session-Id: <session-id>
+```
+
+### Request Body
+
+<TypeTable
+  type={{
+    refreshToken: {
+      description: 'Valid refresh token',
+      type: 'string',
+      required: true,
+    },
+  }}
+/>
+
+### Example
+
+<Tabs items={['Request', 'Response 200', 'Error 401']}>
+<Tab value="Request">
+```bash
+curl -X POST http://localhost:3000/api/auth/refresh-token \
+  -H "Content-Type: application/json" \
+  -H "X-Session-Id: a1b2c3d4-e5f6-7890-abcd-ef1234567890" \
+  -d '{
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  }'
+```
+</Tab>
+<Tab value="Response 200">
+```json
+{
+  "success": true,
+  "message": "Token refreshed",
+  "data": {
+    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "user": {
+      "userId": "507f1f77bcf86cd799439011",
+      "email": "john@example.com"
+    }
+  }
+}
+```
+</Tab>
+<Tab value="Error 401">
+```json
+{
+  "success": false,
+  "message": "Invalid or expired refresh token"
+}
+```
+</Tab>
+</Tabs>
+
+<Callout type="info">
+The axios interceptor automatically handles token refresh when the access token expires.
+</Callout>
+
+---
+
+## Email Verification
+
+Verify email address with OTP code.
+
+```
+POST /api/email-verification
+```
+
+### Request Body
+
+<TypeTable
+  type={{
+    email: {
+      description: 'Email to verify',
+      type: 'string',
+      required: true,
+    },
+    verificationCode: {
+      description: '6-digit OTP code',
+      type: 'string',
+      required: true,
+    },
+  }}
+/>
+
+### Example
+
+<Tabs items={['Request', 'Response 200', 'Error 400']}>
+<Tab value="Request">
+```bash
+curl -X POST http://localhost:3000/api/email-verification \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "john@example.com",
+    "verificationCode": "847291"
+  }'
+```
+</Tab>
+<Tab value="Response 200">
+```json
+{
+  "success": true,
+  "message": "Email verified successfully",
+  "data": {
+    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "session": {
+      "sessionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+    },
+    "user": {
+      "userId": "507f1f77bcf86cd799439011",
+      "email": "john@example.com",
+      "firstName": "John",
+      "lastName": "Doe",
+      "username": "john"
+    }
+  }
+}
+```
+</Tab>
+<Tab value="Error 400">
+```json
+{
+  "success": false,
+  "message": "Invalid or expired verification code"
+}
+```
+</Tab>
+</Tabs>
+
+---
+
+## Resend Verification
+
+Request a new verification code.
+
+```
+POST /api/email-verification/resend
+```
+
+### Request Body
+
+<TypeTable
+  type={{
+    email: {
+      description: 'Email to resend code to',
+      type: 'string',
+      required: true,
+    },
+  }}
+/>
+
+### Example
+
+<Tabs items={['Request', 'Response 200']}>
+<Tab value="Request">
+```bash
+curl -X POST http://localhost:3000/api/email-verification/resend \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "john@example.com"
+  }'
+```
+</Tab>
+<Tab value="Response 200">
+```json
+{
+  "success": true,
+  "message": "Verification email sent",
+  "data": {
+    "email": "john@example.com"
+  }
+}
+```
+</Tab>
+</Tabs>
+
+<Callout type="warn">
+Resending generates a new OTP. Previous codes are invalidated.
+</Callout>
+
+---
+
+## Forgot Password
+
+Request a password reset code.
+
+```
+POST /api/forgot-password
+```
+
+### Request Body
+
+<TypeTable
+  type={{
+    email: {
+      description: 'Registered email address',
+      type: 'string',
+      required: true,
+    },
+  }}
+/>
+
+### Example
+
+<Tabs items={['Request', 'Response 200']}>
+<Tab value="Request">
+```bash
+curl -X POST http://localhost:3000/api/forgot-password \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "john@example.com"
+  }'
+```
+</Tab>
+<Tab value="Response 200">
+```json
+{
+  "success": true,
+  "message": "If an account exists, a reset email has been sent"
+}
+```
+</Tab>
+</Tabs>
+
+<Callout type="info">
+For security, this endpoint always returns success even if the email doesn't exist.
+</Callout>
+
+---
+
+## Reset Password
+
+Set a new password using the reset code.
+
+```
+POST /api/reset-password
+```
+
+### Request Body
+
+<TypeTable
+  type={{
+    email: {
+      description: 'Account email',
+      type: 'string',
+      required: true,
+    },
+    resetToken: {
+      description: '6-digit reset code from email',
+      type: 'string',
+      required: true,
+    },
+    password: {
+      description: 'New password',
+      type: 'string',
+      required: true,
+    },
+    confirmPassword: {
+      description: 'Must match password',
+      type: 'string',
+      required: true,
+    },
+  }}
+/>
+
+### Example
+
+<Tabs items={['Request', 'Response 200', 'Error 400']}>
+<Tab value="Request">
+```bash
+curl -X POST http://localhost:3000/api/reset-password \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "john@example.com",
+    "resetToken": "123456",
+    "password": "NewSecurePass456!",
+    "confirmPassword": "NewSecurePass456!"
+  }'
+```
+</Tab>
+<Tab value="Response 200">
+```json
+{
+  "success": true,
+  "message": "Password reset successful"
+}
+```
+</Tab>
+<Tab value="Error 400">
+```json
+{
+  "success": false,
+  "message": "Invalid or expired reset token"
+}
+```
+</Tab>
+</Tabs>

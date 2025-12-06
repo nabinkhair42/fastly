@@ -1,0 +1,339 @@
+---
+title: Authentication
+description: Complete authentication system with email/password and OAuth providers
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Card, Cards } from 'fumadocs-ui/components/card';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+import { TypeTable } from 'fumadocs-ui/components/type-table';
+
+Fastly provides a complete authentication system with multiple sign-in methods, JWT-based sessions, and multi-device session tracking.
+
+## Authentication Methods
+
+<Cards>
+  <Card title="Email/Password" href="/docs/authentication/email-password">
+    Traditional registration with email verification and password reset.
+  </Card>
+  <Card title="GitHub OAuth" href="/docs/authentication/oauth-github">
+    One-click sign in with GitHub accounts.
+  </Card>
+  <Card title="Google OAuth" href="/docs/authentication/oauth-google">
+    One-click sign in with Google accounts.
+  </Card>
+</Cards>
+
+## JWT Token System
+
+The authentication system uses two JWT tokens with different lifetimes:
+
+| Token | Expiry | Purpose |
+|-------|--------|---------|
+| Access Token | 15 minutes | Authenticate API requests |
+| Refresh Token | 7 days | Obtain new access tokens |
+
+### Token Payload
+
+```typescript
+interface TokenPayload {
+  userId: string;
+  email: string;
+  type: 'access' | 'refresh';
+  iat: number;
+  exp: number;
+}
+```
+
+### Token Storage
+
+Tokens are managed via the token manager at `src/lib/config/token-manager.ts`:
+
+```typescript
+import { tokenManager } from '@/lib/config/token-manager';
+
+// Store tokens after login
+tokenManager.setTokens(accessToken, refreshToken, sessionId);
+
+// Retrieve tokens
+const accessToken = tokenManager.getAccessToken();
+const refreshToken = tokenManager.getRefreshToken();
+const sessionId = tokenManager.getSessionId();
+
+// Clear tokens on logout
+tokenManager.clearTokens();
+```
+
+<Callout type="info">
+Tokens are stored in localStorage. The axios interceptor automatically attaches them to API requests.
+</Callout>
+
+## Session Tracking
+
+Every successful authentication creates a session record with device metadata:
+
+<TypeTable
+  type={{
+    sessionId: {
+      description: 'Unique identifier for the session',
+      type: 'string (UUID)',
+    },
+    browser: {
+      description: 'Browser name and version',
+      type: 'string',
+    },
+    os: {
+      description: 'Operating system name and version',
+      type: 'string',
+    },
+    device: {
+      description: 'Device vendor and model',
+      type: 'string',
+    },
+    ipAddress: {
+      description: 'Client IP address',
+      type: 'string',
+    },
+    authMethod: {
+      description: 'How the user authenticated',
+      type: "'email' | 'github' | 'google'",
+    },
+    lastActiveAt: {
+      description: 'Last activity timestamp',
+      type: 'Date',
+    },
+    revokedAt: {
+      description: 'When session was revoked (null if active)',
+      type: 'Date | null',
+    },
+  }}
+/>
+
+### Session Validation
+
+Every authenticated request validates:
+
+1. Access token is valid and not expired
+2. Session ID exists in the `X-Session-Id` header
+3. Session is not revoked (`revokedAt === null`)
+4. Session belongs to the authenticated user
+
+```typescript
+// Request headers for authenticated endpoints
+{
+  'Authorization': 'Bearer <access-token>',
+  'X-Session-Id': '<session-id>'
+}
+```
+
+## Authentication Flow
+
+<Steps>
+<Step>
+### User initiates authentication
+
+User chooses email/password or OAuth provider on the login page.
+</Step>
+
+<Step>
+### Credentials validated
+
+For email/password: credentials checked against database.
+For OAuth: authorization code exchanged for user data.
+</Step>
+
+<Step>
+### Email verification check
+
+For email/password users, email must be verified before login completes.
+OAuth users are automatically verified.
+</Step>
+
+<Step>
+### Tokens generated
+
+Access and refresh tokens are created with user payload.
+
+```typescript
+const tokens = generateTokenPair(userId, email);
+// { accessToken: '...', refreshToken: '...' }
+```
+</Step>
+
+<Step>
+### Session created
+
+A session record is created with device metadata from the request.
+
+```typescript
+const session = await createUserSession({
+  userAuthId,
+  authMethod: 'email',
+  request,
+});
+```
+</Step>
+
+<Step>
+### Response returned
+
+Tokens, session ID, and user data are returned to the client.
+
+```json
+{
+  "accessToken": "eyJhbG...",
+  "refreshToken": "eyJhbG...",
+  "session": {
+    "sessionId": "uuid-here",
+    "browser": "Chrome 120",
+    "os": "macOS 14"
+  },
+  "user": {
+    "userId": "...",
+    "email": "user@example.com",
+    "firstName": "John"
+  }
+}
+```
+</Step>
+</Steps>
+
+## Token Refresh
+
+When the access token expires, the client automatically refreshes it:
+
+```typescript
+// POST /api/auth/refresh-token
+{
+  "refreshToken": "eyJhbG..."
+}
+
+// Headers
+{
+  "X-Session-Id": "session-uuid"
+}
+```
+
+The axios interceptor handles this automatically. Failed refresh attempts redirect to login.
+
+## Frontend Hooks
+
+### useSession
+
+Access current authentication state:
+
+```typescript
+import { useSession } from '@/hooks/auth/useSession';
+
+function Component() {
+  const { user, isAuthenticated, isLoading } = useSession();
+
+  if (isLoading) return <Loading />;
+  if (!isAuthenticated) return <Redirect to="/log-in" />;
+
+  return <div>Welcome, {user.firstName}</div>;
+}
+```
+
+### useAuthMutations
+
+Authentication actions with React Query:
+
+```typescript
+import { useLogin, useLogout } from '@/hooks/auth/useAuthMutations';
+
+function LoginForm() {
+  const login = useLogin();
+
+  const handleSubmit = (data) => {
+    login.mutate(data, {
+      onSuccess: () => router.push('/dashboard'),
+    });
+  };
+}
+```
+
+Available mutations:
+- `useLogin()` - Email/password login
+- `useCreateAccount()` - Registration
+- `useVerifyEmail()` - OTP verification
+- `useResendVerification()` - Resend OTP
+- `useForgotPassword()` - Request reset
+- `useResetPassword()` - Complete reset
+- `useLogout()` - End session
+
+## Route Protection
+
+### Client-side
+
+Use the `useRequireAuth` hook:
+
+```typescript
+import { useRequireAuth } from '@/hooks/auth/useRequireAuth';
+
+function ProtectedPage() {
+  useRequireAuth(); // Redirects to login if not authenticated
+
+  return <Dashboard />;
+}
+```
+
+### Server-side
+
+Use the `authenticate` middleware in API routes:
+
+```typescript
+import { authenticate } from '@/lib/auth/auth-middleware';
+
+export async function GET(request: Request) {
+  const auth = await authenticate(request);
+
+  if (!auth.success) {
+    return auth.response; // Returns 401
+  }
+
+  const { user } = auth;
+  // user.userId, user.email available
+}
+```
+
+## Authentication Pages
+
+| Route | Purpose | File |
+|-------|---------|------|
+| `/create-account` | New user registration | `src/app/(auth)/create-account/page.tsx` |
+| `/log-in` | User login | `src/app/(auth)/log-in/page.tsx` |
+| `/email-verification` | OTP code entry | `src/app/(auth)/email-verification/page.tsx` |
+| `/forgot-password` | Request password reset | `src/app/(auth)/forgot-password/page.tsx` |
+| `/reset-password` | Set new password | `src/app/(auth)/reset-password/page.tsx` |
+| `/oauth-callback` | Handle OAuth redirects | `src/app/(auth)/oauth-callback/page.tsx` |
+
+## Security Considerations
+
+<Callout type="warn">
+Tokens are stored in localStorage which is vulnerable to XSS attacks. For higher security requirements, consider httpOnly cookies.
+</Callout>
+
+Security features implemented:
+
+- Passwords hashed with bcrypt (10 salt rounds)
+- JWT secrets separate for access and refresh tokens
+- Session validation on every authenticated request
+- Session revocation capability
+- IP and device tracking
+- OTP expiration (10 minutes for email verification)
+- Password reset token expiration (10 minutes)
+
+## Next Steps
+
+<Cards>
+  <Card title="Email/Password" href="/docs/authentication/email-password">
+    Implement email/password authentication.
+  </Card>
+  <Card title="GitHub OAuth" href="/docs/authentication/oauth-github">
+    Add GitHub sign-in to your app.
+  </Card>
+  <Card title="API Reference" href="/docs/api-reference/auth-endpoints">
+    View all authentication endpoints.
+  </Card>
+</Cards>

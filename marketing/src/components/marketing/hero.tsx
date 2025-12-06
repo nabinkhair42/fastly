@@ -51,7 +51,7 @@ export default function Hero() {
               {/* Main Heading */}
               <h1
                 id="hero-heading"
-                className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl"
+                className="text-4xl font-medium tracking-tight sm:text-5xl lg:text-6xl"
               >
                 <span className="block">Build your SaaS</span>
                 <span className="block mt-2">
