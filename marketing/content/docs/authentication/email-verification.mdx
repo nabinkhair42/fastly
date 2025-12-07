@@ -72,7 +72,7 @@ On success:
 
 The OTP generator at `src/helpers/generate-otp.ts` creates secure 6-digit codes:
 
-```typescript
+```typescript title="src/helpers/generate-otp.ts"
 import crypto from 'crypto';
 
 const OTP_LENGTH = 6;
@@ -402,8 +402,3 @@ Only use this in development. Never bypass verification in production.
 3. **Cryptographic Generation**: Uses `crypto.randomBytes` for unpredictable codes
 4. **Rate Limiting**: Implement limits on resend requests
 5. **Account Lockout**: Consider locking accounts after multiple failed attempts
-
-## Next Steps
-
-- [Email/Password](/docs/authentication/email-password) - Full registration flow
-- [Authentication Overview](/docs/authentication) - Complete auth system

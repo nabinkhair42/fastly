@@ -7,19 +7,21 @@ import { Callout } from 'fumadocs-ui/components/callout';
 import { Card, Cards } from 'fumadocs-ui/components/card';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 import { TypeTable } from 'fumadocs-ui/components/type-table';
+import { Mail } from 'lucide-react';
+import { GitHubIcon, GoogleIcon, APIIcon } from '@/components/icons';
 
 Fastly provides a complete authentication system with multiple sign-in methods, JWT-based sessions, and multi-device session tracking.
 
 ## Authentication Methods
 
 <Cards>
-  <Card title="Email/Password" href="/docs/authentication/email-password">
+  <Card title="Email/Password" icon={<Mail />} href="/docs/authentication/email-password">
     Traditional registration with email verification and password reset.
   </Card>
-  <Card title="GitHub OAuth" href="/docs/authentication/oauth-github">
+  <Card title="GitHub OAuth" icon={<GitHubIcon />} href="/docs/authentication/oauth-github">
     One-click sign in with GitHub accounts.
   </Card>
-  <Card title="Google OAuth" href="/docs/authentication/oauth-google">
+  <Card title="Google OAuth" icon={<GoogleIcon />} href="/docs/authentication/oauth-google">
     One-click sign in with Google accounts.
   </Card>
 </Cards>
@@ -28,10 +30,20 @@ Fastly provides a complete authentication system with multiple sign-in methods, 
 
 The authentication system uses two JWT tokens with different lifetimes:
 
-| Token | Expiry | Purpose |
-|-------|--------|---------|
-| Access Token | 15 minutes | Authenticate API requests |
-| Refresh Token | 7 days | Obtain new access tokens |
+<TypeTable
+  type={{
+    accessToken: {
+      description: 'Authenticate API requests',
+      type: 'string (JWT)',
+      default: 'Expires in 15 minutes',
+    },
+    refreshToken: {
+      description: 'Obtain new access tokens',
+      type: 'string (JWT)',
+      default: 'Expires in 7 days',
+    },
+  }}
+/>
 
 ### Token Payload
 
@@ -324,16 +336,3 @@ Security features implemented:
 - OTP expiration (10 minutes for email verification)
 - Password reset token expiration (10 minutes)
 
-## Next Steps
-
-<Cards>
-  <Card title="Email/Password" href="/docs/authentication/email-password">
-    Implement email/password authentication.
-  </Card>
-  <Card title="GitHub OAuth" href="/docs/authentication/oauth-github">
-    Add GitHub sign-in to your app.
-  </Card>
-  <Card title="API Reference" href="/docs/api-reference/auth-endpoints">
-    View all authentication endpoints.
-  </Card>
-</Cards>

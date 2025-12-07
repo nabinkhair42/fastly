@@ -309,9 +309,15 @@ GET /api/change-username?username=<username>
 
 ### Query Parameters
 
-| Parameter | Description |
-|-----------|-------------|
-| `username` | Username to check (1-20 chars, alphanumeric + underscore) |
+<TypeTable
+  type={{
+    username: {
+      description: 'Username to check (1-20 chars, alphanumeric + underscore)',
+      type: 'string',
+      required: true,
+    },
+  }}
+/>
 
 ### Example
 

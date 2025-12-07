@@ -7,22 +7,24 @@ import { Callout } from 'fumadocs-ui/components/callout';
 import { Card, Cards } from 'fumadocs-ui/components/card';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 import { File, Folder, Files } from 'fumadocs-ui/components/files';
+import { Mail, Smartphone, Download, Key, Fingerprint } from 'lucide-react';
+import { GitHubIcon, JWTIcon, APIIcon } from '@/components/icons';
 
 Fastly is a full-stack authentication and user management system built with Next.js 16. It provides everything you need to handle user accounts, sessions, and profiles in production applications.
 
 ## Features
 
 <Cards>
-  <Card title="Email/Password Auth" href="/docs/authentication/email-password">
+  <Card title="Email/Password Auth" icon={<Mail />} href="/docs/authentication/email-password">
     Registration with OTP verification, password reset, and secure bcrypt hashing.
   </Card>
-  <Card title="OAuth Integration" href="/docs/authentication/oauth-github">
+  <Card title="OAuth Integration" icon={<GitHubIcon />} href="/docs/authentication/oauth-github">
     GitHub and Google OAuth with automatic account creation and profile linking.
   </Card>
-  <Card title="JWT Sessions" href="/docs/api-reference/auth-endpoints">
+  <Card title="JWT Sessions" icon={<JWTIcon />} href="/docs/api-reference/auth-endpoints">
     Access tokens (15 min) and refresh tokens (7 days) with automatic renewal.
   </Card>
-  <Card title="Session Management" href="/docs/api-reference/session-endpoints">
+  <Card title="Session Management" icon={<Smartphone />} href="/docs/api-reference/session-endpoints">
     Multi-device session tracking with browser, OS, and IP metadata.
   </Card>
 </Cards>
@@ -130,16 +132,16 @@ All protected endpoints require the access token in the `Authorization` header a
 ## Next Steps
 
 <Cards>
-  <Card title="Installation" href="/docs/getting-started/installation">
+  <Card title="Installation" icon={<Download />} href="/docs/getting-started/installation">
     Complete setup instructions and prerequisites.
   </Card>
-  <Card title="Environment Setup" href="/docs/getting-started/environment-setup">
+  <Card title="Environment Setup" icon={<Key />} href="/docs/getting-started/environment-setup">
     Configure MongoDB, JWT secrets, OAuth, and email settings.
   </Card>
-  <Card title="Authentication" href="/docs/authentication">
+  <Card title="Authentication" icon={<Fingerprint />} href="/docs/authentication">
     Learn how the auth system works.
   </Card>
-  <Card title="API Reference" href="/docs/api-reference">
+  <Card title="API Reference" icon={<APIIcon />} href="/docs/api-reference">
     Complete endpoint documentation.
   </Card>
 </Cards>
