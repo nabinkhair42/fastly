@@ -27,6 +27,10 @@ export default function Layout({ children }: { children: ReactNode }) {
           text: 'Changelog',
           url: '/changelog',
         },
+        {
+          text: 'llms.txt',
+          url: '/llms.txt',
+        }
       ]}
 
     >

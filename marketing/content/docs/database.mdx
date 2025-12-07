@@ -6,6 +6,7 @@ description: MongoDB models, schemas, and database configuration
 import { Callout } from 'fumadocs-ui/components/callout';
 import { TypeTable } from 'fumadocs-ui/components/type-table';
 import { File, Folder, Files } from 'fumadocs-ui/components/files';
+import { Mermaid } from '@/components/mdx/mermaid';
 
 Fastly uses MongoDB with Mongoose ODM. All models are located in `src/models/`.
 
@@ -21,14 +22,13 @@ The application uses three main collections:
 
 ### Relationships
 
-```
-UserAuth (1) ─────────── (1) User
-    │
-    └──────────────── (n) UserSession
-```
+<Mermaid chart="graph LR
+    UserAuth -->|1:1| User
+    UserAuth -->|1:n| UserSession
+" />
 
-- Each `UserAuth` has exactly one `User` profile (created after email verification)
-- Each `UserAuth` can have multiple `UserSession` records
+- Each `UserAuth` has one `User` profile (created after email verification)
+- Each `UserAuth` can have multiple `UserSession` documents
 
 ## Model Files
 

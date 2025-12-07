@@ -6,6 +6,7 @@ description: Complete REST API documentation for Fastly
 import { Callout } from 'fumadocs-ui/components/callout';
 import { Card, Cards } from 'fumadocs-ui/components/card';
 import { TypeTable } from 'fumadocs-ui/components/type-table';
+import { KeyRound, User, Smartphone } from 'lucide-react';
 
 All API endpoints are available under the `/api/` path. This reference covers authentication, user management, and session endpoints.
 
@@ -230,16 +231,3 @@ Consider implementing rate limiting for production:
 | Email verification resend | 3 per 15 minutes |
 | General API | 100 per minute |
 
-## Detailed Documentation
-
-<Cards>
-  <Card title="Auth Endpoints" href="/docs/api-reference/auth-endpoints">
-    Registration, login, logout, token refresh, password reset.
-  </Card>
-  <Card title="User Endpoints" href="/docs/api-reference/user-endpoints">
-    Profile management, password change, account deletion.
-  </Card>
-  <Card title="Session Endpoints" href="/docs/api-reference/session-endpoints">
-    View and revoke sessions across devices.
-  </Card>
-</Cards>
