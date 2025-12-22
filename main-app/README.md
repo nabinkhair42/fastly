@@ -11,7 +11,6 @@ This is a [Fastly](https://starter.nabinkhair.com.np) SaaS starter kit bootstrap
 - **File Uploads**: Integrated file upload functionality with UploadThing
 - **Database**: MongoDB integration with Mongoose
 - **Type Safety**: Full TypeScript support throughout the application
-- **Performance**: Optimized with Next.js 15 and Turbopack
 
 ## Getting Started
 

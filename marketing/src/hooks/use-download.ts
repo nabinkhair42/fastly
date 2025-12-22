@@ -1,5 +1,7 @@
-import { type StatsData, fetchStats } from "@/services/download";
-import { useMutation, useQuery } from "@tanstack/react-query";
+"use client";
+
+import { type StatsData, type StatsResponse, fetchStats, downloadSaaSStarter } from "@/services/download";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
 type ApiError = Error & {
@@ -8,33 +10,22 @@ type ApiError = Error & {
 
 /**
  * Hook to initiate product bundle download from /api/download
+ * Returns mutation object with download function and loading state
+ * Refetches stats after successful download to update the counter
  */
 export const useDownload = () => {
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: async () => {
-      const response = await fetch("/api/download");
-
-      if (!response.ok) {
-        const error = await response.json().catch(() => ({}));
-        throw new Error(error?.message || "Failed to download file");
-      }
-
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = "create-fastly-app.zip";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-    },
+    mutationFn: downloadSaaSStarter,
     onMutate: () => {
       toast.loading("Preparing your download…", { id: "download-status" });
     },
     onSuccess: () => {
       toast.success("Download started!", { id: "download-status" });
+
+      // Refetch stats to update the download count immediately
+      queryClient.invalidateQueries({ queryKey: ["stats"] });
     },
     onError: (error: ApiError) => {
       console.error("Download failed:", error);
@@ -48,20 +39,27 @@ export const useDownload = () => {
 
 /**
  * Hook to fetch download statistics
+ * Returns query object with download count and loading state
  */
 export const useFetchStats = () => {
   return useQuery<StatsData, ApiError>({
     queryKey: ["stats"],
-    queryFn: async () => {
+    queryFn: async (): Promise<StatsData> => {
       try {
-        const response = await fetchStats();
+        const response: StatsResponse = await fetchStats();
+
+        // Verify data exists
+        if (!response || !response.data) {
+          throw new Error("Invalid stats response");
+        }
+
         return response.data;
       } catch (error) {
         console.error("Failed to fetch stats:", error);
         throw new Error("Failed to load statistics");
       }
     },
-    staleTime: 5 * 60 * 1000,
+    staleTime: 5 * 60 * 1000, // 5 minutes
     refetchOnWindowFocus: false,
     retry: 2,
   });
