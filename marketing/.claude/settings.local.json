@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm list:*)",
+      "Bash(pnpm install:*)",
+      "Bash(pnpm build:*)",
+      "Bash(powershell -Command \"Get-ItemProperty ''HKLM:\\\\SYSTEM\\\\CurrentControlSet\\\\Control\\\\Lsa'' -Name ''ForceGuest''\")",
+      "Bash(pnpm add:*)",
+      "Bash(pnpm --version:*)",
+      "Bash(TURBOPACK_SKIP_INSTALL=true pnpm build:*)"
+    ]
+  }
+}
