@@ -1,5 +1,86 @@
 [
   {
+    "version": "v1.4.0",
+    "date": "March 4, 2026",
+    "title": "Performance Optimization and Vercel Best Practices",
+    "description": "Applied Vercel and Next.js best practices across every API route, service, hook, and provider. Parallelized async work, deferred non-critical tasks with after(), added mutex-based token refresh, and eliminated redundant re-renders.",
+    "type": "improved",
+    "changes": [
+      {
+        "type": "improved",
+        "description": "Parallelized dbConnect() and request.json() with Promise.all across all API routes, reducing cold-start latency."
+      },
+      {
+        "type": "improved",
+        "description": "Deferred non-blocking work (verification emails, welcome emails, auth event logging) using Next.js after() to speed up response times."
+      },
+      {
+        "type": "fixed",
+        "description": "Fixed OAuth welcome email bug where welcome messages were sent on every login instead of only on first signup."
+      },
+      {
+        "type": "improved",
+        "description": "Parallelized GitHub OAuth user and emails API calls with Promise.all, and user profile + auth data queries in user-details endpoint."
+      },
+      {
+        "type": "improved",
+        "description": "Added mutex pattern to token refresh interceptor preventing concurrent 401 responses from triggering duplicate refresh requests."
+      },
+      {
+        "type": "improved",
+        "description": "Converted avatar upload hook from manual useCallback to useMutation with automatic cache invalidation via TanStack Query."
+      },
+      {
+        "type": "improved",
+        "description": "Replaced manual username availability check (useState + useEffect) with useQuery for built-in caching, deduplication, and stale-time control."
+      },
+      {
+        "type": "fixed",
+        "description": "Fixed cache race condition in useUpdateUserDetails and useChangeUsername by awaiting invalidateQueries before reading fresh cache."
+      },
+      {
+        "type": "fixed",
+        "description": "Fixed useDeleteUser hook that was logging users out even when account deletion failed."
+      },
+      {
+        "type": "improved",
+        "description": "Simplified useLogout by replacing identical onSuccess and onError handlers with a single onSettled callback."
+      },
+      {
+        "type": "improved",
+        "description": "Replaced useEffect-based provider initialization with lazy useState for synchronous cookie reads in useLastUsedProvider."
+      },
+      {
+        "type": "improved",
+        "description": "Hardened AuthProvider with stored user validation, reactive hasToken state, and cleanup on corrupt localStorage data."
+      },
+      {
+        "type": "improved",
+        "description": "Narrowed useEffect dependencies in FontProvider and profile form to primitives, preventing unnecessary re-renders from object references."
+      },
+      {
+        "type": "improved",
+        "description": "Added typed return values (ApiResponse<T>) to all service functions for end-to-end type safety."
+      },
+      {
+        "type": "improved",
+        "description": "Parallelized user data deletion (UserModel, UserSessionModel, UserAuthModel) with Promise.all in delete-user endpoint."
+      },
+      {
+        "type": "fixed",
+        "description": "Fixed Google OAuth token exchange using wrong client_secret value (was sending client ID instead of secret)."
+      },
+      {
+        "type": "fixed",
+        "description": "Fixed UploadThing avatar upload 500 error by passing JWT authorization header via useUploadThing headers callback."
+      },
+      {
+        "type": "improved",
+        "description": "Removed dead barrel export files (lib/auth/auth.ts, protected/components/index.tsx) that added bundle weight with zero consumers."
+      }
+    ]
+  },
+  {
     "version": "v1.3.0",
     "date": "December 6, 2025",
     "title": "Comprehensive Documentation with Fumadocs",
