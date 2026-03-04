@@ -28,9 +28,7 @@ export async function POST(request: NextRequest) {
   const requestId = crypto.randomUUID();
 
   try {
-    await dbConnect();
-
-    const authResult = await requireAuth(request);
+    const [, authResult] = await Promise.all([dbConnect(), requireAuth(request)]);
     if (!authResult.success) {
       return authResult.response;
     }
@@ -109,9 +107,7 @@ export async function GET(request: NextRequest) {
   const requestId = crypto.randomUUID();
 
   try {
-    await dbConnect();
-
-    const authResult = await requireAuth(request);
+    const [, authResult] = await Promise.all([dbConnect(), requireAuth(request)]);
     if (!authResult.success) {
       return authResult.response;
     }

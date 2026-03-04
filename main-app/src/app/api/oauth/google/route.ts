@@ -5,7 +5,7 @@ import dbConnect from '@/lib/config/db-connect';
 import { sendWelcomeEmail } from '@/mail-templates/email-service';
 import { UserAuthModel, UserModel } from '@/models/users';
 import { AuthMethod } from '@/types/user';
-import { type NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse, after } from 'next/server';
 
 // External API types - properties are defined by Google OAuth API
 interface GoogleUser {
@@ -54,7 +54,7 @@ export async function GET(request: NextRequest) {
       },
       body: new URLSearchParams({
         client_id: googleOAuth.clientId || '',
-        client_secret: googleOAuth.clientId || '',
+        client_secret: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_SECRET || '',
         code: code,
         grant_type: 'authorization_code',
         redirect_uri: googleOAuth.redirectUri || '',
@@ -112,6 +112,7 @@ export async function GET(request: NextRequest) {
 
     // Check if user already exists
     let userAuth = await UserAuthModel.findOne({ email: googleUser.email });
+    let isNewUser = false;
 
     if (userAuth) {
       // User exists, check if they used Google auth before
@@ -148,6 +149,8 @@ export async function GET(request: NextRequest) {
           username: googleUser.email.split('@')[0], // Use email prefix as username
           avatar: googleUser.picture,
         });
+
+        isNewUser = true;
       } catch (dbError) {
         console.error('Database error creating user:', dbError);
         throw dbError;
@@ -181,9 +184,11 @@ export async function GET(request: NextRequest) {
     redirectUrl.searchParams.set('lastName', userAuth.lastName || '');
     redirectUrl.searchParams.set('username', userProfile?.username || '');
 
-    // Send welcome email if new user
-    if (userAuth?.isVerified && userProfile) {
-      await sendWelcomeEmail(userAuth.email, userAuth.firstName || '');
+    // Send welcome email only for new users (non-blocking, after response)
+    if (isNewUser) {
+      after(async () => {
+        await sendWelcomeEmail(userAuth.email, userAuth.firstName || '');
+      });
     }
 
     return NextResponse.redirect(redirectUrl.toString());

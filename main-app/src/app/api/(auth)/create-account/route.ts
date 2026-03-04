@@ -14,7 +14,7 @@ import { sanitizeEmail, validateAndSanitize } from "@/lib/utils/validators";
 import { sendVerificationEmail } from "@/mail-templates";
 import { UserAuthModel } from "@/models/users";
 import { createAccountSchema } from "@/zod/authValidation";
-import type { NextRequest } from "next/server";
+import { type NextRequest, after } from "next/server";
 
 /**
  * POST /api/create-account
@@ -26,10 +26,7 @@ export async function POST(request: NextRequest) {
   const requestId = crypto.randomUUID();
 
   try {
-    await dbConnect();
-
-    // Parse and validate request body
-    const body = await request.json();
+    const [, body] = await Promise.all([dbConnect(), request.json()]);
     const { firstName, lastName, email, password, confirmPassword } =
       validateAndSanitize(body, createAccountSchema);
     const sanitizedEmail = sanitizeEmail(email);
@@ -78,15 +75,15 @@ export async function POST(request: NextRequest) {
       authMethod: "email",
     });
 
-    // Send verification email
-    await sendVerificationEmail(
-      sanitizedEmail,
-      trimmedFirstName,
-      verificationCode,
-    );
-
-    // Log signup event
-    logAuthEvent("signup", newUser._id.toString(), { provider: "email" });
+    // Send verification email (non-blocking, after response)
+    after(async () => {
+      await sendVerificationEmail(
+        sanitizedEmail,
+        trimmedFirstName,
+        verificationCode,
+      );
+      logAuthEvent("signup", newUser._id.toString(), { provider: "email" });
+    });
 
     // Return success response
     return sendCreated(

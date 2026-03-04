@@ -130,12 +130,8 @@ export const useLogout = () => {
         error: (error: unknown) => getErrorMessage(error),
       });
     },
-    onSuccess: () => {
-      logout();
-      queryClient.clear(); // Clear all cached queries
-    },
-    onError: () => {
-      // Even if logout API fails, we should still clear local state
+    // Always clear local state, whether API succeeds or fails
+    onSettled: () => {
       logout();
       queryClient.clear();
     },

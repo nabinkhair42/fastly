@@ -13,15 +13,13 @@ import { sanitizeEmail, validateAndSanitize } from "@/lib/utils/validators";
 import { sendVerificationEmail } from "@/mail-templates";
 import { UserAuthModel } from "@/models/users";
 import { resendVerificationEmailSchema } from "@/zod/authValidation";
-import type { NextRequest } from "next/server";
+import { type NextRequest, after } from "next/server";
 
 export async function POST(req: NextRequest) {
   const requestId = crypto.randomUUID();
 
   try {
-    await dbConnect();
-
-    const body = await req.json();
+    const [, body] = await Promise.all([dbConnect(), req.json()]);
     const { email } = validateAndSanitize(body, resendVerificationEmailSchema);
     const sanitizedEmail = sanitizeEmail(email);
 
@@ -45,12 +43,14 @@ export async function POST(req: NextRequest) {
     userAuth.verificationCodeExpiresAt = verificationCodeExpiresAt;
     await userAuth.save();
 
-    // Send verification email
-    await sendVerificationEmail(
-      userAuth.email,
-      userAuth.firstName,
-      verificationCode,
-    );
+    // Send verification email (non-blocking, after response)
+    after(async () => {
+      await sendVerificationEmail(
+        userAuth.email,
+        userAuth.firstName,
+        verificationCode,
+      );
+    });
 
     return sendSuccess(
       "Verification code sent to email",

@@ -1,6 +1,7 @@
 import api from "@/lib/config/axios";
 import { API_ENDPOINTS } from "@/lib/config/endpoints";
 import type {
+  ApiResponse,
   AuthResponse,
   CreateAccountRequest,
   EmailVerificationRequest,
@@ -19,7 +20,7 @@ export const authService = {
   },
 
   // Create new account
-  createAccount: async (data: CreateAccountRequest) => {
+  createAccount: async (data: CreateAccountRequest): Promise<ApiResponse> => {
     const response = await api.post(API_ENDPOINTS.AUTH.CREATE_ACCOUNT, data);
     return response.data;
   },
@@ -36,7 +37,7 @@ export const authService = {
   },
 
   // Resend verification email
-  resendVerification: async (email: string) => {
+  resendVerification: async (email: string): Promise<ApiResponse> => {
     const response = await api.post(
       API_ENDPOINTS.AUTH.EMAIL_VERIFICATION_RESEND,
       {
@@ -47,13 +48,13 @@ export const authService = {
   },
 
   // Forgot password
-  forgotPassword: async (data: ForgotPasswordRequest) => {
+  forgotPassword: async (data: ForgotPasswordRequest): Promise<ApiResponse> => {
     const response = await api.post(API_ENDPOINTS.AUTH.FORGOT_PASSWORD, data);
     return response.data;
   },
 
   // Reset password
-  resetPassword: async (data: ResetPasswordRequest) => {
+  resetPassword: async (data: ResetPasswordRequest): Promise<ApiResponse> => {
     const response = await api.post(API_ENDPOINTS.AUTH.RESET_PASSWORD, data);
     return response.data;
   },
@@ -65,7 +66,7 @@ export const authService = {
   },
 
   // Logout
-  logout: async () => {
+  logout: async (): Promise<ApiResponse> => {
     const response = await api.post(API_ENDPOINTS.AUTH.LOGOUT);
     return response.data;
   },

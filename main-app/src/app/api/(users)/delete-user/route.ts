@@ -67,10 +67,12 @@ export async function DELETE(request: NextRequest) {
       }
     }
 
-    // Delete all user data
-    await UserModel.deleteOne({ userAuth: userAuth._id });
-    await UserSessionModel.deleteMany({ userAuth: userAuth._id });
-    await UserAuthModel.findByIdAndDelete(userAuth._id);
+    // Delete all user data in parallel
+    await Promise.all([
+      UserModel.deleteOne({ userAuth: userAuth._id }),
+      UserSessionModel.deleteMany({ userAuth: userAuth._id }),
+      UserAuthModel.findByIdAndDelete(userAuth._id),
+    ]);
 
     // Log account deletion
     logAuthEvent("logout", userAuth._id.toString(), {

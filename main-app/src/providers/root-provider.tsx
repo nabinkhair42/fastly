@@ -54,20 +54,22 @@ function FontProvider({ children }: FontProviderProps) {
   const { setTheme } = useTheme();
   const [font, setFont] = useState<FontType>(DEFAULT_FONT);
 
+  // Extract primitive values for stable dependencies
+  const userTheme = userDetails?.data?.user?.preferences?.theme;
+  const userFont = userDetails?.data?.user?.preferences?.font;
+
   // Sync preferences with database
   useEffect(() => {
-    if (isAuthenticated && userDetails?.data?.user?.preferences) {
-      const { theme, font: dbFont } = userDetails.data.user.preferences;
-
-      if (theme) {
-        setTheme(theme);
+    if (isAuthenticated) {
+      if (userTheme) {
+        setTheme(userTheme);
       }
 
-      if (dbFont && ["sans", "serif", "mono", "system"].includes(dbFont)) {
-        setFont(dbFont as FontType);
+      if (userFont && ["sans", "serif", "mono", "system"].includes(userFont)) {
+        setFont(userFont as FontType);
       }
     }
-  }, [isAuthenticated, userDetails, setTheme]);
+  }, [isAuthenticated, userTheme, userFont, setTheme]);
 
   const value = useMemo(() => ({ font, setFont }), [font]);
 

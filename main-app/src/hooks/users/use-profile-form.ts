@@ -12,6 +12,7 @@ import {
 import { userService } from "@/services/user-service";
 import type { UpdateUserDetailsRequest } from "@/types/api";
 import { profileFormInputSchema } from "@/zod/usersUpdate";
+import { useQuery } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
 type ProfileFormValues = z.infer<typeof profileFormInputSchema>;
@@ -61,11 +62,34 @@ export function useProfileForm() {
   const changeUsername = useChangeUsername();
 
   const [usernameValue, setUsernameValue] = useState("");
-  const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(
-    null,
-  );
-  const [checkingUsername, setCheckingUsername] = useState(false);
   const debouncedUsername = useDebounce(usernameValue, 500);
+
+  // Derive primitive values for dependency tracking
+  const currentUsername = userDetails?.data?.user?.username ?? "";
+  const hasChangedUsername = userDetails?.data?.user?.hasChangedUsername ?? false;
+
+  // Use TanStack Query for username availability check
+  const shouldCheckUsername =
+    debouncedUsername.length >= 3 &&
+    debouncedUsername !== currentUsername &&
+    !hasChangedUsername;
+
+  const usernameCheckQuery = useQuery({
+    queryKey: ["username-availability", debouncedUsername],
+    queryFn: () => userService.checkUsernameAvailability(debouncedUsername),
+    enabled: shouldCheckUsername,
+    retry: false,
+    staleTime: 30 * 1000, // Cache availability checks for 30s
+  });
+
+  const usernameAvailable = !shouldCheckUsername
+    ? null
+    : usernameCheckQuery.isSuccess
+      ? true
+      : usernameCheckQuery.isError
+        ? false
+        : null;
+  const checkingUsername = usernameCheckQuery.isFetching;
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormInputSchema),
@@ -87,15 +111,21 @@ export function useProfileForm() {
   });
 
   // Update form when user details are loaded
+  // Use primitive values as dependencies to avoid unnecessary re-renders
+  const userId = userDetails?.data?.user?._id;
+  const userFirstName = userDetails?.data?.user?.firstName ?? "";
+  const userLastName = userDetails?.data?.user?.lastName ?? "";
+  const userBio = userDetails?.data?.user?.bio ?? "";
+
   useEffect(() => {
-    if (userDetails?.data?.user) {
+    if (userId && userDetails?.data?.user) {
       const user = userDetails.data.user;
       const initialUsername = user.username || "";
       form.reset({
-        firstName: user.firstName || "",
-        lastName: user.lastName || "",
+        firstName: userFirstName,
+        lastName: userLastName,
         username: initialUsername,
-        bio: user.bio || "",
+        bio: userBio,
         socialAccounts:
           user.socialAccounts?.map((account) => ({
             provider: account.provider || "website",
@@ -106,46 +136,7 @@ export function useProfileForm() {
       });
       setUsernameValue(initialUsername);
     }
-  }, [userDetails, form]);
-
-  // Check username availability when debounced value changes
-  useEffect(() => {
-    if (debouncedUsername && userDetails?.data?.user) {
-      const currentUsername = userDetails.data.user.username;
-      const hasChangedUsername = userDetails.data.user.hasChangedUsername;
-
-      // Don't check if username hasn't changed or if user has already changed username
-      if (debouncedUsername === currentUsername || hasChangedUsername) {
-        setUsernameAvailable(null);
-        return;
-      }
-
-      // Don't check if username is empty or too short
-      if (debouncedUsername.length < 3) {
-        setUsernameAvailable(null);
-        return;
-      }
-
-      // Reset states before checking
-      setCheckingUsername(true);
-      setUsernameAvailable(null);
-
-      // Use the service directly instead of the mutation hook
-      toast.promise(userService.checkUsernameAvailability(debouncedUsername), {
-        loading: "Checking username availability...",
-        success: () => {
-          setUsernameAvailable(true);
-          setCheckingUsername(false);
-          return "Username is available!";
-        },
-        error: () => {
-          setUsernameAvailable(false);
-          setCheckingUsername(false);
-          return "Username is not available";
-        },
-      });
-    }
-  }, [debouncedUsername, userDetails]);
+  }, [userId, userFirstName, userLastName, userBio, form, userDetails]);
 
   const updateOtherDetails = (data: ProfileFormValues) => {
     // Transform social accounts to the expected format
@@ -208,7 +199,6 @@ export function useProfileForm() {
   };
 
   const user = userDetails?.data?.user;
-  const hasChangedUsername = user?.hasChangedUsername || false;
   const isSubmitDisabled =
     updateUserDetails.isPending ||
     changeUsername.isPending ||
