@@ -1,52 +1,37 @@
-import { Button } from "@/components/ui/button";
-import { SiGithub } from "react-icons/si";
-import { Suspense } from "react";
-
-async function StarsCount() {
-  try {
-    const data = await fetch("https://api.github.com/repos/nabinkhair42/fastly", {
-      headers: {
-        Accept: "application/vnd.github.v3+json",
-        ...(process.env.GITHUB_TOKEN && {
-          Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
-        }),
-      },
-      next: { revalidate: 86400 },
-      cache: "force-cache",
-    });
-
-    if (!data.ok) {
-      throw new Error(`GitHub API error: ${data.status}`);
-    }
-
-    const json = await data.json();
-
-    return (
-      <span className="text-muted-foreground w-8 text-xs tabular-nums">
-        {json.stargazers_count}
-      </span>
-    );
-  } catch (error) {
-    console.error("Failed to fetch GitHub stars:", error);
-    return (
-      <span className="text-muted-foreground w-8 text-xs tabular-nums">
-        --
-      </span>
-    );
-  }
-}
+'use client';
+import { Button } from '@/components/ui/button';
+import { SiGithub } from 'react-icons/si';
+import { useEffect, useState } from 'react';
 
 export const GitHubButton = () => {
+  const [stars, setStars] = useState<number | null>(null);
+
+  useEffect(() => {
+    const fetchStars = async () => {
+      try {
+        const res = await fetch('https://api.github.com/repos/nabinkhair42/fastly', {
+          headers: { Accept: 'application/vnd.github.v3+json' },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setStars(data.stargazers_count);
+        }
+      } catch {
+        // Silently fail - stars will show as "--"
+      }
+    };
+    fetchStars();
+  }, []);
+
   return (
     <Button
-      variant={"outline"}
+      variant={'outline'}
       size="sm"
       className="rounded-full sm:inline-flex shadow-none"
+      onClick={() => window.open('https://github.com/nabinkhair42/fastly', '_blank')}
     >
       <SiGithub />
-      <Suspense fallback={<span className="text-muted-foreground w-8 text-xs tabular-nums">--</span>}>
-        <StarsCount />
-      </Suspense>
+      <span className="text-muted-foreground text-xs tabular-nums">{stars ?? '--'}</span>
     </Button>
   );
 };
