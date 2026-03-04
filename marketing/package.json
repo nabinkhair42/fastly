@@ -31,6 +31,7 @@
     "fumadocs-mdx": "^14.2.9",
     "fumadocs-ui": "^16.6.9",
     "install": "^0.13.0",
+    "jszip": "^3.10.1",
     "lucide-react": "^0.577.0",
     "mermaid": "^11.12.3",
     "mongoose": "^9.2.4",
