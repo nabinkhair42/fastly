@@ -45,14 +45,10 @@ const STORAGE_KEYS = {
   SESSION_ID: "sessionId",
 } as const;
 
-const API_ENDPOINTS = {
-  SESSIONS: "/api/sessions",
-  LOGOUT: "/api/auth/logout",
-} as const;
-
 export default function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<AuthenticatedUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasToken, setHasToken] = useState(false);
 
   // Initialize auth state from localStorage
   useEffect(() => {
@@ -62,11 +58,20 @@ export default function AuthProvider({ children }: AuthProviderProps) {
         const storedUser = localStorage.getItem(STORAGE_KEYS.USER);
 
         if (accessToken && storedUser) {
-          setUser(JSON.parse(storedUser));
+          const parsed = JSON.parse(storedUser);
+          // Basic validation that parsed data has required fields
+          if (parsed && typeof parsed === "object" && parsed.email) {
+            setUser(parsed);
+            setHasToken(true);
+          } else {
+            tokenManager.clearTokens();
+            localStorage.removeItem(STORAGE_KEYS.USER);
+          }
         }
       } catch (error) {
         console.error("Failed to initialize auth:", error);
         tokenManager.clearTokens();
+        localStorage.removeItem(STORAGE_KEYS.USER);
       } finally {
         setIsLoading(false);
       }
@@ -88,45 +93,17 @@ export default function AuthProvider({ children }: AuthProviderProps) {
         localStorage.setItem(STORAGE_KEYS.SESSION_ID, options.sessionId);
       }
       setUser(userData);
+      setHasToken(true);
     },
     [],
   );
 
   const logout = useCallback(() => {
-    const accessToken = tokenManager.getAccessToken();
-    const sessionId = tokenManager.getSessionId();
-
     tokenManager.clearTokens();
     setUser(null);
-
-    // Revoke session
-    if (sessionId && accessToken) {
-      fetch(API_ENDPOINTS.SESSIONS, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json",
-          "X-Session-Id": sessionId,
-        },
-        body: JSON.stringify({ sessionId }),
-      }).catch(() => {
-        // Silently fail - user is already logged out locally
-      });
-    }
-
-    // Invalidate tokens on server
-    if (accessToken) {
-      fetch(API_ENDPOINTS.LOGOUT, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json",
-          ...(sessionId ? { "X-Session-Id": sessionId } : {}),
-        },
-      }).catch(() => {
-        // Silently fail - user is already logged out locally
-      });
-    }
+    setHasToken(false);
+    localStorage.removeItem(STORAGE_KEYS.USER);
+    localStorage.removeItem(STORAGE_KEYS.SESSION_ID);
   }, []);
 
   const updateUser = useCallback((updatedUser: AuthenticatedUser) => {
@@ -135,8 +112,8 @@ export default function AuthProvider({ children }: AuthProviderProps) {
   }, []);
 
   const isAuthenticated = useMemo(
-    () => !!user && !!tokenManager.getAccessToken(),
-    [user],
+    () => !!user && hasToken,
+    [user, hasToken],
   );
 
   const value: AuthContextType = useMemo(

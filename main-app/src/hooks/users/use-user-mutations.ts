@@ -44,22 +44,23 @@ export const useUpdateUserDetails = () => {
         error: (response) => response.message,
       });
     },
-    onSuccess: () => {
-      // Invalidate and refetch user details
-      queryClient.invalidateQueries({ queryKey: userQueryKeys.userDetails });
+    onSuccess: async () => {
+      // Wait for refetch to complete so cache is fresh
+      await queryClient.invalidateQueries({ queryKey: userQueryKeys.userDetails });
 
-      // Update auth context if user data changed
+      // Now read the fresh cache
       const cachedUserDetails = queryClient.getQueryData(
         userQueryKeys.userDetails,
       ) as UserDetailsResponse;
       if (cachedUserDetails?.data?.user) {
+        const user = cachedUserDetails.data.user;
         updateUser({
-          userId: cachedUserDetails.data.user._id || "",
-          firstName: cachedUserDetails.data.user.firstName,
-          lastName: cachedUserDetails.data.user.lastName,
-          email: cachedUserDetails.data.user.email,
-          username: cachedUserDetails.data.user.username,
-          preferences: cachedUserDetails.data.user.preferences,
+          userId: user._id || "",
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          username: user.username,
+          preferences: user.preferences,
         });
       }
     },
@@ -79,13 +80,13 @@ export const useChangeUsername = (onSuccessCallback?: () => void) => {
         error: (response) => response.message,
       });
     },
-    onSuccess: async (response, variables) => {
-      // Invalidate and refetch user details
+    onSuccess: async (_response, variables) => {
+      // Wait for refetch to complete so cache is fresh
       await queryClient.invalidateQueries({
         queryKey: userQueryKeys.userDetails,
       });
 
-      // Update auth context with new username and hasChangedUsername flag
+      // Now read the fresh cache
       const cachedUserDetails = queryClient.getQueryData(
         userQueryKeys.userDetails,
       ) as UserDetailsResponse;
@@ -105,14 +106,6 @@ export const useChangeUsername = (onSuccessCallback?: () => void) => {
         onSuccessCallback();
       }
     },
-  });
-};
-
-// Check if username is available
-export const useCheckUsernameAvailability = () => {
-  return useMutation({
-    mutationFn: (username: string) =>
-      userService.checkUsernameAvailability(username),
   });
 };
 
@@ -149,14 +142,10 @@ export const useDeleteUser = () => {
     },
     onSuccess: () => {
       logout();
-      queryClient.invalidateQueries({ queryKey: userQueryKeys.userDetails });
+      queryClient.clear();
       router.push("/");
     },
-    onError: () => {
-      // Even if delete API fails, we should still clear local state
-      logout();
-      queryClient.clear();
-    },
+    // Don't logout on error - the account still exists if delete failed
   });
 };
 

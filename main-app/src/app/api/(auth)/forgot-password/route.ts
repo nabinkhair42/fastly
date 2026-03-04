@@ -14,7 +14,7 @@ import { sendForgotPasswordEmail } from "@/mail-templates";
 import { UserAuthModel } from "@/models/users";
 import { AuthMethod } from "@/types/user";
 import { forgotPasswordSchema } from "@/zod/authValidation";
-import type { NextRequest } from "next/server";
+import { type NextRequest, after } from "next/server";
 
 /**
  * POST /api/(auth)/forgot-password
@@ -26,10 +26,7 @@ export async function POST(request: NextRequest) {
   const requestId = crypto.randomUUID();
 
   try {
-    await dbConnect();
-
-    // Parse and validate request body
-    const body = await request.json();
+    const [, body] = await Promise.all([dbConnect(), request.json()]);
     const { email } = validateAndSanitize(body, forgotPasswordSchema);
     const sanitizedEmail = sanitizeEmail(email);
 
@@ -65,16 +62,16 @@ export async function POST(request: NextRequest) {
     userAuth.resetPasswordTokenExpiresAt = resetPasswordTokenExpiresAt;
     await userAuth.save();
 
-    // Send reset password email
-    await sendForgotPasswordEmail(
-      userAuth.email,
-      userAuth.firstName,
-      resetPasswordToken,
-    );
-
-    // Log event
-    logAuthEvent("failed_login", userAuth._id.toString(), {
-      reason: "password_reset_requested",
+    // Send reset password email (non-blocking, after response)
+    after(async () => {
+      await sendForgotPasswordEmail(
+        userAuth.email,
+        userAuth.firstName,
+        resetPasswordToken,
+      );
+      logAuthEvent("failed_login", userAuth._id.toString(), {
+        reason: "password_reset_requested",
+      });
     });
 
     // Return success response

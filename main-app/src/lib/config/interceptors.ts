@@ -62,42 +62,59 @@ const handleSessionRevocation = (message?: string): void => {
 
 /**
  * Attempt to refresh access token
+ * Uses a mutex to prevent concurrent 401s from triggering multiple refresh calls
  */
+let refreshPromise: Promise<string | null> | null = null;
+
 const refreshAccessToken = async (): Promise<string | null> => {
-  const refreshToken = tokenManager.getRefreshToken();
-  if (!refreshToken) {
-    return null;
+  // If a refresh is already in-flight, reuse its promise
+  if (refreshPromise) {
+    return refreshPromise;
   }
 
-  try {
-    const sessionId = tokenManager.getSessionId();
-    const response = await axios.post(
-      `/api${API_ENDPOINTS.AUTH.REFRESH_TOKEN}`,
-      { refreshToken },
-      {
-        headers: sessionId
-          ? {
-              "X-Session-Id": sessionId,
-            }
-          : undefined,
-      },
-    );
-
-    const { accessToken, refreshToken: newRefreshToken } = response.data.data;
-    const existingSessionId = tokenManager.getSessionId();
-    tokenManager.setTokens(
-      accessToken,
-      newRefreshToken,
-      existingSessionId ?? undefined,
-    );
-
-    return accessToken;
-  } catch {
-    tokenManager.clearTokens();
-    if (typeof window !== "undefined") {
-      window.location.href = "/log-in";
+  refreshPromise = (async () => {
+    const refreshToken = tokenManager.getRefreshToken();
+    if (!refreshToken) {
+      return null;
     }
-    return null;
+
+    try {
+      const sessionId = tokenManager.getSessionId();
+      const response = await axios.post(
+        `/api${API_ENDPOINTS.AUTH.REFRESH_TOKEN}`,
+        { refreshToken },
+        {
+          headers: sessionId
+            ? {
+                "X-Session-Id": sessionId,
+              }
+            : undefined,
+        },
+      );
+
+      const { accessToken, refreshToken: newRefreshToken } =
+        response.data.data;
+      const existingSessionId = tokenManager.getSessionId();
+      tokenManager.setTokens(
+        accessToken,
+        newRefreshToken,
+        existingSessionId ?? undefined,
+      );
+
+      return accessToken;
+    } catch {
+      tokenManager.clearTokens();
+      if (typeof window !== "undefined") {
+        window.location.href = "/log-in";
+      }
+      return null;
+    }
+  })();
+
+  try {
+    return await refreshPromise;
+  } finally {
+    refreshPromise = null;
   }
 };
 

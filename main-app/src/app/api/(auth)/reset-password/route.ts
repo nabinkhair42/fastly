@@ -24,10 +24,7 @@ export async function POST(request: NextRequest) {
   const requestId = crypto.randomUUID();
 
   try {
-    await dbConnect();
-
-    // Parse and validate request body
-    const body = await request.json();
+    const [, body] = await Promise.all([dbConnect(), request.json()]);
     const { email, resetToken, password, confirmPassword } =
       validateAndSanitize(body, resetPasswordRequestSchema);
     const sanitizedEmail = sanitizeEmail(email);

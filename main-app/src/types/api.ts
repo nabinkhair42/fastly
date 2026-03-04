@@ -6,6 +6,16 @@ import type {
 } from "@/types/user";
 
 // ============================================
+// Generic API Response
+// ============================================
+
+export interface ApiResponse<T = unknown> {
+  success: boolean;
+  message: string;
+  data?: T;
+}
+
+// ============================================
 // Authentication API Types
 // ============================================
 

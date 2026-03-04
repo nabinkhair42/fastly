@@ -13,7 +13,7 @@ import { sanitizeEmail, validateAndSanitize } from "@/lib/utils/validators";
 import { sendWelcomeEmail } from "@/mail-templates";
 import { UserAuthModel, UserModel } from "@/models/users";
 import { verifyEmailSchema } from "@/zod/authValidation";
-import type { NextRequest } from "next/server";
+import { type NextRequest, after } from "next/server";
 
 /**
  * POST /api/(auth)/email-verification
@@ -25,10 +25,7 @@ export async function POST(request: NextRequest) {
   const requestId = crypto.randomUUID();
 
   try {
-    await dbConnect();
-
-    // Parse and validate request body
-    const body = await request.json();
+    const [, body] = await Promise.all([dbConnect(), request.json()]);
     const { verificationCode, email } = validateAndSanitize(
       body,
       verifyEmailSchema,
@@ -107,12 +104,12 @@ export async function POST(request: NextRequest) {
       request,
     });
 
-    // Send welcome email
-    await sendWelcomeEmail(userAuth.email, userAuth.firstName);
-
-    // Log successful verification
-    logAuthEvent("signup", userAuth._id.toString(), {
-      provider: userAuth.authMethod,
+    // Send welcome email (non-blocking, after response)
+    after(async () => {
+      await sendWelcomeEmail(userAuth.email, userAuth.firstName);
+      logAuthEvent("signup", userAuth._id.toString(), {
+        provider: userAuth.authMethod,
+      });
     });
 
     // Return success response

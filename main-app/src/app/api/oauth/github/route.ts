@@ -5,7 +5,7 @@ import dbConnect from '@/lib/config/db-connect';
 import { sendWelcomeEmail } from '@/mail-templates/email-service';
 import { UserAuthModel, UserModel } from '@/models/users';
 import { AuthMethod } from '@/types/user';
-import { type NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse, after } from 'next/server';
 
 // External API types - properties are defined by GitHub OAuth API
 interface GitHubUser {
@@ -82,13 +82,21 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Get user data from GitHub
-    const userResponse = await fetch('https://api.github.com/user', {
-      headers: {
-        Authorization: `Bearer ${tokenData.access_token}`,
-        Accept: 'application/vnd.github.v3+json',
-      },
-    });
+    // Get user data and emails from GitHub in parallel
+    const [userResponse, emailsResponse] = await Promise.all([
+      fetch('https://api.github.com/user', {
+        headers: {
+          Authorization: `Bearer ${tokenData.access_token}`,
+          Accept: 'application/vnd.github.v3+json',
+        },
+      }),
+      fetch('https://api.github.com/user/emails', {
+        headers: {
+          Authorization: `Bearer ${tokenData.access_token}`,
+          Accept: 'application/vnd.github.v3+json',
+        },
+      }),
+    ]);
 
     if (!userResponse.ok) {
       console.error('GitHub user data fetch failed:', await userResponse.text());
@@ -98,14 +106,6 @@ export async function GET(request: NextRequest) {
     }
 
     const githubUser: GitHubUser = await userResponse.json();
-
-    // Get user's email from GitHub
-    const emailsResponse = await fetch('https://api.github.com/user/emails', {
-      headers: {
-        Authorization: `Bearer ${tokenData.access_token}`,
-        Accept: 'application/vnd.github.v3+json',
-      },
-    });
 
     let primaryEmail = githubUser.email;
     if (emailsResponse.ok) {
@@ -124,6 +124,7 @@ export async function GET(request: NextRequest) {
 
     // Check if user already exists
     let userAuth = await UserAuthModel.findOne({ email: primaryEmail });
+    let isNewUser = false;
 
     if (userAuth) {
       // User exists, check if they used GitHub auth before
@@ -158,6 +159,8 @@ export async function GET(request: NextRequest) {
         username: githubUser.login,
         avatar: githubUser.avatar_url,
       });
+
+      isNewUser = true;
     }
 
     // Get user profile data
@@ -187,9 +190,11 @@ export async function GET(request: NextRequest) {
     redirectUrl.searchParams.set('lastName', userAuth.lastName || '');
     redirectUrl.searchParams.set('username', userProfile?.username || '');
 
-    // Send welcome email if new user
-    if (userAuth?.isVerified && userProfile) {
-      await sendWelcomeEmail(userAuth.email, userAuth.firstName || '');
+    // Send welcome email only for new users (non-blocking, after response)
+    if (isNewUser) {
+      after(async () => {
+        await sendWelcomeEmail(userAuth.email, userAuth.firstName || '');
+      });
     }
     return NextResponse.redirect(redirectUrl.toString());
   } catch (error) {

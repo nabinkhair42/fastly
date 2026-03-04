@@ -40,19 +40,19 @@ export async function GET(request: NextRequest) {
   const requestId = crypto.randomUUID();
 
   try {
-    await dbConnect();
-
-    const authResult = await requireAuth(request);
+    const [, authResult] = await Promise.all([dbConnect(), requireAuth(request)]);
     if (!authResult.success) {
       return authResult.response;
     }
 
-    const user = await UserModel.findOne({ userAuth: authResult.user?.userId });
+    // Fetch user profile and auth data in parallel
+    const [user, userAuth] = await Promise.all([
+      UserModel.findOne({ userAuth: authResult.user?.userId }),
+      UserAuthModel.findOne({ _id: authResult.user?.userId }),
+    ]);
     if (!user) {
       return sendNotFound("User profile not found", requestId);
     }
-
-    const userAuth = await UserAuthModel.findOne({ _id: user.userAuth });
 
     return sendSuccess(
       "User details fetched successfully",
@@ -96,9 +96,7 @@ export async function POST(request: NextRequest) {
   const requestId = crypto.randomUUID();
 
   try {
-    await dbConnect();
-
-    const authResult = await requireAuth(request);
+    const [, authResult] = await Promise.all([dbConnect(), requireAuth(request)]);
     if (!authResult.success) {
       return authResult.response;
     }
